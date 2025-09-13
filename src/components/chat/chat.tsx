@@ -16,7 +16,7 @@ import { toast } from "sonner";
 import ChatBottombar from "@/components/chat/chat-bottombar";
 import ChatLanding from "@/components/chat/chat-landing";
 import ChatMessageContent from "@/components/chat/chat-message-content";
-import { Info } from "lucide-react";
+import { Info, Copy } from "lucide-react";
 import HelperBoost from "./HelperBoost";
 
 // Message type definition
@@ -164,49 +164,111 @@ const MessageInfoDialog = ({
   isOpen: boolean;
   onClose: () => void;
 }) => {
-  if (!isOpen) return null;
+  if (!isOpen || !message) return null;
+
+  const formatDate = (date: Date) => {
+    return date.toLocaleString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    });
+  };
+
+  const getMessageStats = (content: string) => {
+    const words = content.trim().split(/\s+/).length;
+    const characters = content.length;
+    const charactersNoSpaces = content.replace(/\s/g, "").length;
+    const readingTime = Math.ceil(words / 200); // Average reading speed
+
+    return { words, characters, charactersNoSpaces, readingTime };
+  };
+
+  const stats = getMessageStats(message.content);
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
       onClick={onClose}
     >
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="from-background to-background/95 border-border/50 mx-4 max-w-sm rounded-2xl border bg-gradient-to-br p-5 shadow-lg"
+        className="from-background to-background/95 border-border/50 mx-4 max-w-lg rounded-2xl border bg-gradient-to-br p-6 shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-foreground text-base font-semibold">
-            Message Info
+        <div className="mb-6 flex items-center justify-between">
+          <h3 className="text-foreground text-lg font-semibold">
+            Message Details
           </h3>
           <button
             onClick={onClose}
-            className="text-muted-foreground hover:text-foreground hover:bg-accent/10 rounded-full p-1 transition-colors"
+            className="text-muted-foreground hover:text-foreground hover:bg-accent/10 rounded-full p-2 transition-colors"
           >
-            ×
+            ✕
           </button>
         </div>
-        <div className="space-y-3">
-          <div className="border-border/30 flex items-center justify-between border-b py-2">
-            <span className="text-muted-foreground text-sm">From</span>
-            <span className="text-sm font-medium">
-              {message.role === "assistant" ? "Siraj Ahmed" : "You"}
-            </span>
+
+        <div className="space-y-4">
+          {/* Message Preview */}
+          <div className="border-border/30 rounded-lg border bg-muted/30 p-3">
+            <p className="text-sm text-muted-foreground mb-2">Preview:</p>
+            <p className="text-sm text-foreground line-clamp-3">
+              {message.content}
+            </p>
           </div>
-          <div className="border-border/30 flex items-center justify-between border-b py-2">
-            <span className="text-muted-foreground text-sm">Time</span>
-            <span className="text-sm font-medium">
-              {message.timestamp.toLocaleString()}
-            </span>
+
+          {/* Message Stats */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="border-border/30 flex flex-col items-center rounded-lg border bg-muted/20 p-3">
+              <span className="text-2xl font-bold text-primary">
+                {stats.words}
+              </span>
+              <span className="text-xs text-muted-foreground">Words</span>
+            </div>
+            <div className="border-border/30 flex flex-col items-center rounded-lg border bg-muted/20 p-3">
+              <span className="text-2xl font-bold text-primary">
+                {stats.characters}
+              </span>
+              <span className="text-xs text-muted-foreground">Characters</span>
+            </div>
+            <div className="border-border/30 flex flex-col items-center rounded-lg border bg-muted/20 p-3">
+              <span className="text-2xl font-bold text-primary">
+                {stats.charactersNoSpaces}
+              </span>
+              <span className="text-xs text-muted-foreground">No Spaces</span>
+            </div>
+            <div className="border-border/30 flex flex-col items-center rounded-lg border bg-muted/20 p-3">
+              <span className="text-2xl font-bold text-primary">
+                {stats.readingTime}m
+              </span>
+              <span className="text-xs text-muted-foreground">Read Time</span>
+            </div>
           </div>
-          <div className="flex items-center justify-between py-2">
-            <span className="text-muted-foreground text-sm">Length</span>
-            <span className="text-sm font-medium">
-              {message.content.length} characters
-            </span>
+
+          {/* Message Info */}
+          <div className="space-y-3">
+            <div className="border-border/30 flex items-center justify-between border-b py-2">
+              <span className="text-muted-foreground text-sm">From</span>
+              <span className="text-sm font-medium">
+                {message.role === "assistant" ? "Siraj Ahmed" : "You"}
+              </span>
+            </div>
+            <div className="border-border/30 flex items-center justify-between border-b py-2">
+              <span className="text-muted-foreground text-sm">Sent</span>
+              <span className="text-sm font-medium">
+                {formatDate(message.timestamp)}
+              </span>
+            </div>
+            <div className="flex items-center justify-between py-2">
+              <span className="text-muted-foreground text-sm">Message ID</span>
+              <span className="text-xs font-mono text-muted-foreground">
+                {message.id.substring(0, 8)}...
+              </span>
+            </div>
           </div>
         </div>
       </motion.div>
@@ -337,6 +399,27 @@ const Chat = () => {
 
   // In-memory storage for conversation
   const conversationStorageRef = useRef<Message[]>([]);
+
+  // Copy message content to clipboard
+  const copyToClipboard = useCallback(async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast.success("Copied to clipboard!");
+    } catch (err) {
+      // Fallback for older browsers
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      document.body.appendChild(textArea);
+      textArea.select();
+      try {
+        document.execCommand("copy");
+        toast.success("Copied to clipboard!");
+      } catch (fallbackErr) {
+        toast.error("Failed to copy text");
+      }
+      document.body.removeChild(textArea);
+    }
+  }, []);
 
   // Generate unique ID for messages
   const generateId = useCallback(
@@ -809,7 +892,7 @@ const Chat = () => {
 
         {/* Messages Area */}
         <div className="flex-1 overflow-hidden">
-          <div className="h-full overflow-y-auto px-4 py-6">
+          <div className="h-full overflow-y-auto px-4 pt-10 pb-6 scrollbar-hide">
             <div className="mx-auto max-w-4xl">
               <AnimatePresence mode="wait">
                 {isEmptyState ? (
@@ -845,20 +928,21 @@ const Chat = () => {
                             className={`flex items-start gap-3 ${message.role === "user" ? "flex-row-reverse" : "flex-row"}`}
                           >
                             {/* Avatar for Assistant */}
-                            {message.role === "assistant" && (
-                              <div className="from-primary/20 to-accent/20 border-primary/20 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border bg-gradient-to-br">
-                                <span className="text-primary text-sm font-bold">
-                                  SA
-                                </span>
-                              </div>
-                            )}
+                            {message.role === "assistant" &&
+                              message.content.trim() !== "" && (
+                                <div className="from-primary/20 to-accent/20 border-primary/20 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border bg-gradient-to-br">
+                                  <span className="text-primary text-sm font-bold">
+                                    SA
+                                  </span>
+                                </div>
+                              )}
 
                             {/* Message Bubble */}
                             <div
                               className={`relative ${message.role === "user" ? "ml-8" : "mr-8"}`}
                             >
                               {message.role === "user" ? (
-                                <div className="bg-primary text-primary-foreground rounded-2xl rounded-br-md px-4 py-3 shadow-sm">
+                                <div className="bg-blue-50 text-blue-900 rounded-2xl rounded-br-md px-4 py-3 shadow-sm border border-blue-100">
                                   <div className="prose prose-sm max-w-none">
                                     <ChatMessageContent
                                       message={message}
@@ -866,17 +950,6 @@ const Chat = () => {
                                       isLoading={false}
                                       reload={() => Promise.resolve(null)}
                                     />
-                                  </div>
-                                  <div className="mt-1 flex h-4 justify-end">
-                                    <span className="text-primary-foreground/70 text-xs opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-                                      {message.timestamp.toLocaleTimeString(
-                                        [],
-                                        {
-                                          hour: "2-digit",
-                                          minute: "2-digit",
-                                        }
-                                      )}
-                                    </span>
                                   </div>
                                 </div>
                               ) : (
@@ -909,16 +982,26 @@ const Chat = () => {
                             </div>
                           </div>
 
-                          {/* Info Icon */}
-                          <button
-                            onClick={() => {
-                              setSelectedMessage(message);
-                              setShowMessageInfo(true);
-                            }}
-                            className="text-muted-foreground hover:text-foreground hover:bg-accent/10 absolute top-0 -right-6 rounded-full p-1 opacity-0 transition-all duration-300 group-hover:opacity-100 hover:scale-110"
-                          >
-                            <Info className="h-3 w-3" />
-                          </button>
+                          {/* Action Buttons */}
+                          <div className="absolute top-0 -right-6 flex flex-col gap-1 opacity-0 transition-all duration-300 group-hover:opacity-100">
+                            <button
+                              onClick={() => copyToClipboard(message.content)}
+                              className="text-muted-foreground hover:text-foreground hover:bg-accent/10 rounded-full p-1 transition-all duration-200 hover:scale-110"
+                              title="Copy message"
+                            >
+                              <Copy className="h-3.5 w-3.5" />
+                            </button>
+                            <button
+                              onClick={() => {
+                                setSelectedMessage(message);
+                                setShowMessageInfo(true);
+                              }}
+                              className="text-muted-foreground hover:text-foreground hover:bg-accent/10 rounded-full p-1 transition-all duration-200 hover:scale-110"
+                              title="Message details"
+                            >
+                              <Info className="h-3.5 w-3.5" />
+                            </button>
+                          </div>
                         </div>
                       </motion.div>
                     ))}

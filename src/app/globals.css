@@ -1,5 +1,5 @@
-@import 'tailwindcss';
-@import 'tw-animate-css';
+@import "tailwindcss";
+@import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -148,9 +148,12 @@
   background-color: rgba(155, 155, 155, 0.7);
 }
 
-/* Ensure code blocks can scroll horizontally */
-pre {
-  white-space: pre;
-  word-wrap: normal;
-  overflow-x: auto;
+/* Hide scrollbar completely */
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
 }

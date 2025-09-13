@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Github, Star } from "lucide-react";
 import Image from "next/image";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import Link from "next/link";
 
 export default function Header() {
   const [stars, setStars] = useState<number | null>(null);
@@ -42,9 +43,11 @@ export default function Header() {
             height={24}
             className="rounded"
           />
-          <span className="text-foreground text-sm font-medium">
-            Siraj Ahmed
-          </span>
+          <Link href={"/"} className="flex items-center gap-2">
+            <span className="text-foreground text-sm font-medium">
+              Siraj Ahmed
+            </span>
+          </Link>
         </div>
 
         {/* Right side - GitHub and Theme */}

@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import FluidCursor from '@/components/FluidCursor';
-import { Button } from '@/components/ui/button';
-import WelcomeModal from '@/components/welcome-modal';
-import { motion } from 'framer-motion';
+import FluidCursor from "@/components/FluidCursor";
+import { Button } from "@/components/ui/button";
+import WelcomeModal from "@/components/welcome-modal";
+import { motion } from "framer-motion";
 import {
   ArrowRight,
   BriefcaseBusiness,
@@ -14,29 +14,29 @@ import {
   Sparkles,
   UserRoundSearch,
   Zap,
-} from 'lucide-react';
-import Image from 'next/image';
-import { useRouter } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+} from "lucide-react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 
 /* ---------- quick-question data ---------- */
 const questions = {
-  Me: 'Who are you? I want to know more about you.',
-  Projects: 'What are your projects? What are you working on right now?',
-  Skills: 'What are your skills? Give me a list of your soft and hard skills.',
-  Contact: 'How can I contact you?',
+  Me: "Who are you? I want to know more about you.",
+  Projects: "What are your projects? What are you working on right now?",
+  Skills: "What are your skills? Give me a list of your soft and hard skills.",
+  Contact: "How can I contact you?",
 } as const;
 
 const questionConfig = [
-  { key: 'Me', color: '#329696', icon: Laugh },
-  { key: 'Projects', color: '#3E9858', icon: BriefcaseBusiness },
-  { key: 'Skills', color: '#856ED9', icon: Layers },
-  { key: 'Contact', color: '#C19433', icon: UserRoundSearch },
+  { key: "Me", color: "#329696", icon: Laugh },
+  { key: "Projects", color: "#3E9858", icon: BriefcaseBusiness },
+  { key: "Skills", color: "#856ED9", icon: Layers },
+  { key: "Contact", color: "#C19433", icon: UserRoundSearch },
 ] as const;
 
 /* ---------- component ---------- */
 export default function Home() {
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState("");
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -57,18 +57,18 @@ export default function Home() {
   useEffect(() => {
     // Preload assets
     const img = new window.Image();
-    img.src = '/landing-memojis.png';
+    img.src = "/landing-memojis.png";
 
-    const linkWebm = document.createElement('link');
-    linkWebm.rel = 'preload';
-    linkWebm.as = 'video';
-    linkWebm.href = '/final_memojis.webm';
+    const linkWebm = document.createElement("link");
+    linkWebm.rel = "preload";
+    linkWebm.as = "video";
+    linkWebm.href = "/final_memojis.webm";
     document.head.appendChild(linkWebm);
 
-    const linkMp4 = document.createElement('link');
-    linkMp4.rel = 'prefetch';
-    linkMp4.as = 'video';
-    linkMp4.href = '/final_memojis_ios.mp4';
+    const linkMp4 = document.createElement("link");
+    linkMp4.rel = "prefetch";
+    linkMp4.as = "video";
+    linkMp4.href = "/final_memojis_ios.mp4";
     document.head.appendChild(linkMp4);
   }, []);
 
@@ -110,7 +110,7 @@ export default function Home() {
               transition={{ delay: 0.3 }}
               className="text-4xl font-bold tracking-tight sm:text-6xl lg:text-7xl"
             >
-              Hi, I'm{' '}
+              Hi, I'm{" "}
               <span className="from-primary to-accent bg-gradient-to-r bg-clip-text text-transparent">
                 Siraj
               </span>
@@ -139,10 +139,6 @@ export default function Home() {
               <div className="bg-card flex items-center gap-2 rounded-lg px-3 py-2 text-sm">
                 <Coffee className="text-primary h-4 w-4" />
                 Node.js & GraphQL
-              </div>
-              <div className="bg-card flex items-center gap-2 rounded-lg px-3 py-2 text-sm">
-                <Zap className="text-primary h-4 w-4" />
-                Python
               </div>
             </motion.div>
           </div>
