@@ -7,6 +7,7 @@ import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 export default function Header() {
   const [stars, setStars] = useState<number | null>(null);
+  const [error, setError] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchStars = async () => {
@@ -15,9 +16,12 @@ export default function Header() {
         if (response.ok) {
           const data = await response.json();
           setStars(data.stars);
+        } else {
+          setError(true);
         }
       } catch (error) {
         console.error("Failed to fetch stars:", error);
+        setError(true);
       }
     };
     fetchStars();
@@ -50,9 +54,16 @@ export default function Header() {
             target="_blank"
             rel="noopener noreferrer"
             className="text-muted-foreground hover:text-foreground flex items-center gap-1 rounded-md px-2 py-1 text-xs transition-all duration-200"
+            aria-label="View Siraj Ahmed's GitHub profile"
           >
             <Github className="h-3.5 w-3.5" />
-            {stars !== null && <span>{stars}</span>}
+            {error ? (
+              <span>Unavailable</span>
+            ) : stars !== null ? (
+              <span>{stars}</span>
+            ) : (
+              <span>Loading...</span>
+            )}
             <Star className="h-3 w-3" />
           </a>
           <ThemeToggle />

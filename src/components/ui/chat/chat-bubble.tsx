@@ -6,25 +6,22 @@ import { Button, ButtonProps } from "../button";
 import MessageLoading from "./message-loading";
 
 // ChatBubble
-const chatBubbleVariant = cva(
-  "flex gap-2 items-start relative group",
-  {
-    variants: {
-      variant: {
-        received: "self-start w-full",
-        sent: "self-center flex-row-reverse mx-auto",
-      },
-      layout: {
-        default: "",
-        ai: "max-w-full w-full items-center",
-      },
+const chatBubbleVariant = cva("flex gap-2 items-start relative group", {
+  variants: {
+    variant: {
+      received: "self-start w-full",
+      sent: "self-center flex-row-reverse mx-auto",
     },
-    defaultVariants: {
-      variant: "received",
-      layout: "default",
+    layout: {
+      default: "",
+      ai: "max-w-full w-full items-center",
     },
-  }
-);
+  },
+  defaultVariants: {
+    variant: "received",
+    layout: "default",
+  },
+});
 
 interface ChatBubbleProps
   extends React.HTMLAttributes<HTMLDivElement>,
@@ -66,18 +63,18 @@ const ChatBubbleAvatar: React.FC<ChatBubbleAvatarProps> = ({
   src,
   fallback,
   className,
-  width,
-  height,
+  width = 40,
+  height = 40,
 }) => (
   <Avatar>
     <AvatarImage
-      src={src}
-      alt="Avatar"
+      src={src || "/default-avatar.png"}
+      alt="User Avatar"
       className={className}
       width={width}
       height={height}
     />
-    <AvatarFallback>{fallback}</AvatarFallback>
+    <AvatarFallback>{fallback || "U"}</AvatarFallback>
   </Avatar>
 );
 
@@ -85,8 +82,7 @@ const ChatBubbleAvatar: React.FC<ChatBubbleAvatarProps> = ({
 const chatBubbleMessageVariants = cva("", {
   variants: {
     variant: {
-      received:
-        "text-secondary-foreground rounded-lg py-2",
+      received: "text-secondary-foreground rounded-lg py-2",
       sent: "p-2 px-5 bg-[#007AFF] text-primary-foreground rounded-3xl",
     },
     layout: {
@@ -145,8 +141,15 @@ const ChatBubbleTimestamp: React.FC<ChatBubbleTimestampProps> = ({
   className,
   ...props
 }) => (
-  <div className={cn("text-xs mt-2 text-right", className)} {...props}>
-    {timestamp}
+  <div
+    className={cn("text-xs mt-2 text-right text-gray-500", className)}
+    {...props}
+  >
+    {new Date(timestamp).toLocaleString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    })}
   </div>
 );
 
@@ -201,9 +204,12 @@ const ChatBubbleActionWrapper = React.forwardRef<
 ChatBubbleActionWrapper.displayName = "ChatBubbleActionWrapper";
 
 export {
-	ChatBubble, ChatBubbleAction,
-	ChatBubbleActionWrapper, ChatBubbleAvatar,
-	ChatBubbleMessage, chatBubbleMessageVariants, ChatBubbleTimestamp,
-	chatBubbleVariant
+  ChatBubble,
+  ChatBubbleAction,
+  ChatBubbleActionWrapper,
+  ChatBubbleAvatar,
+  ChatBubbleMessage,
+  chatBubbleMessageVariants,
+  ChatBubbleTimestamp,
+  chatBubbleVariant,
 };
-

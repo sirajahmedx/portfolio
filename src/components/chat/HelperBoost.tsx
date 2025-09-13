@@ -1,13 +1,7 @@
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
-import { cn } from '@/lib/utils';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@radix-ui/react-tooltip';
-import { motion } from 'framer-motion';
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
 import {
   BriefcaseBusiness,
   BriefcaseIcon,
@@ -24,9 +18,15 @@ import {
   Sparkles,
   UserRoundSearch,
   UserSearch,
-} from 'lucide-react';
-import { useMemo, useState } from 'react';
-import { Drawer } from 'vaul';
+} from "lucide-react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { Drawer } from "vaul";
 
 interface HelperBoostProps {
   submitQuery?: (query: string) => void;
@@ -35,140 +35,218 @@ interface HelperBoostProps {
 }
 
 const questions = {
-  Me: 'Who are you? I want to know more about you.',
-  Projects: 'What are your projects? What are you working on right now?',
-  Skills: 'What are your skills? Give me a list of your soft and hard skills.',
+  Me: "Who are you? I want to know more about you.",
+  Projects: "What are your projects? What are you working on right now?",
+  Skills: "What are your skills? Give me a list of your soft and hard skills.",
   Contact:
     'How can I reach you? What kind of project would make you say "yes" immediately?',
 };
 
 const questionConfig = [
-  { key: 'Me', color: '#329696', icon: Laugh },
-  { key: 'Projects', color: '#3E9858', icon: BriefcaseBusiness },
-  { key: 'Skills', color: '#856ED9', icon: Layers },
-  { key: 'Contact', color: '#C19433', icon: UserRoundSearch },
+  { key: "Me", color: "#329696", icon: Laugh },
+  { key: "Projects", color: "#3E9858", icon: BriefcaseBusiness },
+  { key: "Skills", color: "#856ED9", icon: Layers },
+  { key: "Contact", color: "#C19433", icon: UserRoundSearch },
 ];
 
 // Helper drawer data
 const specialQuestions = [
-  'Mountain Bike you said?? Show me!',
-  'Who are you?',
-  'Can I see your resume?',
-  'What projects are you most proud of?',
-  'What are your skills?',
-  'How can I reach you?',
+  "Mountain Bike you said?? Show me!",
+  "Who are you?",
+  "Can I see your resume?",
+  "What projects are you most proud of?",
+  "What are your skills?",
+  "How can I reach you?",
   "What's the craziest thing you've ever done?",
 ];
 
 const questionsByCategory = [
   {
-    id: 'me',
-    name: 'Me',
+    id: "me",
+    name: "Me",
     icon: UserSearch,
     questions: [
-      'Who are you?',
-      'What are your passions?',
-      'How did you get started in tech?',
-      'Where do you see yourself in 5 years?',
+      "Who are you?",
+      "What are your passions?",
+      "How did you get started in tech?",
+      "Where do you see yourself in 5 years?",
     ],
   },
   {
-    id: 'professional',
-    name: 'Professional',
+    id: "professional",
+    name: "Professional",
     icon: BriefcaseIcon,
     questions: [
-      'Can I see your resume?',
-      'What makes you a valuable team member?',
-      'Where are you working now?',
-      'Why should I hire you?',
+      "Can I see your resume?",
+      "What makes you a valuable team member?",
+      "Where are you working now?",
+      "Why should I hire you?",
       "What's your educational background?",
     ],
   },
   {
-    id: 'projects',
-    name: 'Projects',
+    id: "projects",
+    name: "Projects",
     icon: CodeIcon,
-    questions: ['What projects are you most proud of?'],
+    questions: ["What projects are you most proud of?"],
   },
   {
-    id: 'skills',
-    name: 'Skills',
+    id: "skills",
+    name: "Skills",
     icon: GraduationCapIcon,
     questions: [
-      'What are your skills?',
-      'How was your experience at École 42?',
+      "What are your skills?",
+      "How was your experience at École 42?",
     ],
   },
   {
-    id: 'fun',
-    name: 'Fun',
+    id: "fun",
+    name: "Fun",
     icon: PartyPopper,
     questions: [
-      'Mountain Bike you said?? Show me!',
+      "Mountain Bike you said?? Show me!",
       "What's the craziest thing you've ever done?",
-      'Mac or PC?',
-      'What are you certain about that 90% get wrong?',
+      "Mac or PC?",
+      "What are you certain about that 90% get wrong?",
     ],
   },
   {
-    id: 'contact',
-    name: 'Contact & Future',
+    id: "contact",
+    name: "Contact & Future",
     icon: MailIcon,
     questions: [
-      'How can I reach you?',
+      "How can I reach you?",
       "What kind of project would make you say 'yes' immediately?",
-      'Where are you located?',
+      "Where are you located?",
     ],
   },
 ];
 
 // Animated Chevron component - Simplified to prevent infinite loops
-const AnimatedChevron = () => {
-  return (
-    <div className="text-primary mb-1.5">
-      <ChevronUp size={16} />
-    </div>
-  );
-};
+// const AnimatedChevron = () => {
+//   return (
+//     <div className="text-primary mb-1.5">
+//       <ChevronUp size={16} />
+//     </div>
+//   );
+// };
 
-export default function HelperBoost({
+export default React.memo(function HelperBoost({
   submitQuery,
   setInput,
   hasReachedLimit = false,
 }: HelperBoostProps) {
   const [isVisible, setIsVisible] = useState(true);
   const [open, setOpen] = useState(false);
+  const [lastClickedQuestion, setLastClickedQuestion] = useState<string>("");
+  const [lastClickTime, setLastClickTime] = useState<number>(0);
+  const [disabledQuestions, setDisabledQuestions] = useState<Set<string>>(
+    new Set()
+  );
+  const timeoutIds = useRef<Set<NodeJS.Timeout>>(new Set());
 
-  // Memoize motion props to prevent unnecessary re-renders
-  const motionProps = useMemo(
-    () => ({
-      className: `flex h-auto items-center space-x-1 rounded-2xl border-2 px-5 py-4 text-sm backdrop-blur-md transition-all duration-200 hover:shadow-md ${
-        hasReachedLimit
-          ? 'border-border/50 bg-muted/50 cursor-not-allowed opacity-60'
-          : 'hover:border-border hover:bg-accent/90 border-border/80 bg-background/90 cursor-pointer'
-      }`,
-      whileHover: !hasReachedLimit ? { scale: 1.02 } : {},
-      whileTap: !hasReachedLimit ? { scale: 0.98 } : {},
-    }),
-    [hasReachedLimit]
+  useEffect(() => {
+    return () => {
+      timeoutIds.current.forEach(clearTimeout);
+    };
+  }, []);
+
+  const handleQuestionClick = useCallback(
+    (questionKey: string) => {
+      if (
+        submitQuery &&
+        !hasReachedLimit &&
+        !disabledQuestions.has(questionKey)
+      ) {
+        const now = Date.now();
+        // Prevent rapid clicking of the same question
+        if (lastClickedQuestion === questionKey && now - lastClickTime < 1000) {
+          console.log(
+            "[HelperBoost] Rapid click blocked for question:",
+            questionKey
+          );
+          return;
+        }
+
+        // Temporarily disable the button
+        setDisabledQuestions((prev) => new Set(prev).add(questionKey));
+
+        setLastClickedQuestion(questionKey);
+        setLastClickTime(now);
+        submitQuery(questions[questionKey as keyof typeof questions]);
+
+        // Re-enable the button after 1 second
+        const timeoutId = setTimeout(() => {
+          setDisabledQuestions((prev) => {
+            const newSet = new Set(prev);
+            newSet.delete(questionKey);
+            return newSet;
+          });
+          timeoutIds.current.delete(timeoutId);
+        }, 1000);
+        timeoutIds.current.add(timeoutId);
+      }
+    },
+    [
+      submitQuery,
+      hasReachedLimit,
+      lastClickedQuestion,
+      lastClickTime,
+      disabledQuestions,
+    ]
   );
 
-  const handleQuestionClick = (questionKey: string) => {
-    if (submitQuery) {
-      submitQuery(questions[questionKey as keyof typeof questions]);
-    }
-  };
+  const handleDrawerQuestionClick = useCallback(
+    (questionText: string) => {
+      if (
+        submitQuery &&
+        !hasReachedLimit &&
+        !disabledQuestions.has(questionText)
+      ) {
+        const now = Date.now();
+        // Prevent rapid clicking of the same question
+        if (
+          lastClickedQuestion === questionText &&
+          now - lastClickTime < 1000
+        ) {
+          console.log(
+            "[HelperBoost] Rapid click blocked for drawer question:",
+            questionText
+          );
+          return;
+        }
 
-  const handleDrawerQuestionClick = (question: string) => {
-    if (submitQuery) {
-      submitQuery(question);
-    }
-    setOpen(false);
-  };
+        // Temporarily disable the button
+        setDisabledQuestions((prev) => new Set(prev).add(questionText));
 
-  const toggleVisibility = () => {
+        setLastClickedQuestion(questionText);
+        setLastClickTime(now);
+        submitQuery(questionText);
+
+        // Re-enable the button after 1 second
+        const timeoutId = setTimeout(() => {
+          setDisabledQuestions((prev) => {
+            const newSet = new Set(prev);
+            newSet.delete(questionText);
+            return newSet;
+          });
+          timeoutIds.current.delete(timeoutId);
+        }, 1000);
+        timeoutIds.current.add(timeoutId);
+      }
+    },
+    [
+      submitQuery,
+      hasReachedLimit,
+      lastClickedQuestion,
+      lastClickTime,
+      disabledQuestions,
+    ]
+  );
+
+  const toggleVisibility = useCallback(() => {
     setIsVisible(!isVisible);
-  };
+  }, [isVisible]);
 
   return (
     <>
@@ -178,8 +256,8 @@ export default function HelperBoost({
           <div
             className={
               isVisible
-                ? 'mb-2 flex justify-center'
-                : 'mb-0 flex justify-center'
+                ? "mb-2 flex justify-center"
+                : "mb-0 flex justify-center"
             }
           >
             <button
@@ -205,19 +283,19 @@ export default function HelperBoost({
             <div className="w-full">
               <div
                 className="flex w-full flex-wrap gap-2 md:gap-4"
-                style={{ justifyContent: 'safe center' }}
+                style={{ justifyContent: "safe center" }}
               >
                 {questionConfig.map(({ key, color, icon: Icon }) => (
                   <Button
                     key={key}
-                    onClick={() => !hasReachedLimit && handleQuestionClick(key)}
+                    onClick={() => handleQuestionClick(key)}
                     variant="outline"
                     className={`h-auto min-w-[110px] flex-shrink-0 rounded-2xl border-2 px-5 py-4 shadow-sm backdrop-blur-md transition-all duration-200 hover:shadow-md ${
-                      hasReachedLimit
-                        ? 'border-border/50 bg-muted/50 cursor-not-allowed opacity-60'
-                        : 'border-border/80 hover:border-border hover:bg-accent/90 bg-background/90 cursor-pointer hover:scale-[1.02] active:scale-[0.98]'
+                      hasReachedLimit || disabledQuestions.has(key)
+                        ? "border-border/50 bg-muted/50 cursor-not-allowed opacity-60"
+                        : "border-border/80 hover:border-border hover:bg-accent/90 bg-background/90 cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
                     }`}
-                    disabled={hasReachedLimit}
+                    disabled={hasReachedLimit || disabledQuestions.has(key)}
                   >
                     <div className="text-foreground flex items-center gap-3">
                       <Icon size={20} strokeWidth={2.5} color={color} />
@@ -227,33 +305,22 @@ export default function HelperBoost({
                     </div>
                   </Button>
                 ))}
-
                 {/* Need Inspiration Button */}
-                <TooltipProvider>
-                  <Tooltip delayDuration={0}>
-                    <TooltipTrigger asChild>
-                      <Drawer.Trigger
-                        className="group relative flex flex-shrink-0 items-center justify-center"
-                        disabled={hasReachedLimit}
-                      >
-                        <motion.div {...motionProps}>
-                          <div className="text-foreground flex items-center gap-3">
-                            <CircleEllipsis
-                              className="h-5 w-5"
-                              strokeWidth={2.5}
-                            />
-                            <span className="text-sm font-semibold tracking-wide">
-                              More
-                            </span>
-                          </div>
-                        </motion.div>
-                      </Drawer.Trigger>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <AnimatedChevron />
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+                <Drawer.Trigger
+                  className={`group relative flex flex-shrink-0 items-center justify-center h-auto min-w-[110px] rounded-2xl border-2 px-5 py-4 text-sm backdrop-blur-md transition-all duration-200 hover:shadow-md ${
+                    hasReachedLimit
+                      ? "border-border/50 bg-muted/50 cursor-not-allowed opacity-60"
+                      : "hover:border-border hover:bg-accent/90 border-border/80 bg-background/90 cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
+                  }`}
+                  disabled={hasReachedLimit}
+                >
+                  <div className="text-foreground flex items-center gap-3">
+                    <CircleEllipsis className="h-5 w-5" strokeWidth={2.5} />
+                    <span className="text-sm font-semibold tracking-wide">
+                      More
+                    </span>
+                  </div>
+                </Drawer.Trigger>
               </div>
             </div>
           )}
@@ -278,6 +345,7 @@ export default function HelperBoost({
                         Icon={category.icon}
                         questions={category.questions}
                         onQuestionClick={handleDrawerQuestionClick}
+                        disabledQuestions={disabledQuestions}
                       />
                     ))}
                   </div>
@@ -289,21 +357,23 @@ export default function HelperBoost({
       </Drawer.Root>
     </>
   );
-}
+});
 
 // Component for each category section
 interface CategorySectionProps {
   name: string;
   Icon: React.ElementType;
   questions: string[];
-  onQuestionClick: (question: string) => void;
+  onQuestionClick: (questionText: string) => void;
+  disabledQuestions: Set<string>;
 }
 
-function CategorySection({
+const CategorySection = React.memo(function CategorySection({
   name,
   Icon,
   questions,
   onQuestionClick,
+  disabledQuestions,
 }: CategorySectionProps) {
   return (
     <div className="space-y-3">
@@ -318,55 +388,74 @@ function CategorySection({
 
       <div className="space-y-3">
         {questions.map((question, index) => (
-          <QuestionItem
+          <MemoizedQuestionItem
             key={index}
             question={question}
             onClick={() => onQuestionClick(question)}
             isSpecial={specialQuestions.includes(question)}
+            isDisabled={disabledQuestions.has(question)}
           />
         ))}
       </div>
     </div>
   );
-}
+});
 
 // Component for each question item with animated chevron
 interface QuestionItemProps {
   question: string;
   onClick: () => void;
   isSpecial: boolean;
+  isDisabled: boolean;
 }
 
-function QuestionItem({ question, onClick, isSpecial }: QuestionItemProps) {
+function QuestionItem({
+  question,
+  onClick,
+  isSpecial,
+  isDisabled,
+}: QuestionItemProps) {
   return (
     <motion.button
       className={cn(
-        'flex w-full items-center justify-between rounded-[10px]',
-        'text-md px-6 py-4 text-left font-normal',
-        'transition-all duration-200',
-        'focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500',
-        'hover:bg-gray-100 active:scale-95',
-        isSpecial ? 'bg-black' : 'bg-[#F7F8F9]'
+        "flex w-full items-center justify-between rounded-[10px]",
+        "text-md px-6 py-4 text-left font-normal",
+        "transition-all duration-200",
+        "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500",
+        isDisabled
+          ? "cursor-not-allowed opacity-60 bg-gray-200"
+          : isSpecial
+            ? "hover:bg-gray-100 active:scale-95 bg-black"
+            : "hover:bg-gray-100 active:scale-95 bg-[#F7F8F9]"
       )}
-      onClick={onClick}
-      whileHover={{
-        backgroundColor: isSpecial ? undefined : '#F0F0F2',
-      }}
-      whileTap={{
-        scale: 0.98,
-        backgroundColor: isSpecial ? undefined : '#E8E8EA',
-      }}
+      onClick={isDisabled ? undefined : onClick}
+      disabled={isDisabled}
+      whileHover={
+        isDisabled
+          ? undefined
+          : {
+              backgroundColor: isSpecial ? undefined : "#F0F0F2",
+            }
+      }
+      whileTap={
+        isDisabled
+          ? undefined
+          : {
+              scale: 0.98,
+              backgroundColor: isSpecial ? undefined : "#E8E8EA",
+            }
+      }
     >
       <div className="flex items-center">
         {isSpecial && <Sparkles className="mr-2 h-4 w-4 text-white" />}
-        <span className={isSpecial ? 'font-medium text-white' : ''}>
+        <span className={isSpecial ? "font-medium text-white" : ""}>
           {question}
         </span>
       </div>
       <motion.div
         className={cn(
-          'h-5 w-5 shrink-0',
-          isSpecial ? 'text-white' : 'text-primary'
+          "h-5 w-5 shrink-0",
+          isSpecial ? "text-white" : "text-primary"
         )}
       >
         <ChevronRight size={20} />
@@ -374,3 +463,5 @@ function QuestionItem({ question, onClick, isSpecial }: QuestionItemProps) {
     </motion.button>
   );
 }
+
+const MemoizedQuestionItem = React.memo(QuestionItem);

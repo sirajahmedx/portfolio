@@ -87,12 +87,12 @@ export default function RootLayout({
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
-          enableSystem={false}
+          enableSystem={true} // Enable system theme detection
         >
           <Header />
           <main
             className="flex flex-col overflow-hidden"
-            style={{ height: "calc(100vh - 56px)" }}
+            style={{ height: "100dvh" }} // Use dynamic viewport height
           >
             {children}
           </main>

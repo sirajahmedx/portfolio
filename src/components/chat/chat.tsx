@@ -8,6 +8,7 @@ import React, {
   useMemo,
   useRef,
   useState,
+  useReducer,
 } from "react";
 import { toast } from "sonner";
 
@@ -15,14 +16,143 @@ import { toast } from "sonner";
 import ChatBottombar from "@/components/chat/chat-bottombar";
 import ChatLanding from "@/components/chat/chat-landing";
 import ChatMessageContent from "@/components/chat/chat-message-content";
-import { SimplifiedChatView } from "@/components/chat/simple-chat-view";
-import {
-  ChatBubble,
-  ChatBubbleMessage,
-} from "@/components/ui/chat/chat-bubble";
-import WelcomeModal from "@/components/welcome-modal";
 import { Info } from "lucide-react";
 import HelperBoost from "./HelperBoost";
+
+// Message type definition
+interface Message {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+  timestamp: Date;
+}
+
+// Chat state interface
+interface ChatState {
+  messages: Message[];
+  input: string;
+  isLoading: boolean;
+  loadingSubmit: boolean;
+  isTalking: boolean;
+  hasReachedLimit: boolean;
+  conversationLoaded: boolean;
+  lastRequestTime: number;
+  currentAssistantId: string | null;
+  chunkCount: number;
+}
+
+// Action types
+type ChatAction =
+  | { type: "SET_INPUT"; payload: string }
+  | { type: "ADD_MESSAGE"; payload: Message }
+  | {
+      type: "UPDATE_ASSISTANT_MESSAGE";
+      payload: { id: string; content: string };
+    }
+  | {
+      type: "START_ASSISTANT_MESSAGE";
+      payload: { id: string; message: Message };
+    }
+  | { type: "SET_LOADING"; payload: boolean }
+  | { type: "SET_LOADING_SUBMIT"; payload: boolean }
+  | { type: "SET_TALKING"; payload: boolean }
+  | { type: "SET_MESSAGES"; payload: Message[] }
+  | { type: "CLEAR_CONVERSATION" }
+  | { type: "SET_REACHED_LIMIT"; payload: boolean }
+  | { type: "SET_CONVERSATION_LOADED"; payload: boolean }
+  | { type: "SET_LAST_REQUEST_TIME"; payload: number }
+  | { type: "INCREMENT_CHUNK_COUNT" }
+  | { type: "RESET_STREAMING_STATE" };
+
+// Initial state
+const initialState: ChatState = {
+  messages: [],
+  input: "",
+  isLoading: false,
+  loadingSubmit: false,
+  isTalking: false,
+  hasReachedLimit: false,
+  conversationLoaded: false,
+  lastRequestTime: 0,
+  currentAssistantId: null,
+  chunkCount: 0,
+};
+
+// Reducer
+function chatReducer(state: ChatState, action: ChatAction): ChatState {
+  switch (action.type) {
+    case "SET_INPUT":
+      return { ...state, input: action.payload };
+
+    case "ADD_MESSAGE":
+      return {
+        ...state,
+        messages: [...state.messages, action.payload],
+      };
+
+    case "START_ASSISTANT_MESSAGE":
+      return {
+        ...state,
+        currentAssistantId: action.payload.id,
+        messages: [...state.messages, action.payload.message],
+        chunkCount: 0,
+      };
+
+    case "UPDATE_ASSISTANT_MESSAGE":
+      const { id, content } = action.payload;
+      return {
+        ...state,
+        messages: state.messages.map((msg) =>
+          msg.id === id ? { ...msg, content } : msg
+        ),
+      };
+
+    case "SET_LOADING":
+      return { ...state, isLoading: action.payload };
+
+    case "SET_LOADING_SUBMIT":
+      return { ...state, loadingSubmit: action.payload };
+
+    case "SET_TALKING":
+      return { ...state, isTalking: action.payload };
+
+    case "SET_MESSAGES":
+      return { ...state, messages: action.payload };
+
+    case "CLEAR_CONVERSATION":
+      return {
+        ...state,
+        messages: [],
+        currentAssistantId: null,
+        chunkCount: 0,
+      };
+
+    case "SET_REACHED_LIMIT":
+      return { ...state, hasReachedLimit: action.payload };
+
+    case "SET_CONVERSATION_LOADED":
+      return { ...state, conversationLoaded: action.payload };
+
+    case "SET_LAST_REQUEST_TIME":
+      return { ...state, lastRequestTime: action.payload };
+
+    case "INCREMENT_CHUNK_COUNT":
+      return { ...state, chunkCount: state.chunkCount + 1 };
+
+    case "RESET_STREAMING_STATE":
+      return {
+        ...state,
+        currentAssistantId: null,
+        chunkCount: 0,
+        isLoading: false,
+        loadingSubmit: false,
+        isTalking: false,
+      };
+
+    default:
+      return state;
+  }
+}
 
 // Message info dialog component
 const MessageInfoDialog = ({
@@ -83,14 +213,6 @@ const MessageInfoDialog = ({
     </div>
   );
 };
-
-// Message type definition
-interface Message {
-  id: string;
-  role: "user" | "assistant";
-  content: string;
-  timestamp: Date;
-}
 
 // ClientOnly component for client-side rendering
 const ClientOnly = ({ children }: { children: React.ReactNode }) => {
@@ -190,55 +312,67 @@ const Chat = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get("query");
+  const abortControllerRef = useRef<AbortController | null>(null);
+  const assistantContentRef = useRef<string>("");
 
-  // Chat state
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  // Chat state using reducer
+  const [state, dispatch] = useReducer(chatReducer, initialState);
+  const {
+    messages,
+    input,
+    isLoading,
+    loadingSubmit,
+    isTalking,
+    hasReachedLimit,
+    conversationLoaded,
+    lastRequestTime,
+    currentAssistantId,
+    chunkCount,
+  } = state;
+
+  // Local state for UI interactions
   const [autoSubmitted, setAutoSubmitted] = useState(false);
-  const [loadingSubmit, setLoadingSubmit] = useState(false);
-  const [isTalking, setIsTalking] = useState(false);
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
   const [showMessageInfo, setShowMessageInfo] = useState(false);
-  const [lastRequestTime, setLastRequestTime] = useState<number>(0);
-  const [hasReachedLimit, setHasReachedLimit] = useState(false);
 
-  // Ref to store current messages for submitQuery
-  const messagesRef = useRef<Message[]>([]);
-
-  // Update ref when messages change
-  useEffect(() => {
-    messagesRef.current = messages;
-  }, [messages]);
+  // In-memory storage for conversation
+  const conversationStorageRef = useRef<Message[]>([]);
 
   // Generate unique ID for messages
   const generateId = useCallback(
-    () => Math.random().toString(36).substring(7),
+    () => Math.random().toString(36).substring(2, 15),
     []
   );
 
-  // Load conversation from local storage
+  // Load conversation from memory storage
   const loadConversation = useCallback(() => {
+    if (conversationLoaded) return;
+
     try {
-      const saved = localStorage.getItem("chat-conversation");
-      if (saved) {
-        const parsedMessages = JSON.parse(saved);
-        // Convert timestamp strings back to Date objects
-        const messagesWithDates = parsedMessages.map((msg: any) => ({
-          ...msg,
-          timestamp: new Date(msg.timestamp),
-        }));
-        setMessages(messagesWithDates);
+      console.log("[CLIENT] Loading conversation from memory...");
+      if (conversationStorageRef.current.length > 0) {
+        dispatch({
+          type: "SET_MESSAGES",
+          payload: conversationStorageRef.current,
+        });
+        console.log(
+          "[CLIENT] Loaded",
+          conversationStorageRef.current.length,
+          "messages"
+        );
       }
     } catch (error) {
       console.error("Failed to load conversation:", error);
+    } finally {
+      dispatch({ type: "SET_CONVERSATION_LOADED", payload: true });
     }
-  }, []);
+  }, [conversationLoaded]);
 
-  // Save conversation to local storage
+  // Save conversation to memory storage
   const saveConversation = useCallback((messages: Message[]) => {
     try {
-      localStorage.setItem("chat-conversation", JSON.stringify(messages));
+      conversationStorageRef.current = messages;
+      console.log("[CLIENT] Saved", messages.length, "messages to memory");
     } catch (error) {
       console.error("Failed to save conversation:", error);
     }
@@ -247,49 +381,147 @@ const Chat = () => {
   // Enhanced auto-scroll to bottom
   const scrollToBottom = useCallback(() => {
     if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({
-        behavior: "smooth",
-        block: "end",
-        inline: "nearest",
+      requestAnimationFrame(() => {
+        messagesEndRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "end",
+          inline: "nearest",
+        });
       });
     }
   }, []);
 
   // Auto-scroll when messages change or loading state changes
   useEffect(() => {
-    const timer = setTimeout(() => {
-      scrollToBottom();
-    }, 100); // Small delay to ensure DOM updates
-
+    const timer = setTimeout(scrollToBottom, 100);
     return () => clearTimeout(timer);
   }, [messages, loadingSubmit, scrollToBottom]);
 
   // Clear conversation
   const clearConversation = useCallback(() => {
-    setMessages([]);
-    localStorage.removeItem("chat-conversation");
+    dispatch({ type: "CLEAR_CONVERSATION" });
+    conversationStorageRef.current = [];
+    // Cancel any ongoing request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
   }, []);
 
   // Handle input change
   const handleInputChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      setInput(e.target.value);
+      dispatch({ type: "SET_INPUT", payload: e.target.value });
     },
     []
+  );
+
+  // Enhanced streaming response handler
+  const handleStreamingResponse = useCallback(
+    async (response: Response, assistantMessageId: string) => {
+      if (!response.body) {
+        throw new Error("No response body available");
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      assistantContentRef.current = "";
+
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+
+          if (done) {
+            // Process any remaining buffer
+            if (buffer.trim()) {
+              processBuffer(buffer, assistantMessageId);
+            }
+            break;
+          }
+
+          buffer += decoder.decode(value, { stream: true });
+          buffer = processBuffer(buffer, assistantMessageId);
+        }
+      } finally {
+        reader.releaseLock();
+      }
+    },
+    []
+  );
+
+  // Process streaming buffer
+  const processBuffer = useCallback(
+    (buffer: string, assistantMessageId: string): string => {
+      const lines = buffer.split("\n");
+      let remainingBuffer = "";
+
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+
+        if (line.startsWith("data: ")) {
+          const data = line.slice(6).trim();
+
+          if (data === "[DONE]") {
+            console.log("[CLIENT] Received [DONE] marker");
+            return remainingBuffer;
+          }
+
+          try {
+            const parsed = JSON.parse(data);
+
+            if (parsed.error) {
+              throw new Error(parsed.error);
+            }
+
+            if (parsed.text && parsed.text.trim()) {
+              assistantContentRef.current += parsed.text;
+              dispatch({ type: "INCREMENT_CHUNK_COUNT" });
+
+              console.log(
+                `[CLIENT] Chunk ${chunkCount + 1}: "${parsed.text.substring(0, 50)}..."`
+              );
+
+              // Update the assistant message content
+              dispatch({
+                type: "UPDATE_ASSISTANT_MESSAGE",
+                payload: {
+                  id: assistantMessageId,
+                  content: assistantContentRef.current,
+                },
+              });
+
+              // Stop loading animation after first chunk
+              if (chunkCount === 0) {
+                dispatch({ type: "SET_LOADING", payload: false });
+              }
+
+              // Auto-scroll to bottom
+              setTimeout(scrollToBottom, 50);
+            }
+          } catch (parseError) {
+            console.warn(
+              "[CLIENT] Failed to parse streaming data:",
+              data,
+              parseError
+            );
+          }
+        } else if (i === lines.length - 1 && line) {
+          // Keep incomplete line for next iteration
+          remainingBuffer = line;
+        }
+      }
+
+      return remainingBuffer;
+    },
+    [chunkCount, scrollToBottom]
   );
 
   // Submit query to API
   const submitQuery = useCallback(
     async (query: string) => {
       if (!query.trim() || isLoading || loadingSubmit) {
-        console.log(
-          "[CLIENT] Submit blocked - query:",
-          query.trim(),
-          "isLoading:",
-          isLoading,
-          "loadingSubmit:",
-          loadingSubmit
-        );
+        console.log("[CLIENT] Submit blocked - invalid conditions");
         return;
       }
 
@@ -305,9 +537,15 @@ const Chat = () => {
       const trimmedQuery = query.trim();
       console.log("[CLIENT] Starting submitQuery with:", trimmedQuery);
 
-      setLastRequestTime(now);
+      // Cancel any existing request
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+      abortControllerRef.current = new AbortController();
 
-      // Add user message immediately
+      dispatch({ type: "SET_LAST_REQUEST_TIME", payload: now });
+
+      // Add user message
       const userMessage: Message = {
         id: generateId(),
         role: "user",
@@ -315,25 +553,11 @@ const Chat = () => {
         timestamp: new Date(),
       };
 
-      console.log("[CLIENT] Adding user message:", userMessage.id);
-
-      setMessages((prev) => {
-        const newMessages = [...prev, userMessage];
-        console.log("[CLIENT] Messages after adding user:", newMessages.length);
-        return newMessages;
-      });
-
-      setInput(""); // Clear input after adding message
-      setIsLoading(true);
-      setLoadingSubmit(true);
-      setIsTalking(true);
-
-      // Get current messages for API call (using ref to avoid dependency)
-      const currentMessages = [...messagesRef.current, userMessage];
-      console.log(
-        "[CLIENT] Sending to API - message count:",
-        currentMessages.length
-      );
+      dispatch({ type: "ADD_MESSAGE", payload: userMessage });
+      dispatch({ type: "SET_INPUT", payload: "" });
+      dispatch({ type: "SET_LOADING", payload: true });
+      dispatch({ type: "SET_LOADING_SUBMIT", payload: true });
+      dispatch({ type: "SET_TALKING", payload: true });
 
       // Play video
       if (videoRef.current) {
@@ -342,168 +566,76 @@ const Chat = () => {
         });
       }
 
+      // Create assistant message placeholder
+      const assistantMessageId = generateId();
+      const assistantMessage: Message = {
+        id: assistantMessageId,
+        role: "assistant",
+        content: "",
+        timestamp: new Date(),
+      };
+
+      dispatch({
+        type: "START_ASSISTANT_MESSAGE",
+        payload: { id: assistantMessageId, message: assistantMessage },
+      });
+
       try {
         console.log("[CLIENT] Making API request...");
+
+        // Build messages array including the new user message
+        const messagesToSend = [...messages, userMessage];
+
         const response = await fetch("/api/chat", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            messages: currentMessages,
+            messages: messagesToSend.map((msg) => ({
+              role: msg.role,
+              content: msg.content,
+              timestamp: msg.timestamp.toISOString(),
+              id: msg.id,
+            })),
           }),
+          signal: abortControllerRef.current.signal,
         });
 
         console.log("[CLIENT] API response status:", response.status);
 
         if (!response.ok) {
-          if (response.status === 429) {
-            const errorText = await response.text();
-            throw new Error(
-              errorText || "API quota exceeded. Please try again later."
-            );
+          let errorMessage = `HTTP error! status: ${response.status}`;
+
+          try {
+            const errorData = await response.json();
+            errorMessage = errorData.error || errorMessage;
+
+            if (response.status === 429) {
+              dispatch({ type: "SET_REACHED_LIMIT", payload: true });
+              toast.error("API quota exceeded. Please try again tomorrow.");
+            } else {
+              toast.error(errorMessage);
+            }
+          } catch {
+            toast.error(errorMessage);
           }
-          throw new Error(`HTTP error! status: ${response.status}`);
+
+          throw new Error(errorMessage);
         }
 
         // Handle streaming response
-        const reader = response.body?.getReader();
-        const decoder = new TextDecoder();
-        let assistantContent = "";
-        let chunkCount = 0;
+        await handleStreamingResponse(response, assistantMessageId);
 
-        // Create assistant message placeholder
-        const assistantMessageId = generateId();
-        const assistantMessage: Message = {
-          id: assistantMessageId,
-          role: "assistant",
-          content: "",
-          timestamp: new Date(),
-        };
-
-        console.log(
-          "[CLIENT] Adding assistant placeholder:",
-          assistantMessageId
-        );
-
-        // Add empty assistant message to state
-        setMessages((prev) => {
-          const newMessages = [...prev, assistantMessage];
-          console.log(
-            "[CLIENT] Messages after adding assistant placeholder:",
-            newMessages.length
-          );
-          return newMessages;
-        });
-
-        if (reader) {
-          try {
-            while (true) {
-              const { done, value } = await reader.read();
-              if (done) {
-                console.log("[CLIENT] Stream done, total chunks:", chunkCount);
-                break;
-              }
-
-              const chunk = decoder.decode(value);
-              const lines = chunk.split("\n");
-
-              for (const line of lines) {
-                if (line.startsWith("data: ")) {
-                  const data = line.slice(6).trim();
-
-                  if (data === "[DONE]") {
-                    console.log("[CLIENT] Received [DONE] marker");
-                    break;
-                  }
-
-                  try {
-                    const parsed = JSON.parse(data);
-                    if (parsed.text && parsed.text.trim()) {
-                      assistantContent += parsed.text;
-                      chunkCount++;
-
-                      console.log(
-                        `[CLIENT] Chunk ${chunkCount}: "${parsed.text}" (total length: ${assistantContent.length})`
-                      );
-
-                      // Update the assistant message in real-time
-                      setMessages((prev) =>
-                        prev.map((msg) =>
-                          msg.id === assistantMessageId
-                            ? { ...msg, content: assistantContent }
-                            : msg
-                        )
-                      );
-
-                      // Stop loading animation after first chunk
-                      if (chunkCount === 1) {
-                        console.log(
-                          "[CLIENT] First chunk received, stopping loading animation"
-                        );
-                        setIsLoading(false);
-                      }
-
-                      // Auto-scroll to bottom on each chunk
-                      setTimeout(() => scrollToBottom(), 50);
-                    }
-                  } catch (parseError) {
-                    console.warn(
-                      "[CLIENT] Failed to parse streaming data:",
-                      data,
-                      parseError
-                    );
-                  }
-                }
-              }
-            }
-          } catch (streamError) {
-            console.error("[CLIENT] Streaming error:", streamError);
-            // Update with error message
-            setMessages((prev) =>
-              prev.map((msg) =>
-                msg.id === assistantMessageId
-                  ? {
-                      ...msg,
-                      content:
-                        "Sorry, there was an error processing your request. Please try again.",
-                    }
-                  : msg
-              )
-            );
-          } finally {
-            reader.releaseLock();
-          }
+        console.log("[CLIENT] Request completed successfully");
+      } catch (error) {
+        if (error instanceof Error && error.name === "AbortError") {
+          console.log("[CLIENT] Request was aborted");
+          return;
         }
 
-        console.log(
-          "[CLIENT] Final assistant content length:",
-          assistantContent.length
-        );
-
-        // Final update to ensure content is complete
-        setMessages((prev) =>
-          prev.map((msg) =>
-            msg.id === assistantMessageId
-              ? { ...msg, content: assistantContent }
-              : msg
-          )
-        );
-
-        // Save to localStorage
-        setTimeout(() => {
-          const finalMessages = [
-            ...messagesRef.current,
-            userMessage,
-            { ...assistantMessage, content: assistantContent },
-          ];
-          saveConversation(finalMessages);
-          console.log("[CLIENT] Saved conversation to localStorage");
-        }, 100);
-      } catch (error) {
         console.error("[CLIENT] Chat error:", error);
 
-        // Check if it's a quota exceeded error
         const isQuotaError =
           error instanceof Error &&
           (error.message.includes("QUOTA_EXCEEDED") ||
@@ -511,42 +643,36 @@ const Chat = () => {
             error.message.includes("429"));
 
         if (isQuotaError) {
-          setHasReachedLimit(true);
+          dispatch({ type: "SET_REACHED_LIMIT", payload: true });
         }
 
-        const errorToastMessage = isQuotaError
-          ? "Daily API limit reached. Please try again tomorrow."
-          : "Failed to get response. Please try again.";
+        const errorMessage = isQuotaError
+          ? "I've reached my daily conversation limit. Please try again tomorrow."
+          : "Sorry, I encountered an error while processing your request. Please try again.";
 
-        toast.error(errorToastMessage);
-
-        // Add error message to chat
-        const errorMessage: Message = {
-          id: generateId(),
-          role: "assistant",
-          content: isQuotaError
-            ? "I've reached my daily conversation limit. Please try again tomorrow or contact me directly for more information."
-            : "Sorry, I encountered an error while processing your request. Please try again.",
-          timestamp: new Date(),
-        };
-        setMessages((prev) => [...prev, errorMessage]);
+        // Update assistant message with error
+        dispatch({
+          type: "UPDATE_ASSISTANT_MESSAGE",
+          payload: {
+            id: assistantMessageId,
+            content: errorMessage,
+          },
+        });
       } finally {
-        setIsLoading(false);
-        setLoadingSubmit(false);
-        setIsTalking(false);
+        dispatch({ type: "RESET_STREAMING_STATE" });
         if (videoRef.current) {
           videoRef.current.pause();
         }
-        console.log("[CLIENT] Request completed");
+        abortControllerRef.current = null;
       }
     },
     [
       isLoading,
       loadingSubmit,
-      generateId,
-      scrollToBottom,
-      saveConversation,
       lastRequestTime,
+      messages,
+      generateId,
+      handleStreamingResponse,
     ]
   );
 
@@ -554,23 +680,12 @@ const Chat = () => {
   const onSubmit = useCallback(
     (e: React.FormEvent) => {
       e.preventDefault();
-
       const currentInput = input.trim();
-      console.log("[CLIENT] Form submit triggered with input:", currentInput);
 
-      if (!currentInput || isToolInProgress) {
-        console.log(
-          "[CLIENT] Submit blocked - empty input or tool in progress"
-        );
+      if (!currentInput || isLoading || loadingSubmit) {
         return;
       }
 
-      if (isLoading || loadingSubmit) {
-        console.log("[CLIENT] Submit blocked - already processing");
-        return;
-      }
-
-      console.log("[CLIENT] Calling submitQuery with:", currentInput);
       submitQuery(currentInput);
     },
     [input, isLoading, loadingSubmit, submitQuery]
@@ -578,15 +693,16 @@ const Chat = () => {
 
   // Stop current request
   const handleStop = useCallback(() => {
-    setIsLoading(false);
-    setLoadingSubmit(false);
-    setIsTalking(false);
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    dispatch({ type: "RESET_STREAMING_STATE" });
     if (videoRef.current) {
       videoRef.current.pause();
     }
   }, []);
 
-  // Reload last message (simplified)
+  // Reload last message
   const reload = useCallback(async () => {
     const lastUserMessage = messages.filter((m) => m.role === "user").pop();
     if (lastUserMessage) {
@@ -595,52 +711,15 @@ const Chat = () => {
     return null;
   }, [messages, submitQuery]);
 
-  // Add tool result (placeholder)
-  const addToolResult = useCallback(() => {
-    // Placeholder for tool results
-  }, []);
-
-  // Append message (for compatibility)
-  const append = useCallback(
-    (message: { role: "user" | "assistant"; content: string }) => {
-      const newMessage: Message = {
-        id: generateId(),
-        role: message.role,
-        content: message.content,
-        timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, newMessage]);
-    },
+  // Computed values
+  const { hasActiveTool } = useMemo(
+    () => ({
+      hasActiveTool: false, // Simplified - no tool support for now
+    }),
     []
   );
 
-  // Computed values
-  const { currentAIMessage, latestUserMessage, hasActiveTool } = useMemo(() => {
-    const latestAIMessageIndex = messages.findLastIndex(
-      (m: Message) => m.role === "assistant"
-    );
-    const latestUserMessageIndex = messages.findLastIndex(
-      (m: Message) => m.role === "user"
-    );
-
-    const result = {
-      currentAIMessage:
-        latestAIMessageIndex !== -1 ? messages[latestAIMessageIndex] : null,
-      latestUserMessage:
-        latestUserMessageIndex !== -1 ? messages[latestUserMessageIndex] : null,
-      hasActiveTool: false,
-    };
-
-    if (latestAIMessageIndex < latestUserMessageIndex) {
-      result.currentAIMessage = null;
-    }
-
-    return result;
-  }, [messages]);
-
-  const isToolInProgress = messages.some(
-    (m: Message) => m.role === "assistant" && false // Simplified - no tool support for now
-  );
+  const isToolInProgress = false; // Simplified - no tool support
 
   // Effects
   useEffect(() => {
@@ -651,24 +730,28 @@ const Chat = () => {
       videoRef.current.pause();
     }
 
-    // Load conversation from local storage on mount
-    loadConversation();
+    // Load conversation from memory storage on mount
+    if (!conversationLoaded) {
+      loadConversation();
+    }
+  }, [loadConversation, conversationLoaded]);
 
-    if (initialQuery && !autoSubmitted) {
+  // Handle initial query submission
+  useEffect(() => {
+    if (initialQuery && !autoSubmitted && conversationLoaded) {
       setAutoSubmitted(true);
-      setInput("");
       submitQuery(initialQuery);
     }
-  }, [initialQuery, autoSubmitted, submitQuery, loadConversation]);
+  }, [initialQuery, autoSubmitted, submitQuery, conversationLoaded]);
 
   // Save conversation whenever messages change
   useEffect(() => {
-    if (messages.length > 0) {
+    if (messages.length > 0 && conversationLoaded) {
       saveConversation(messages);
-      scrollToBottom();
     }
-  }, [messages, saveConversation, scrollToBottom]);
+  }, [messages, saveConversation, conversationLoaded]);
 
+  // Control video based on talking state
   useEffect(() => {
     if (videoRef.current) {
       if (isTalking) {
@@ -681,7 +764,16 @@ const Chat = () => {
     }
   }, [isTalking]);
 
-  // Check if this is the initial empty state (no messages)
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
+  }, []);
+
+  // Check if this is the initial empty state
   const isEmptyState = messages.length === 0 && !loadingSubmit;
 
   return (
@@ -696,21 +788,26 @@ const Chat = () => {
           <div className="flex items-center gap-1">
             <button
               onClick={clearConversation}
-              className="text-muted-foreground hover:text-destructive hover:bg-destructive/5 rounded-md px-2 py-0.5 text-xs transition-all duration-200"
+              disabled={isLoading || loadingSubmit}
+              className="text-muted-foreground hover:text-destructive hover:bg-destructive/5 rounded-md px-2 py-0.5 text-xs transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Clear
             </button>
-            <WelcomeModal
-              trigger={
-                <button className="text-muted-foreground hover:text-foreground hover:bg-accent/5 rounded-md p-1 transition-all duration-200">
-                  <Info className="h-3 w-3" />
-                </button>
-              }
-            />
+            <button
+              className="text-muted-foreground hover:text-foreground hover:bg-accent/5 rounded-md p-1 transition-all duration-200"
+              onClick={() => {
+                // Could add help modal here
+                toast.info(
+                  "This is Siraj Ahmed's AI assistant. Ask me anything!"
+                );
+              }}
+            >
+              <Info className="h-3 w-3" />
+            </button>
           </div>
         </div>
 
-        {/* Messages Area with proper padding */}
+        {/* Messages Area */}
         <div className="flex-1 overflow-hidden">
           <div className="h-full overflow-y-auto px-4 py-6">
             <div className="mx-auto max-w-4xl">
@@ -737,13 +834,13 @@ const Chat = () => {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         transition={{
                           duration: 0.4,
-                          delay: index * 0.05,
+                          delay: Math.min(index * 0.05, 0.3),
                           ease: "easeOut",
                         }}
                         className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
                       >
                         <div className="group relative max-w-[85%]">
-                          {/* Gemini-style Message Layout */}
+                          {/* Message Layout */}
                           <div
                             className={`flex items-start gap-3 ${message.role === "user" ? "flex-row-reverse" : "flex-row"}`}
                           >
@@ -760,7 +857,6 @@ const Chat = () => {
                             <div
                               className={`relative ${message.role === "user" ? "ml-8" : "mr-8"}`}
                             >
-                              {/* User Message - Clean bubble style */}
                               {message.role === "user" ? (
                                 <div className="bg-primary text-primary-foreground rounded-2xl rounded-br-md px-4 py-3 shadow-sm">
                                   <div className="prose prose-sm max-w-none">
@@ -771,7 +867,6 @@ const Chat = () => {
                                       reload={() => Promise.resolve(null)}
                                     />
                                   </div>
-                                  {/* Reserved space for timestamp */}
                                   <div className="mt-1 flex h-4 justify-end">
                                     <span className="text-primary-foreground/70 text-xs opacity-0 transition-opacity duration-200 group-hover:opacity-100">
                                       {message.timestamp.toLocaleTimeString(
@@ -785,7 +880,6 @@ const Chat = () => {
                                   </div>
                                 </div>
                               ) : (
-                                /* Assistant Message - Clean text style like Gemini */
                                 <div className="text-foreground max-w-3xl">
                                   <div className="prose prose-sm max-w-none">
                                     <ChatMessageContent
@@ -799,7 +893,6 @@ const Chat = () => {
                                       reload={() => Promise.resolve(null)}
                                     />
                                   </div>
-                                  {/* Reserved space for timestamp */}
                                   <div className="mt-3 flex h-4 justify-start">
                                     <span className="text-muted-foreground text-xs opacity-0 transition-opacity duration-200 group-hover:opacity-100">
                                       {message.timestamp.toLocaleTimeString(
@@ -830,7 +923,7 @@ const Chat = () => {
                       </motion.div>
                     ))}
 
-                    {/* Gemini-style Typing Animation */}
+                    {/* Typing Animation */}
                     {loadingSubmit && (
                       <motion.div
                         initial={{ opacity: 0, y: 10 }}
@@ -839,61 +932,36 @@ const Chat = () => {
                         className="flex justify-start"
                       >
                         <div className="flex items-start gap-3">
-                          {/* Avatar */}
                           <div className="from-primary/15 to-accent/15 border-primary/10 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border bg-gradient-to-br">
                             <span className="text-primary text-sm font-semibold">
                               SA
                             </span>
                           </div>
-
-                          {/* Typing indicator */}
                           <div className="text-foreground">
                             <div className="flex items-center gap-1 py-1">
-                              <motion.div
-                                className="bg-primary/50 h-2 w-2 rounded-full"
-                                animate={{
-                                  scale: [1, 1.4, 1],
-                                  opacity: [0.3, 1, 0.3],
-                                }}
-                                transition={{
-                                  duration: 1.2,
-                                  repeat: Infinity,
-                                  ease: "easeInOut",
-                                }}
-                              />
-                              <motion.div
-                                className="bg-primary/50 h-2 w-2 rounded-full"
-                                animate={{
-                                  scale: [1, 1.4, 1],
-                                  opacity: [0.3, 1, 0.3],
-                                }}
-                                transition={{
-                                  duration: 1.2,
-                                  repeat: Infinity,
-                                  ease: "easeInOut",
-                                  delay: 0.2,
-                                }}
-                              />
-                              <motion.div
-                                className="bg-primary/50 h-2 w-2 rounded-full"
-                                animate={{
-                                  scale: [1, 1.4, 1],
-                                  opacity: [0.3, 1, 0.3],
-                                }}
-                                transition={{
-                                  duration: 1.2,
-                                  repeat: Infinity,
-                                  ease: "easeInOut",
-                                  delay: 0.4,
-                                }}
-                              />
+                              {[0, 1, 2].map((i) => (
+                                <motion.div
+                                  key={i}
+                                  className="bg-primary/50 h-2 w-2 rounded-full"
+                                  animate={{
+                                    scale: [1, 1.4, 1],
+                                    opacity: [0.3, 1, 0.3],
+                                  }}
+                                  transition={{
+                                    duration: 1.2,
+                                    repeat: Infinity,
+                                    ease: "easeInOut",
+                                    delay: i * 0.2,
+                                  }}
+                                />
+                              ))}
                             </div>
                           </div>
                         </div>
                       </motion.div>
                     )}
 
-                    {/* Invisible element to scroll to */}
+                    {/* Scroll target */}
                     <div ref={messagesEndRef} />
                   </motion.div>
                 )}
@@ -902,23 +970,25 @@ const Chat = () => {
           </div>
         </div>
 
-        {/* Minimal Input Area */}
+        {/* Input Area */}
         <div className="border-border/20 bg-background/60 relative z-10 border-t px-6 py-3 backdrop-blur-md">
           <div className="mx-auto max-w-4xl">
             <div className="flex flex-col gap-2">
               <HelperBoost
                 submitQuery={submitQuery}
-                setInput={setInput}
+                setInput={(value: string) =>
+                  dispatch({ type: "SET_INPUT", payload: value })
+                }
                 hasReachedLimit={hasReachedLimit}
               />
               <ChatBottombar
                 input={input}
                 handleInputChange={handleInputChange}
                 handleSubmit={onSubmit}
-                isLoading={isLoading}
+                isLoading={isLoading || loadingSubmit}
                 stop={handleStop}
                 isToolInProgress={isToolInProgress}
-                disabled={false}
+                disabled={hasReachedLimit}
               />
             </div>
           </div>
