@@ -1,28 +1,28 @@
-'use client';
-import { AnimatePresence, motion } from 'framer-motion';
-import dynamic from 'next/dynamic';
-import { useSearchParams } from 'next/navigation';
+"use client";
+import { AnimatePresence, motion } from "framer-motion";
+import dynamic from "next/dynamic";
+import { useSearchParams } from "next/navigation";
 import React, {
   useCallback,
   useEffect,
   useMemo,
   useRef,
   useState,
-} from 'react';
-import { toast } from 'sonner';
+} from "react";
+import { toast } from "sonner";
 
 // Component imports
-import ChatBottombar from '@/components/chat/chat-bottombar';
-import ChatLanding from '@/components/chat/chat-landing';
-import ChatMessageContent from '@/components/chat/chat-message-content';
-import { SimplifiedChatView } from '@/components/chat/simple-chat-view';
+import ChatBottombar from "@/components/chat/chat-bottombar";
+import ChatLanding from "@/components/chat/chat-landing";
+import ChatMessageContent from "@/components/chat/chat-message-content";
+import { SimplifiedChatView } from "@/components/chat/simple-chat-view";
 import {
   ChatBubble,
   ChatBubbleMessage,
-} from '@/components/ui/chat/chat-bubble';
-import WelcomeModal from '@/components/welcome-modal';
-import { Info } from 'lucide-react';
-import HelperBoost from './HelperBoost';
+} from "@/components/ui/chat/chat-bubble";
+import WelcomeModal from "@/components/welcome-modal";
+import { Info } from "lucide-react";
+import HelperBoost from "./HelperBoost";
 
 // Message info dialog component
 const MessageInfoDialog = ({
@@ -63,7 +63,7 @@ const MessageInfoDialog = ({
           <div className="border-border/30 flex items-center justify-between border-b py-2">
             <span className="text-muted-foreground text-sm">From</span>
             <span className="text-sm font-medium">
-              {message.role === 'assistant' ? 'Siraj Ahmed' : 'You'}
+              {message.role === "assistant" ? "Siraj Ahmed" : "You"}
             </span>
           </div>
           <div className="border-border/30 flex items-center justify-between border-b py-2">
@@ -87,7 +87,7 @@ const MessageInfoDialog = ({
 // Message type definition
 interface Message {
   id: string;
-  role: 'user' | 'assistant';
+  role: "user" | "assistant";
   content: string;
   timestamp: Date;
 }
@@ -136,7 +136,7 @@ const Avatar = dynamic<AvatarProps>(
         // iPad Pro check
         const isIPadOS =
           //@ts-ignore
-          platform === 'MacIntel' && maxTouchPoints > 1 && !window.MSStream;
+          platform === "MacIntel" && maxTouchPoints > 1 && !window.MSStream;
 
         // Safari check
         const isSafari = /Safari/.test(userAgent) && !/Chrome/.test(userAgent);
@@ -147,11 +147,11 @@ const Avatar = dynamic<AvatarProps>(
       // Conditional rendering based on detection
       return (
         <div
-          className={`flex items-center justify-center rounded-full transition-all duration-300 ${hasActiveTool ? 'h-20 w-20' : 'h-28 w-28'}`}
+          className={`flex items-center justify-center rounded-full transition-all duration-300 ${hasActiveTool ? "h-20 w-20" : "h-28 w-28"}`}
         >
           <div
             className="relative cursor-pointer"
-            onClick={() => (window.location.href = '/')}
+            onClick={() => (window.location.href = "/")}
           >
             {isIOS() ? (
               <img
@@ -189,11 +189,11 @@ const Chat = () => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const searchParams = useSearchParams();
-  const initialQuery = searchParams.get('query');
+  const initialQuery = searchParams.get("query");
 
   // Chat state
   const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [autoSubmitted, setAutoSubmitted] = useState(false);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
@@ -220,7 +220,7 @@ const Chat = () => {
   // Load conversation from local storage
   const loadConversation = useCallback(() => {
     try {
-      const saved = localStorage.getItem('chat-conversation');
+      const saved = localStorage.getItem("chat-conversation");
       if (saved) {
         const parsedMessages = JSON.parse(saved);
         // Convert timestamp strings back to Date objects
@@ -231,16 +231,16 @@ const Chat = () => {
         setMessages(messagesWithDates);
       }
     } catch (error) {
-      console.error('Failed to load conversation:', error);
+      console.error("Failed to load conversation:", error);
     }
   }, []);
 
   // Save conversation to local storage
   const saveConversation = useCallback((messages: Message[]) => {
     try {
-      localStorage.setItem('chat-conversation', JSON.stringify(messages));
+      localStorage.setItem("chat-conversation", JSON.stringify(messages));
     } catch (error) {
-      console.error('Failed to save conversation:', error);
+      console.error("Failed to save conversation:", error);
     }
   }, []);
 
@@ -248,9 +248,9 @@ const Chat = () => {
   const scrollToBottom = useCallback(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({
-        behavior: 'smooth',
-        block: 'end',
-        inline: 'nearest',
+        behavior: "smooth",
+        block: "end",
+        inline: "nearest",
       });
     }
   }, []);
@@ -267,7 +267,7 @@ const Chat = () => {
   // Clear conversation
   const clearConversation = useCallback(() => {
     setMessages([]);
-    localStorage.removeItem('chat-conversation');
+    localStorage.removeItem("chat-conversation");
   }, []);
 
   // Handle input change
@@ -283,11 +283,11 @@ const Chat = () => {
     async (query: string) => {
       if (!query.trim() || isLoading || loadingSubmit) {
         console.log(
-          '[CLIENT] Submit blocked - query:',
+          "[CLIENT] Submit blocked - query:",
           query.trim(),
-          'isLoading:',
+          "isLoading:",
           isLoading,
-          'loadingSubmit:',
+          "loadingSubmit:",
           loadingSubmit
         );
         return;
@@ -297,33 +297,33 @@ const Chat = () => {
       const now = Date.now();
       const timeSinceLastRequest = now - lastRequestTime;
       if (timeSinceLastRequest < 2000) {
-        console.log('[CLIENT] Rate limited - too frequent requests');
-        toast.error('Please wait a moment before sending another message.');
+        console.log("[CLIENT] Rate limited - too frequent requests");
+        toast.error("Please wait a moment before sending another message.");
         return;
       }
 
       const trimmedQuery = query.trim();
-      console.log('[CLIENT] Starting submitQuery with:', trimmedQuery);
+      console.log("[CLIENT] Starting submitQuery with:", trimmedQuery);
 
       setLastRequestTime(now);
 
       // Add user message immediately
       const userMessage: Message = {
         id: generateId(),
-        role: 'user',
+        role: "user",
         content: trimmedQuery,
         timestamp: new Date(),
       };
 
-      console.log('[CLIENT] Adding user message:', userMessage.id);
+      console.log("[CLIENT] Adding user message:", userMessage.id);
 
       setMessages((prev) => {
         const newMessages = [...prev, userMessage];
-        console.log('[CLIENT] Messages after adding user:', newMessages.length);
+        console.log("[CLIENT] Messages after adding user:", newMessages.length);
         return newMessages;
       });
 
-      setInput(''); // Clear input after adding message
+      setInput(""); // Clear input after adding message
       setIsLoading(true);
       setLoadingSubmit(true);
       setIsTalking(true);
@@ -331,36 +331,36 @@ const Chat = () => {
       // Get current messages for API call (using ref to avoid dependency)
       const currentMessages = [...messagesRef.current, userMessage];
       console.log(
-        '[CLIENT] Sending to API - message count:',
+        "[CLIENT] Sending to API - message count:",
         currentMessages.length
       );
 
       // Play video
       if (videoRef.current) {
         videoRef.current.play().catch((error) => {
-          console.error('Failed to play video:', error);
+          console.error("Failed to play video:", error);
         });
       }
 
       try {
-        console.log('[CLIENT] Making API request...');
-        const response = await fetch('/api/chat', {
-          method: 'POST',
+        console.log("[CLIENT] Making API request...");
+        const response = await fetch("/api/chat", {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({
             messages: currentMessages,
           }),
         });
 
-        console.log('[CLIENT] API response status:', response.status);
+        console.log("[CLIENT] API response status:", response.status);
 
         if (!response.ok) {
           if (response.status === 429) {
             const errorText = await response.text();
             throw new Error(
-              errorText || 'API quota exceeded. Please try again later.'
+              errorText || "API quota exceeded. Please try again later."
             );
           }
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -369,20 +369,20 @@ const Chat = () => {
         // Handle streaming response
         const reader = response.body?.getReader();
         const decoder = new TextDecoder();
-        let assistantContent = '';
+        let assistantContent = "";
         let chunkCount = 0;
 
         // Create assistant message placeholder
         const assistantMessageId = generateId();
         const assistantMessage: Message = {
           id: assistantMessageId,
-          role: 'assistant',
-          content: '',
+          role: "assistant",
+          content: "",
           timestamp: new Date(),
         };
 
         console.log(
-          '[CLIENT] Adding assistant placeholder:',
+          "[CLIENT] Adding assistant placeholder:",
           assistantMessageId
         );
 
@@ -390,7 +390,7 @@ const Chat = () => {
         setMessages((prev) => {
           const newMessages = [...prev, assistantMessage];
           console.log(
-            '[CLIENT] Messages after adding assistant placeholder:',
+            "[CLIENT] Messages after adding assistant placeholder:",
             newMessages.length
           );
           return newMessages;
@@ -401,19 +401,19 @@ const Chat = () => {
             while (true) {
               const { done, value } = await reader.read();
               if (done) {
-                console.log('[CLIENT] Stream done, total chunks:', chunkCount);
+                console.log("[CLIENT] Stream done, total chunks:", chunkCount);
                 break;
               }
 
               const chunk = decoder.decode(value);
-              const lines = chunk.split('\n');
+              const lines = chunk.split("\n");
 
               for (const line of lines) {
-                if (line.startsWith('data: ')) {
+                if (line.startsWith("data: ")) {
                   const data = line.slice(6).trim();
 
-                  if (data === '[DONE]') {
-                    console.log('[CLIENT] Received [DONE] marker');
+                  if (data === "[DONE]") {
+                    console.log("[CLIENT] Received [DONE] marker");
                     break;
                   }
 
@@ -439,7 +439,7 @@ const Chat = () => {
                       // Stop loading animation after first chunk
                       if (chunkCount === 1) {
                         console.log(
-                          '[CLIENT] First chunk received, stopping loading animation'
+                          "[CLIENT] First chunk received, stopping loading animation"
                         );
                         setIsLoading(false);
                       }
@@ -449,7 +449,7 @@ const Chat = () => {
                     }
                   } catch (parseError) {
                     console.warn(
-                      '[CLIENT] Failed to parse streaming data:',
+                      "[CLIENT] Failed to parse streaming data:",
                       data,
                       parseError
                     );
@@ -458,7 +458,7 @@ const Chat = () => {
               }
             }
           } catch (streamError) {
-            console.error('[CLIENT] Streaming error:', streamError);
+            console.error("[CLIENT] Streaming error:", streamError);
             // Update with error message
             setMessages((prev) =>
               prev.map((msg) =>
@@ -466,7 +466,7 @@ const Chat = () => {
                   ? {
                       ...msg,
                       content:
-                        'Sorry, there was an error processing your request. Please try again.',
+                        "Sorry, there was an error processing your request. Please try again.",
                     }
                   : msg
               )
@@ -477,7 +477,7 @@ const Chat = () => {
         }
 
         console.log(
-          '[CLIENT] Final assistant content length:',
+          "[CLIENT] Final assistant content length:",
           assistantContent.length
         );
 
@@ -498,35 +498,35 @@ const Chat = () => {
             { ...assistantMessage, content: assistantContent },
           ];
           saveConversation(finalMessages);
-          console.log('[CLIENT] Saved conversation to localStorage');
+          console.log("[CLIENT] Saved conversation to localStorage");
         }, 100);
       } catch (error) {
-        console.error('[CLIENT] Chat error:', error);
+        console.error("[CLIENT] Chat error:", error);
 
         // Check if it's a quota exceeded error
         const isQuotaError =
           error instanceof Error &&
-          (error.message.includes('QUOTA_EXCEEDED') ||
-            error.message.includes('quota exceeded') ||
-            error.message.includes('429'));
+          (error.message.includes("QUOTA_EXCEEDED") ||
+            error.message.includes("quota exceeded") ||
+            error.message.includes("429"));
 
         if (isQuotaError) {
           setHasReachedLimit(true);
         }
 
         const errorToastMessage = isQuotaError
-          ? 'Daily API limit reached. Please try again tomorrow.'
-          : 'Failed to get response. Please try again.';
+          ? "Daily API limit reached. Please try again tomorrow."
+          : "Failed to get response. Please try again.";
 
         toast.error(errorToastMessage);
 
         // Add error message to chat
         const errorMessage: Message = {
           id: generateId(),
-          role: 'assistant',
+          role: "assistant",
           content: isQuotaError
             ? "I've reached my daily conversation limit. Please try again tomorrow or contact me directly for more information."
-            : 'Sorry, I encountered an error while processing your request. Please try again.',
+            : "Sorry, I encountered an error while processing your request. Please try again.",
           timestamp: new Date(),
         };
         setMessages((prev) => [...prev, errorMessage]);
@@ -537,7 +537,7 @@ const Chat = () => {
         if (videoRef.current) {
           videoRef.current.pause();
         }
-        console.log('[CLIENT] Request completed');
+        console.log("[CLIENT] Request completed");
       }
     },
     [
@@ -556,21 +556,21 @@ const Chat = () => {
       e.preventDefault();
 
       const currentInput = input.trim();
-      console.log('[CLIENT] Form submit triggered with input:', currentInput);
+      console.log("[CLIENT] Form submit triggered with input:", currentInput);
 
       if (!currentInput || isToolInProgress) {
         console.log(
-          '[CLIENT] Submit blocked - empty input or tool in progress'
+          "[CLIENT] Submit blocked - empty input or tool in progress"
         );
         return;
       }
 
       if (isLoading || loadingSubmit) {
-        console.log('[CLIENT] Submit blocked - already processing');
+        console.log("[CLIENT] Submit blocked - already processing");
         return;
       }
 
-      console.log('[CLIENT] Calling submitQuery with:', currentInput);
+      console.log("[CLIENT] Calling submitQuery with:", currentInput);
       submitQuery(currentInput);
     },
     [input, isLoading, loadingSubmit, submitQuery]
@@ -588,7 +588,7 @@ const Chat = () => {
 
   // Reload last message (simplified)
   const reload = useCallback(async () => {
-    const lastUserMessage = messages.filter((m) => m.role === 'user').pop();
+    const lastUserMessage = messages.filter((m) => m.role === "user").pop();
     if (lastUserMessage) {
       await submitQuery(lastUserMessage.content);
     }
@@ -602,7 +602,7 @@ const Chat = () => {
 
   // Append message (for compatibility)
   const append = useCallback(
-    (message: { role: 'user' | 'assistant'; content: string }) => {
+    (message: { role: "user" | "assistant"; content: string }) => {
       const newMessage: Message = {
         id: generateId(),
         role: message.role,
@@ -617,10 +617,10 @@ const Chat = () => {
   // Computed values
   const { currentAIMessage, latestUserMessage, hasActiveTool } = useMemo(() => {
     const latestAIMessageIndex = messages.findLastIndex(
-      (m: Message) => m.role === 'assistant'
+      (m: Message) => m.role === "assistant"
     );
     const latestUserMessageIndex = messages.findLastIndex(
-      (m: Message) => m.role === 'user'
+      (m: Message) => m.role === "user"
     );
 
     const result = {
@@ -639,7 +639,7 @@ const Chat = () => {
   }, [messages]);
 
   const isToolInProgress = messages.some(
-    (m: Message) => m.role === 'assistant' && false // Simplified - no tool support for now
+    (m: Message) => m.role === "assistant" && false // Simplified - no tool support for now
   );
 
   // Effects
@@ -656,7 +656,7 @@ const Chat = () => {
 
     if (initialQuery && !autoSubmitted) {
       setAutoSubmitted(true);
-      setInput('');
+      setInput("");
       submitQuery(initialQuery);
     }
   }, [initialQuery, autoSubmitted, submitQuery, loadConversation]);
@@ -673,7 +673,7 @@ const Chat = () => {
     if (videoRef.current) {
       if (isTalking) {
         videoRef.current.play().catch((error) => {
-          console.error('Failed to play video:', error);
+          console.error("Failed to play video:", error);
         });
       } else {
         videoRef.current.pause();
@@ -685,43 +685,31 @@ const Chat = () => {
   const isEmptyState = messages.length === 0 && !loadingSubmit;
 
   return (
-    <div className="bg-background relative flex h-screen flex-col overflow-hidden">
+    <div className="bg-background relative flex h-full flex-col overflow-hidden">
       {/* Subtle background gradient */}
       <div className="from-background via-background/95 to-background absolute inset-0 bg-gradient-to-br" />
-      {/* Ultra-minimal Header */}
-      <header className="border-border/20 bg-background/60 relative z-10 border-b backdrop-blur-md">
-        <div className="flex h-10 items-center justify-between px-6">
-          {/* Left side - Assistant identity */}
-          <div className="flex items-center gap-2">
-            <div className="from-primary/15 to-accent/15 border-primary/10 flex h-6 w-6 items-center justify-center rounded-full border bg-gradient-to-br">
-              <span className="text-primary text-xs font-semibold">SA</span>
-            </div>
-            <span className="text-foreground/80 text-sm font-medium">
-              Siraj Ahmed
-            </span>
-          </div>
 
-          {/* Right side - Minimal controls */}
+      {/* Main Content Area */}
+      <div className="relative z-10 flex flex-1 flex-col overflow-hidden">
+        {/* Chat Controls */}
+        <div className="flex justify-end px-6 py-1 border-b border-border/20">
           <div className="flex items-center gap-1">
             <button
               onClick={clearConversation}
-              className="text-muted-foreground hover:text-destructive hover:bg-destructive/5 rounded-md px-2 py-1 text-xs transition-all duration-200"
+              className="text-muted-foreground hover:text-destructive hover:bg-destructive/5 rounded-md px-2 py-0.5 text-xs transition-all duration-200"
             >
               Clear
             </button>
             <WelcomeModal
               trigger={
-                <button className="text-muted-foreground hover:text-foreground hover:bg-accent/5 rounded-md p-1.5 transition-all duration-200">
-                  <Info className="h-3.5 w-3.5" />
+                <button className="text-muted-foreground hover:text-foreground hover:bg-accent/5 rounded-md p-1 transition-all duration-200">
+                  <Info className="h-3 w-3" />
                 </button>
               }
             />
           </div>
         </div>
-      </header>
 
-      {/* Main Content Area */}
-      <div className="relative z-10 flex flex-1 flex-col overflow-hidden">
         {/* Messages Area with proper padding */}
         <div className="flex-1 overflow-hidden">
           <div className="h-full overflow-y-auto px-4 py-6">
@@ -750,17 +738,17 @@ const Chat = () => {
                         transition={{
                           duration: 0.4,
                           delay: index * 0.05,
-                          ease: 'easeOut',
+                          ease: "easeOut",
                         }}
-                        className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                        className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
                       >
                         <div className="group relative max-w-[85%]">
                           {/* Gemini-style Message Layout */}
                           <div
-                            className={`flex items-start gap-3 ${message.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
+                            className={`flex items-start gap-3 ${message.role === "user" ? "flex-row-reverse" : "flex-row"}`}
                           >
                             {/* Avatar for Assistant */}
-                            {message.role === 'assistant' && (
+                            {message.role === "assistant" && (
                               <div className="from-primary/20 to-accent/20 border-primary/20 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border bg-gradient-to-br">
                                 <span className="text-primary text-sm font-bold">
                                   SA
@@ -770,10 +758,10 @@ const Chat = () => {
 
                             {/* Message Bubble */}
                             <div
-                              className={`relative ${message.role === 'user' ? 'ml-8' : 'mr-8'}`}
+                              className={`relative ${message.role === "user" ? "ml-8" : "mr-8"}`}
                             >
                               {/* User Message - Clean bubble style */}
-                              {message.role === 'user' ? (
+                              {message.role === "user" ? (
                                 <div className="bg-primary text-primary-foreground rounded-2xl rounded-br-md px-4 py-3 shadow-sm">
                                   <div className="prose prose-sm max-w-none">
                                     <ChatMessageContent
@@ -789,8 +777,8 @@ const Chat = () => {
                                       {message.timestamp.toLocaleTimeString(
                                         [],
                                         {
-                                          hour: '2-digit',
-                                          minute: '2-digit',
+                                          hour: "2-digit",
+                                          minute: "2-digit",
                                         }
                                       )}
                                     </span>
@@ -805,8 +793,8 @@ const Chat = () => {
                                       isLast={index === messages.length - 1}
                                       isLoading={
                                         isLoading &&
-                                        message.role === 'assistant' &&
-                                        message.content === ''
+                                        message.role === "assistant" &&
+                                        message.content === ""
                                       }
                                       reload={() => Promise.resolve(null)}
                                     />
@@ -817,8 +805,8 @@ const Chat = () => {
                                       {message.timestamp.toLocaleTimeString(
                                         [],
                                         {
-                                          hour: '2-digit',
-                                          minute: '2-digit',
+                                          hour: "2-digit",
+                                          minute: "2-digit",
                                         }
                                       )}
                                     </span>
@@ -847,7 +835,7 @@ const Chat = () => {
                       <motion.div
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.3, ease: 'easeOut' }}
+                        transition={{ duration: 0.3, ease: "easeOut" }}
                         className="flex justify-start"
                       >
                         <div className="flex items-start gap-3">
@@ -870,7 +858,7 @@ const Chat = () => {
                                 transition={{
                                   duration: 1.2,
                                   repeat: Infinity,
-                                  ease: 'easeInOut',
+                                  ease: "easeInOut",
                                 }}
                               />
                               <motion.div
@@ -882,7 +870,7 @@ const Chat = () => {
                                 transition={{
                                   duration: 1.2,
                                   repeat: Infinity,
-                                  ease: 'easeInOut',
+                                  ease: "easeInOut",
                                   delay: 0.2,
                                 }}
                               />
@@ -895,7 +883,7 @@ const Chat = () => {
                                 transition={{
                                   duration: 1.2,
                                   repeat: Infinity,
-                                  ease: 'easeInOut',
+                                  ease: "easeInOut",
                                   delay: 0.4,
                                 }}
                               />

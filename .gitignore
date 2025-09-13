@@ -13,6 +13,8 @@ out/
 *.sublime-workspace
 *.sublime-project
 
+.next/
+
 # OS files
 .DS_Store
 Thumbs.db
