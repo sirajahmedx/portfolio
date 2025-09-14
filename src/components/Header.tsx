@@ -36,15 +36,8 @@ export default function Header() {
       <div className="flex h-full items-center justify-between px-6">
         {/* Left side - Logo */}
         <div className="flex items-center gap-2">
-          <Image
-            src="/fastfolio-logo.png"
-            alt="Logo"
-            width={24}
-            height={24}
-            className="rounded"
-          />
           <Link href={"/"} className="flex items-center gap-2">
-            <span className="text-foreground text-sm font-medium">
+            <span className="text-foreground text-lg font-extrabold tracking-tight font-[cursive,sans-serif]">
               Siraj Ahmed
             </span>
           </Link>
