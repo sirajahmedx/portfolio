@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Github, Star } from "lucide-react";
+import { Github, Star, MessageCircle } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import Link from "next/link";
 
@@ -43,8 +43,16 @@ export default function Header() {
           </Link>
         </div>
 
-        {/* Right side - GitHub and Theme */}
+        {/* Right side - Chat, GitHub and Theme */}
         <div className="flex items-center gap-2">
+          <Link
+            href="/chat"
+            className="text-muted-foreground hover:text-foreground flex items-center gap-1 rounded-md px-2 py-1 text-xs transition-all duration-200"
+            aria-label="Start a chat"
+          >
+            <MessageCircle className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Chat</span>
+          </Link>
           <a
             href="https://github.com/sirajahmedx"
             target="_blank"

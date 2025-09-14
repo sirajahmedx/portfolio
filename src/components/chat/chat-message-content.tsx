@@ -8,7 +8,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { ChevronDown, ChevronUp } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ExternalLink } from "lucide-react";
@@ -51,7 +51,7 @@ const CodeBlock = ({ content }: { content: string }) => {
       className="my-4 w-full overflow-hidden rounded-md"
     >
       <div className="bg-secondary text-secondary-foreground flex items-center justify-between rounded-t-md border-b px-4 py-1">
-        <span className="text-xs">
+        <span className="text-sm">
           {language !== "text" ? language : "Code"}
         </span>
         <CollapsibleTrigger className="hover:bg-secondary/80 rounded p-1">
@@ -66,7 +66,7 @@ const CodeBlock = ({ content }: { content: string }) => {
       <div className="bg-accent/80 text-accent-foreground rounded-b-md">
         {!isOpen && hasMoreLines ? (
           <pre className="px-4 py-3">
-            <code className="text-xs md:text-sm leading-relaxed">
+            <code className="text-sm md:text-base leading-relaxed">
               {previewLines + "\n..."}
             </code>
           </pre>
@@ -74,7 +74,7 @@ const CodeBlock = ({ content }: { content: string }) => {
           <CollapsibleContent>
             <div className="custom-scrollbar" style={{ overflowX: "auto" }}>
               <pre className="min-w-max px-4 py-3">
-                <code className="text-xs md:text-sm whitespace-pre leading-relaxed">
+                <code className="text-sm md:text-base whitespace-pre leading-relaxed">
                   {code}
                 </code>
               </pre>
@@ -90,6 +90,23 @@ export default function ChatMessageContent({
   message,
 }: ChatMessageContentProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [visibleLines, setVisibleLines] = useState(5);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  // Check if content is long and needs truncation (mobile only, line-based)
+  const lines = message.content ? message.content.split("\n") : [];
+  const shouldTruncate = isMobile && lines.length > 5;
+  const truncatedContent =
+    shouldTruncate && !isExpanded
+      ? lines.slice(0, visibleLines).join("\n")
+      : message.content;
 
   // Handle both parts-based and direct content messages
   const renderContent = () => {
@@ -127,22 +144,22 @@ export default function ChatMessageContent({
                     remarkPlugins={[remarkGfm]}
                     components={{
                       p: ({ children }) => (
-                        <p className="break-words whitespace-pre-wrap text-xs md:text-base leading-relaxed">
+                        <p className="break-words whitespace-pre-wrap text-sm md:text-base leading-relaxed">
                           {children}
                         </p>
                       ),
                       ul: ({ children }) => (
-                        <ul className="my-3 md:my-4 list-disc pl-4 md:pl-6 text-xs md:text-base leading-relaxed">
+                        <ul className="my-3 md:my-4 list-disc pl-4 md:pl-6 text-sm md:text-base leading-relaxed">
                           {children}
                         </ul>
                       ),
                       ol: ({ children }) => (
-                        <ol className="my-3 md:my-4 list-decimal pl-4 md:pl-6 text-xs md:text-base leading-relaxed">
+                        <ol className="my-3 md:my-4 list-decimal pl-4 md:pl-6 text-sm md:text-base leading-relaxed">
                           {children}
                         </ol>
                       ),
                       li: ({ children }) => (
-                        <li className="my-2 text-xs md:text-base leading-relaxed">
+                        <li className="my-2 text-sm md:text-base leading-relaxed">
                           {children}
                         </li>
                       ),
@@ -189,7 +206,9 @@ export default function ChatMessageContent({
       );
     } // If no parts but has direct content, render it directly
     if (message.content) {
-      const contentParts = message.content.split("```");
+      const contentToRender =
+        shouldTruncate && !isExpanded ? truncatedContent : message.content;
+      const contentParts = contentToRender.split("```");
 
       const content = (
         <div className="w-full space-y-4">
@@ -201,22 +220,22 @@ export default function ChatMessageContent({
                   remarkPlugins={[remarkGfm]}
                   components={{
                     p: ({ children }) => (
-                      <p className="break-words whitespace-pre-wrap text-xs md:text-base leading-relaxed">
+                      <p className="break-words whitespace-pre-wrap text-sm md:text-base leading-relaxed">
                         {children}
                       </p>
                     ),
                     ul: ({ children }) => (
-                      <ul className="my-3 md:my-4 list-disc pl-4 md:pl-6 text-xs md:text-base leading-relaxed">
+                      <ul className="my-3 md:my-4 list-disc pl-4 md:pl-6 text-sm md:text-base leading-relaxed">
                         {children}
                       </ul>
                     ),
                     ol: ({ children }) => (
-                      <ol className="my-3 md:my-4 list-decimal pl-4 md:pl-6 text-xs md:text-base leading-relaxed">
+                      <ol className="my-3 md:my-4 list-decimal pl-4 md:pl-6 text-sm md:text-base leading-relaxed">
                         {children}
                       </ol>
                     ),
                     li: ({ children }) => (
-                      <li className="my-2 text-xs md:text-base leading-relaxed">
+                      <li className="my-2 text-sm md:text-base leading-relaxed">
                         {children}
                       </li>
                     ),
@@ -267,20 +286,27 @@ export default function ChatMessageContent({
 
   const content = renderContent();
 
-  // Check if content is long and needs truncation
-  const shouldTruncate = message.content && message.content.length > 500;
-  const truncatedContent =
-    shouldTruncate && !isExpanded
-      ? message.content.substring(0, 500) + "..."
-      : message.content;
-
   return (
     <div className="w-full">
       {content}
       {shouldTruncate && (
         <div className="mt-4 text-center">
           <Button
-            onClick={() => setIsExpanded(!isExpanded)}
+            onClick={() => {
+              if (!isExpanded) {
+                const newVisibleLines = Math.min(
+                  visibleLines + 5,
+                  lines.length
+                );
+                setVisibleLines(newVisibleLines);
+                if (newVisibleLines >= lines.length) {
+                  setIsExpanded(true);
+                }
+              } else {
+                setVisibleLines(5);
+                setIsExpanded(false);
+              }
+            }}
             variant="outline"
             size="sm"
             className="text-xs"

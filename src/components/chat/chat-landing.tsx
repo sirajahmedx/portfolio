@@ -67,7 +67,7 @@ const ChatLanding: React.FC<ChatLandingProps> = ({
         <h2 className="mb-2 md:mb-3 text-lg md:text-2xl font-semibold leading-relaxed">
           I'm Siraj's digital twin
         </h2>
-        <p className="text-muted-foreground mx-auto max-w-md text-xs md:text-base leading-relaxed">
+        <p className="text-muted-foreground mx-auto max-w-md text-sm md:text-base leading-relaxed">
           A passionate 16-year-old developer from Pakistan.
         </p>
       </motion.div>
@@ -94,7 +94,7 @@ const ChatLanding: React.FC<ChatLandingProps> = ({
             <span className="bg-background mr-2 md:mr-3 rounded-full p-1 md:p-2">
               {question.icon}
             </span>
-            <span className="text-left text-xs md:text-base leading-relaxed">
+            <span className="text-left text-sm md:text-base leading-relaxed">
               {question.text}
             </span>
           </motion.button>

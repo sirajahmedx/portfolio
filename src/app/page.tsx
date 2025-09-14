@@ -20,14 +20,14 @@ import { useEffect, useRef, useState } from "react";
 /* ---------- quick-question data ---------- */
 const questions = {
   Me: "Who are you? I want to know more about you.",
-  // Projects: "What are your projects? What are you working on right now?",
+  Projects: "What are your projects? What are you working on right now?",
   Skills: "What are your skills? Give me a list of your soft and hard skills.",
   Contact: "How can I contact you?",
 } as const;
 
 const questionConfig = [
   { key: "Me", color: "#329696", icon: Laugh },
-  // { key: "Projects", color: "#3E9858", icon: BriefcaseBusiness },
+  { key: "Projects", color: "#3E9858", icon: BriefcaseBusiness },
   { key: "Skills", color: "#856ED9", icon: Layers },
   { key: "Contact", color: "#C19433", icon: UserRoundSearch },
 ] as const;
