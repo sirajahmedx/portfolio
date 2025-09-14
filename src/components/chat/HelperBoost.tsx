@@ -184,17 +184,25 @@ export default React.memo(function HelperBoost({
       >
         <button
           onClick={toggleVisibility}
-          className="text-muted-foreground hover:text-foreground hover:bg-accent/50 flex items-center gap-2 rounded-xl px-4 py-2 text-sm transition-all duration-200 active:scale-95"
+          className="text-muted-foreground hover:text-foreground hover:bg-accent/50 flex items-center gap-1 md:gap-2 rounded-xl px-2 md:px-4 py-1.5 md:py-2 text-xs md:text-sm transition-all duration-200 active:scale-95"
         >
           {isVisible ? (
             <>
-              <ChevronDown size={16} strokeWidth={2} />
-              <span className="font-medium">Hide suggestions</span>
+              <ChevronDown
+                size={12}
+                className="md:w-4 md:h-4"
+                strokeWidth={2}
+              />
+              <span className="font-medium leading-relaxed">
+                Hide suggestions
+              </span>
             </>
           ) : (
             <>
-              <ChevronUp size={16} strokeWidth={2} />
-              <span className="font-medium">Show suggestions</span>
+              <ChevronUp size={12} className="md:w-4 md:h-4" strokeWidth={2} />
+              <span className="font-medium leading-relaxed">
+                Show suggestions
+              </span>
             </>
           )}
         </button>
@@ -212,16 +220,21 @@ export default React.memo(function HelperBoost({
                 key={key}
                 onClick={() => handleQuestionClick(key)}
                 variant="outline"
-                className={`h-auto min-w-[110px] flex-shrink-0 rounded-2xl border-2 px-5 py-4 shadow-sm backdrop-blur-md transition-all duration-200 hover:shadow-md ${
+                className={`h-auto min-w-[90px] md:min-w-[110px] flex-shrink-0 rounded-2xl border-2 px-2 md:px-5 py-2 md:py-4 shadow-sm backdrop-blur-md transition-all duration-200 hover:shadow-md ${
                   hasReachedLimit || disabledQuestions.has(key)
                     ? "border-border/50 bg-muted/50 cursor-not-allowed opacity-60"
                     : "border-border/80 hover:border-border hover:bg-accent/90 bg-background/90 cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
                 }`}
                 disabled={hasReachedLimit || disabledQuestions.has(key)}
               >
-                <div className="text-foreground flex items-center gap-3">
-                  <Icon size={20} strokeWidth={2.5} color={color} />
-                  <span className="text-sm font-semibold tracking-wide">
+                <div className="text-foreground flex items-center gap-1 md:gap-3">
+                  <Icon
+                    size={14}
+                    className="md:w-5 md:h-5"
+                    strokeWidth={2.5}
+                    color={color}
+                  />
+                  <span className="text-xs md:text-sm font-semibold tracking-wide leading-relaxed">
                     {key}
                   </span>
                 </div>

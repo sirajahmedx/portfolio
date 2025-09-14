@@ -36,8 +36,8 @@ export function ThemeToggle() {
         className="px-3"
         aria-label="Switch to light theme"
       >
-        <Sun className="mr-2 h-4 w-4" />
-        Light
+        <Sun className="mr-2 h-4 w-4 md:mr-2 md:h-4 md:w-4" />
+        <span className="hidden md:inline">Light</span>
       </Button>
       <Button
         variant={theme === "dark" ? "default" : "outline"}
@@ -46,8 +46,8 @@ export function ThemeToggle() {
         className="px-3"
         aria-label="Switch to dark theme"
       >
-        <Moon className="mr-2 h-4 w-4" />
-        Dark
+        <Moon className="mr-2 h-4 w-4 md:mr-2 md:h-4 md:w-4" />
+        <span className="hidden md:inline">Dark</span>
       </Button>
     </div>
   );

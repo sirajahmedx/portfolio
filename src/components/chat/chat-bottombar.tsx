@@ -1,11 +1,11 @@
 // src/components/chat/chat-bottombar.tsx
-'use client';
+"use client";
 
-import { ChatRequestOptions } from 'ai';
-import { motion } from 'framer-motion';
-import { ArrowRight, ArrowUp } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
-import { FastfolioTracking } from '@/lib/fastfolio-tracking';
+import { ChatRequestOptions } from "ai";
+import { motion } from "framer-motion";
+import { ArrowRight, ArrowUp } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { FastfolioTracking } from "@/lib/fastfolio-tracking";
 
 interface ChatBottombarProps {
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -39,7 +39,7 @@ export default function ChatBottombar({
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (
-      e.key === 'Enter' &&
+      e.key === "Enter" &&
       !e.nativeEvent.isComposing &&
       !isToolInProgress &&
       input.trim()
@@ -62,7 +62,7 @@ export default function ChatBottombar({
       className="w-full pb-2 md:pb-5"
     >
       <form onSubmit={handleSubmit} className="relative w-full md:px-4">
-        <div className="border-border bg-background/50 mx-auto flex items-center rounded-full border py-2 pr-2 pl-6 backdrop-blur-sm">
+        <div className="border-border bg-background/50 mx-auto flex items-center rounded-full border py-2 pr-2 pl-4 md:pl-6 backdrop-blur-sm">
           <input
             ref={inputRef}
             type="text"
@@ -71,13 +71,13 @@ export default function ChatBottombar({
             onKeyDown={handleKeyPress}
             placeholder={
               disabled
-                ? ''
+                ? ""
                 : isToolInProgress
-                  ? 'Tool is in progress...'
-                  : 'Ask me anything'
+                  ? "Tool is in progress..."
+                  : "Ask me anything"
             }
-            className={`text-md placeholder:text-muted-foreground w-full border-none bg-transparent focus:outline-none ${
-              disabled ? 'font-medium text-red-600' : 'text-foreground'
+            className={`text-sm md:text-md placeholder:text-muted-foreground w-full border-none bg-transparent focus:outline-none ${
+              disabled ? "font-medium text-red-600" : "text-foreground"
             }`}
             disabled={isToolInProgress || isLoading || disabled}
           />
@@ -87,7 +87,7 @@ export default function ChatBottombar({
             disabled={
               isLoading || !input.trim() || isToolInProgress || disabled
             }
-            className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center justify-center rounded-full p-2 transition-colors disabled:opacity-50"
+            className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center justify-center rounded-full p-1.5 md:p-2 transition-colors disabled:opacity-50"
             onClick={(e) => {
               if (isLoading) {
                 e.preventDefault();
@@ -95,7 +95,7 @@ export default function ChatBottombar({
               }
             }}
           >
-            <ArrowUp className="h-6 w-6" />
+            <ArrowUp className="h-4 w-4 md:h-6 md:w-6" />
           </button>
         </div>
       </form>

@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { Github, Star } from "lucide-react";
-import Image from "next/image";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import Link from "next/link";
 
@@ -38,7 +37,8 @@ export default function Header() {
         <div className="flex items-center gap-2">
           <Link href={"/"} className="flex items-center gap-2">
             <span className="text-foreground text-lg font-extrabold tracking-tight font-[cursive,sans-serif]">
-              Siraj Ahmed
+              <span className="md:hidden">Siraj</span>
+              <span className="hidden md:inline">Siraj Ahmed</span>
             </span>
           </Link>
         </div>
