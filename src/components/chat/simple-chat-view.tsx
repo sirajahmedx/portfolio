@@ -1,17 +1,17 @@
-'use client';
+"use client";
 
 import {
   ChatBubble,
   ChatBubbleMessage,
-} from '@/components/ui/chat/chat-bubble';
-import { motion } from 'framer-motion';
-import ChatMessageContent from './chat-message-content';
-import ToolRenderer from './tool-renderer';
+} from "@/components/ui/chat/chat-bubble";
+import { motion } from "framer-motion";
+import ChatMessageContent from "./chat-message-content";
+// import ToolRenderer from "./tool-renderer";
 
 // Custom Message interface to match our implementation
 interface Message {
   id: string;
-  role: 'user' | 'assistant';
+  role: "user" | "assistant";
   content: string;
   timestamp: Date;
   parts?: any[];
@@ -39,18 +39,18 @@ export function SimplifiedChatView({
   reload,
   addToolResult,
 }: SimplifiedChatViewProps) {
-  if (message.role !== 'assistant') return null;
+  if (message.role !== "assistant") return null;
 
   // Extract tool invocations that are in "result" state
   const toolInvocations =
     message.parts
       ?.filter(
         (part: any) =>
-          part.type === 'tool-invocation' &&
-          part.toolInvocation?.state === 'result'
+          part.type === "tool-invocation" &&
+          part.toolInvocation?.state === "result"
       )
       .map((part: any) =>
-        part.type === 'tool-invocation' ? part.toolInvocation : null
+        part.type === "tool-invocation" ? part.toolInvocation : null
       )
       .filter(Boolean) || [];
 
@@ -61,21 +61,21 @@ export function SimplifiedChatView({
     message.content !== undefined && message.content !== null;
   const hasTools = currentTool.length > 0;
 
-  console.log('currentTool', currentTool);
+  console.log("currentTool", currentTool);
 
   return (
     <motion.div {...MOTION_CONFIG} className="flex h-full w-full flex-col px-4">
       {/* Single scrollable container for both tool and text content */}
       <div className="custom-scrollbar flex h-full w-full flex-col overflow-y-auto">
         {/* Tool invocation result - displayed at the top */}
-        {hasTools && (
+        {/* {hasTools && (
           <div className="mb-4 w-full">
             <ToolRenderer
               toolInvocations={currentTool}
-              messageId={message.id || 'current-msg'}
+              messageId={message.id || "current-msg"}
             />
           </div>
-        )}
+        )} */}
 
         {/* Text content */}
         {hasTextContent && (

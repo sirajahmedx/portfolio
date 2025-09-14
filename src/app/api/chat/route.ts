@@ -2,14 +2,6 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import { SYSTEM_PROMPT } from './prompt';
 
 // Tool imports (currently unused but keeping for future implementation)
-import { getContact } from './tools/getContact';
-import { getCrazy } from './tools/getCrazy';
-import { getInternship } from './tools/getIntership';
-import { getPresentation } from './tools/getPresentation';
-import { getProjects } from './tools/getProjects';
-import { getResume } from './tools/getResume';
-import { getSkills } from './tools/getSkills';
-import { getSports } from './tools/getSport';
 
 export const maxDuration = 30;
 

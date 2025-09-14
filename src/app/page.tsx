@@ -122,8 +122,7 @@ export default function Home() {
               transition={{ delay: 0.4 }}
               className="text-muted-foreground text-xl sm:text-2xl"
             >
-              Full-Stack Developer crafting digital experiences with modern
-              technologies
+              Full-Stack Developer building modern, dynamic web applications.
             </motion.p>
 
             <motion.div
@@ -152,7 +151,7 @@ export default function Home() {
           >
             <div className="from-primary/20 to-accent/20 relative h-64 w-64 overflow-hidden rounded-full bg-gradient-to-br p-1 sm:h-80 sm:w-80">
               <Image
-                src="/landing-memojis.png"
+                src="/avatar-landing.png"
                 alt="Siraj Ahmed - Full Stack Developer"
                 width={400}
                 height={400}
