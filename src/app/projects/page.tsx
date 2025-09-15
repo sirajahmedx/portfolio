@@ -6,7 +6,7 @@ export default function ProjectsPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
-      <section className="relative py-16 md:py-24 px-4 overflow-hidden">
+      <section className="relative py-16 pb-8 md:pt-24 md:pb-12 px-4 overflow-hidden">
         <div className="max-w-7xl mx-auto text-center">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -14,22 +14,13 @@ export default function ProjectsPage() {
             transition={{ duration: 0.8 }}
             className="space-y-4 md:space-y-6"
           >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="inline-block rounded-full bg-primary/10 px-3 md:px-4 py-1 md:py-2 text-xs md:text-sm font-medium text-primary"
-            >
-              Featured Work
-            </motion.div>
-
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
               className="text-4xl md:text-5xl lg:text-7xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent leading-tight"
             >
-              Featured Projects
+              What I have built
             </motion.h1>
 
             <motion.p
@@ -84,22 +75,44 @@ export default function ProjectsPage() {
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 1.5, delay: 0.5 }}
-            className="absolute -top-40 -right-40 h-80 w-80 rounded-full bg-primary/10 blur-3xl"
+            className="absolute -top-40 -right-40 h-80 w-80 rounded-full bg-primary/20 blur-3xl"
           />
           <motion.div
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 1.5, delay: 0.7 }}
-            className="absolute -bottom-40 -left-40 h-80 w-80 rounded-full bg-accent/10 blur-3xl"
+            className="absolute -bottom-40 -left-40 h-80 w-80 rounded-full bg-accent/20 blur-3xl"
           />
           <motion.div
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 1.5, delay: 0.9 }}
-            className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-96 w-96 rounded-full bg-gradient-to-r from-primary/5 to-accent/5 blur-3xl"
+            className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-96 w-96 rounded-full bg-gradient-to-r from-primary/15 to-accent/15 blur-3xl"
           />
         </div>
       </section>
+
+      {/* Simple Separator */}
+      <div className="py-4 md:py-6 px-4">
+        <div className="max-w-6xl mx-auto">
+          <motion.div
+            initial={{ scaleX: 0 }}
+            whileInView={{ scaleX: 1 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="h-px bg-gradient-to-r from-transparent via-border to-transparent"
+          />
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            viewport={{ once: true }}
+            className="text-center text-lg md:text-base text-muted-foreground mt-6"
+          >
+            Discover my work below
+          </motion.p>
+        </div>
+      </div>
 
       {/* Projects Section */}
       <section className="pb-16 md:pb-20 px-4">

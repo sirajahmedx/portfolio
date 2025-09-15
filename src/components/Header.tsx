@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Github, Star, MessageCircle } from "lucide-react";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { ThemeToggle } from "@/components/theme-toggle";
 import Link from "next/link";
 
 export default function Header() {
@@ -29,48 +29,57 @@ export default function Header() {
 
   return (
     <header
-      className="fixed top-0 left-0 right-0 z-60 bg-background/80 backdrop-blur-md border-b border-border/20"
-      style={{ height: "56px" }}
+      className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-xl border-b border-border/30 shadow-sm"
+      style={{ height: "64px" }}
     >
-      <div className="flex h-full items-center justify-between px-6">
-        {/* Left side - Logo */}
-        <div className="flex items-center gap-2">
-          <Link href={"/"} className="flex items-center gap-2">
-            <span className="text-foreground text-lg font-extrabold tracking-tight font-[cursive,sans-serif]">
-              <span className="md:hidden">Siraj</span>
-              <span className="hidden md:inline">Siraj Ahmed</span>
+      <div className="flex h-full items-center justify-between px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div className="flex items-center">
+          <Link
+            href={"/"}
+            className="group flex items-center gap-2 transition-all duration-300 hover:scale-105"
+          >
+            <span className="text-foreground text-xl sm:text-2xl font-black tracking-tight font-sans bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text transition-all duration-300 group-hover:from-primary group-hover:to-primary/80">
+              <span className="sm:hidden">Siraj</span>
+              <span className="hidden sm:inline">Siraj Ahmed</span>
             </span>
           </Link>
         </div>
 
-        {/* Right side - Chat, GitHub and Theme */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 sm:gap-3">
           <Link
             href="/chat"
-            className="text-muted-foreground hover:text-foreground flex items-center gap-1 rounded-md px-2 py-1 text-xs transition-all duration-200"
+            className="group text-muted-foreground hover:text-foreground flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 sm:px-3 sm:py-2 text-sm font-medium transition-all duration-300 hover:bg-accent/50 hover:scale-105 active:scale-95"
             aria-label="Start a chat"
           >
-            <MessageCircle className="h-3.5 w-3.5" />
+            <MessageCircle className="h-4 w-4 transition-transform duration-300 group-hover:rotate-12" />
             <span className="hidden sm:inline">Chat</span>
           </Link>
+
           <a
             href="https://github.com/sirajahmedx"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-muted-foreground hover:text-foreground flex items-center gap-1 rounded-md px-2 py-1 text-xs transition-all duration-200"
+            className="group text-muted-foreground hover:text-foreground flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 sm:px-3 sm:py-2 text-sm font-medium transition-all duration-300 hover:bg-accent/50 hover:scale-105 active:scale-95"
             aria-label="View Siraj Ahmed's GitHub profile"
           >
-            <Github className="h-3.5 w-3.5" />
-            {error ? (
-              <span>Unavailable</span>
-            ) : stars !== null ? (
-              <span>{stars}</span>
-            ) : (
-              <span>Loading...</span>
-            )}
-            <Star className="h-3 w-3" />
+            <Github className="h-4 w-4 transition-transform duration-300 group-hover:rotate-12" />
+            <span className="text-xs sm:text-sm font-mono">
+              {error ? (
+                <span className="text-destructive">Error</span>
+              ) : stars !== null ? (
+                <span className="bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text text-transparent font-semibold">
+                  {stars.toLocaleString()}
+                </span>
+              ) : (
+                <span className="animate-pulse">...</span>
+              )}
+            </span>
+            <Star className="h-3.5 w-3.5 text-yellow-500 transition-all duration-300 group-hover:scale-110 group-hover:rotate-12" />
           </a>
-          <ThemeToggle />
+
+          <div className="ml-1 sm:ml-2">
+            <ThemeToggle />
+          </div>
         </div>
       </div>
     </header>

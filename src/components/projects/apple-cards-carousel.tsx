@@ -3,7 +3,7 @@ import { useOutsideClick } from "@/hooks/use-outside-click";
 import { cn } from "@/lib/utils";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
-import Image, { ImageProps } from "next/image";
+import Image, { type ImageProps } from "next/image";
 import React, {
   createContext,
   useContext,
@@ -50,22 +50,15 @@ export const Carousel = ({
     if (carouselRef.current) {
       const { scrollLeft, scrollWidth, clientWidth } = carouselRef.current;
       setCanScrollLeft(scrollLeft > 0);
-      setCanScrollRight(scrollLeft < scrollWidth - clientWidth);
+      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 1);
     }
   };
 
-  // Get the card width and gap based on viewport size
   const getScrollDistance = () => {
-    // Card width (w-56 = 224px) + gap-4 (16px)
-    const cardWidth = 224;
+    const cardWidth = 384;
     const gap = 16;
 
-    // Check if mobile
-    const isMobile = window && window.innerWidth < 768;
-
-    // Scroll by 1 card on mobile, 2 on desktop
-    const cardsToScroll = isMobile ? 1 : 2;
-    return (cardWidth + gap) * cardsToScroll;
+    return cardWidth + gap;
   };
 
   const scrollLeft = () => {
@@ -88,8 +81,8 @@ export const Carousel = ({
 
   const handleCardClose = (index: number) => {
     if (carouselRef.current) {
-      const cardWidth = 224; // w-56 (224px)
-      const gap = isMobile() ? 16 : 16; // gap-4 (16px)
+      const cardWidth = 384;
+      const gap = 16;
       const scrollPosition = (cardWidth + gap) * index;
       carouselRef.current.scrollTo({
         left: scrollPosition,
@@ -122,7 +115,7 @@ export const Carousel = ({
           <div
             className={cn(
               "flex flex-row justify-start gap-4",
-              "mx-auto max-w-7xl" // remove max-w-4xl if you want the carousel to span the full width of its container
+              "mx-auto max-w-7xl"
             )}
           >
             {items.map((item, index) => (
@@ -140,7 +133,7 @@ export const Carousel = ({
                   },
                 }}
                 key={"card" + index}
-                className="rounded-3xl last:pr-[5%] md:last:pr-[33%]"
+                className="rounded-3xl last:pr-[2%]"
               >
                 {item}
               </motion.div>
@@ -198,8 +191,7 @@ export const Card = ({
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [open]);
 
-  //@ts-ignore
-  useOutsideClick(containerRef, () => handleClose());
+  useOutsideClick(containerRef as React.RefObject<HTMLElement>, () => handleClose());
 
   const handleOpen = () => {
     setOpen(true);
@@ -225,11 +217,10 @@ export const Card = ({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              ref={containerRef}
+              ref={containerRef as any}
               layoutId={layout ? `card-${card.title}` : undefined}
               className="relative z-[60] mx-auto my-10 h-fit max-w-5xl rounded-3xl bg-white font-sans dark:bg-neutral-900"
             >
-              {/* Sticky close button */}
               <div className="sticky top-4 z-52 flex justify-end px-8 pt-8 md:px-14 md:pt-8">
                 <button
                   className="flex h-8 w-8 items-center justify-center rounded-full bg-black/90 shadow-md dark:bg-white/90"
@@ -239,7 +230,6 @@ export const Card = ({
                 </button>
               </div>
 
-              {/* Header section with consistent padding */}
               <div className="relative px-8 pt-2 pb-0 md:px-14">
                 <div>
                   <motion.p
@@ -257,8 +247,9 @@ export const Card = ({
                 </div>
               </div>
 
-              {/* Content with consistent padding */}
-              <div className="px-8 pt-8 pb-14 md:px-14">{card.content}</div>
+              <div className="px-8 pt-8 pb-20 md:px-14 md:pb-24">
+                {card.content}
+              </div>
             </motion.div>
           </div>
         )}
@@ -266,11 +257,10 @@ export const Card = ({
       <motion.button
         layoutId={layout ? `card-${card.title}` : undefined}
         onClick={handleOpen}
-        className="relative z-10 flex h-80 w-56 flex-col items-start justify-start overflow-hidden rounded-3xl bg-gray-100 dark:bg-neutral-900 md:h-80 md:w-56 sm:h-72 sm:w-48"
+        className="relative z-10 flex h-96 w-96 flex-col items-start justify-start overflow-hidden rounded-3xl bg-gray-100 dark:bg-neutral-900 md:h-96 md:w-96 sm:h-80 sm:w-80"
       >
-        <div className="absolute inset-x-0 top-0 z-30 h-full cursor-pointer bg-gradient-to-b from-black hover:scale-110 via-transparent to-transparent" />
-        {/*<div className="absolute inset-0 z-20 cursor-pointer bg-black/20 hover:bg-black/2" />*/}
-        <div className="relative z-40 p-8">
+        <div className="absolute inset-x-0 top-0 z-30 h-full cursor-pointer bg-gradient-to-b from-black/20 hover:scale-110 via-transparent to-transparent" />
+        <div className="relative z-40 p-8 mt-auto mb-8">
           <motion.p
             layoutId={layout ? `category-${card.category}` : undefined}
             className="text-left font-sans text-sm font-medium text-white md:text-base"
@@ -329,7 +319,7 @@ export const BlurImage = ({
             setLoading(false);
             setHasError(true);
           }}
-          src={src}
+          src={src || "/placeholder.svg"}
           width={width}
           height={height}
           loading="lazy"

@@ -1,14 +1,12 @@
 "use client";
 import { AnimatePresence, motion } from "framer-motion";
-import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
 import React, {
   useCallback,
   useEffect,
-  useMemo,
+  useReducer,
   useRef,
   useState,
-  useReducer,
 } from "react";
 import { toast } from "sonner";
 
@@ -16,7 +14,7 @@ import { toast } from "sonner";
 import ChatBottombar from "@/components/chat/chat-bottombar";
 import ChatLanding from "@/components/chat/chat-landing";
 import ChatMessageContent from "@/components/chat/chat-message-content";
-import { Info, Copy } from "lucide-react";
+import { Copy, Info } from "lucide-react";
 import HelperBoost from "./HelperBoost";
 
 // Message type definition
@@ -275,92 +273,6 @@ const MessageInfoDialog = ({
     </div>
   );
 };
-
-// ClientOnly component for client-side rendering
-const ClientOnly = ({ children }: { children: React.ReactNode }) => {
-  const [hasMounted, setHasMounted] = useState(false);
-
-  useEffect(() => {
-    setHasMounted(true);
-  }, []);
-
-  if (!hasMounted) {
-    return null;
-  }
-
-  return <>{children}</>;
-};
-
-// Define Avatar component props interface
-interface AvatarProps {
-  hasActiveTool: boolean;
-  videoRef: React.RefObject<HTMLVideoElement | null>;
-  isTalking: boolean;
-}
-
-// Dynamic import of Avatar component
-const Avatar = dynamic<AvatarProps>(
-  () =>
-    Promise.resolve(({ hasActiveTool, videoRef, isTalking }: AvatarProps) => {
-      // This function will only execute on the client
-      const isIOS = () => {
-        // Multiple detection methods
-        const userAgent = window.navigator.userAgent;
-        const platform = window.navigator.platform;
-        const maxTouchPoints = window.navigator.maxTouchPoints || 0;
-
-        // UserAgent-based check
-        const isIOSByUA =
-          //@ts-ignore
-          /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
-
-        // Platform-based check
-        const isIOSByPlatform = /iPad|iPhone|iPod/.test(platform);
-
-        // iPad Pro check
-        const isIPadOS =
-          //@ts-ignore
-          platform === "MacIntel" && maxTouchPoints > 1 && !window.MSStream;
-
-        // Safari check
-        const isSafari = /Safari/.test(userAgent) && !/Chrome/.test(userAgent);
-
-        return isIOSByUA || isIOSByPlatform || isIPadOS || isSafari;
-      };
-
-      // Conditional rendering based on detection
-      return (
-        <div
-          className={`flex items-center justify-center rounded-full transition-all duration-300 ${hasActiveTool ? "h-20 w-20" : "h-28 w-28"}`}
-        >
-          <div
-            className="relative cursor-pointer"
-            onClick={() => (window.location.href = "/")}
-          >
-            {isIOS() ? (
-              <img
-                src="/landing-memojis.png"
-                alt="iOS avatar"
-                className="h-full w-full scale-[1.8] object-contain"
-              />
-            ) : (
-              <video
-                ref={videoRef}
-                className="h-full w-full scale-[1.8] object-contain"
-                muted
-                playsInline
-                loop
-              >
-                <source src="/final_memojis.webm" type="video/webm" />
-                <source src="/final_memojis_ios.mp4" type="video/mp4" />
-              </video>
-            )}
-          </div>
-        </div>
-      );
-    }),
-  { ssr: false }
-);
 
 const MOTION_CONFIG = {
   initial: { opacity: 0, y: 20 },
@@ -785,23 +697,6 @@ const Chat = () => {
     }
   }, []);
 
-  // Reload last message
-  const reload = useCallback(async () => {
-    const lastUserMessage = messages.filter((m) => m.role === "user").pop();
-    if (lastUserMessage) {
-      await submitQuery(lastUserMessage.content);
-    }
-    return null;
-  }, [messages, submitQuery]);
-
-  // Computed values
-  const { hasActiveTool } = useMemo(
-    () => ({
-      hasActiveTool: false, // Simplified - no tool support for now
-    }),
-    []
-  );
-
   const isToolInProgress = false; // Simplified - no tool support
 
   // Effects
@@ -859,57 +754,58 @@ const Chat = () => {
   // Check if this is the initial empty state
   const isEmptyState = messages.length === 0 && !loadingSubmit;
 
+  //chat
   return (
-    <div className="bg-background relative flex h-full flex-col overflow-hidden">
-      {/* Subtle background gradient */}
-      <div className="from-background via-background/95 to-background absolute inset-0 bg-gradient-to-br" />
+    <div className="bg-gradient-to-br from-background via-background/98 to-background/95 relative flex h-full flex-col overflow-hidden">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/5 via-background to-background" />
+      <div className="absolute inset-0 bg-grid-pattern opacity-[0.02]" />
 
       {/* Main Content Area */}
       <div className="relative z-10 flex flex-1 flex-col overflow-hidden">
-        {/* Chat Controls */}
-        <div className="flex justify-end px-6 py-1 border-b border-border/20">
-          <div className="flex items-center gap-1">
+        <div className="flex justify-end px-6 py-2 border-b border-border/30 bg-card/30 backdrop-blur-sm">
+          <div className="flex items-center gap-2">
             <button
               onClick={clearConversation}
               disabled={isLoading || loadingSubmit}
-              className="text-muted-foreground hover:text-destructive hover:bg-destructive/5 rounded-md px-2 py-0.5 text-xs transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-xl px-3 py-1.5 text-xs font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 active:scale-95"
             >
               Clear
             </button>
             <button
-              className="text-muted-foreground hover:text-foreground hover:bg-accent/5 rounded-md p-1 transition-all duration-200"
+              className="text-muted-foreground hover:text-foreground hover:bg-accent/20 rounded-xl p-1.5 transition-all duration-200 hover:scale-105 active:scale-95"
               onClick={() => {
-                // Could add help modal here
                 toast.info(
                   "This is Siraj Ahmed's AI assistant. Ask me anything!"
                 );
               }}
             >
-              <Info className="h-3 w-3" />
+              <Info className="h-3.5 w-3.5" />
             </button>
           </div>
         </div>
 
         {/* Messages Area */}
         <div className="flex-1 overflow-hidden">
-          <div className="h-full overflow-y-auto px-4 pt-10 pb-6 scrollbar-hide">
+          <div className="h-full overflow-y-auto px-4 pt-8 pb-6 scrollbar-hide">
             <div className="mx-auto max-w-4xl">
               <AnimatePresence mode="wait">
                 {isEmptyState ? (
                   <motion.div
                     key="landing"
-                    className="flex h-full items-center justify-center"
+                    className="flex h-full items-center justify-center min-h-[60vh]"
                     {...MOTION_CONFIG}
                   >
-                    <ChatLanding submitQuery={submitQuery} />
+                    <ChatLanding
+                      submitQuery={submitQuery}
+                      hasReachedLimit={hasReachedLimit}
+                    />
                   </motion.div>
                 ) : (
                   <motion.div
                     key="conversation"
-                    className="space-y-8"
+                    className="space-y-6 md:space-y-8"
                     {...MOTION_CONFIG}
                   >
-                    {/* Conversation History */}
                     {messages.map((message, index) => (
                       <motion.div
                         key={message.id}
@@ -923,27 +819,24 @@ const Chat = () => {
                         className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
                       >
                         <div className="group relative max-w-[85%]">
-                          {/* Message Layout */}
                           <div
-                            className={`flex items-start gap-3 ${message.role === "user" ? "flex-row-reverse" : "flex-row"}`}
+                            className={`flex items-start gap-4 ${message.role === "user" ? "flex-row-reverse" : "flex-row"}`}
                           >
-                            {/* Avatar for Assistant */}
                             {message.role === "assistant" &&
                               message.content.trim() !== "" && (
-                                <div className="from-primary/20 to-accent/20 border-primary/20 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border bg-gradient-to-br">
+                                <div className="from-primary/20 via-primary/10 to-accent/20 border-primary/30 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-2xl border bg-gradient-to-br shadow-md">
                                   <span className="text-primary text-sm font-bold">
                                     SA
                                   </span>
                                 </div>
                               )}
 
-                            {/* Message Bubble */}
                             <div
                               className={`relative ${message.role === "user" ? "ml-8" : "mr-8"}`}
                             >
                               {message.role === "user" ? (
-                                <div className="bg-blue-50 text-blue-900 rounded-2xl rounded-br-md px-4 py-3 shadow-sm border border-blue-100">
-                                  <div className="prose prose-sm max-w-none">
+                                <div className="bg-primary/10 text-primary-foreground border-primary/20 rounded-3xl rounded-br-lg px-5 py-4 shadow-lg border backdrop-blur-sm">
+                                  <div className="prose prose-sm max-w-none text-foreground">
                                     <ChatMessageContent
                                       message={message}
                                       isLast={index === messages.length - 1}
@@ -982,11 +875,10 @@ const Chat = () => {
                             </div>
                           </div>
 
-                          {/* Action Buttons */}
-                          <div className="absolute top-0 -right-6 flex flex-col gap-1 opacity-0 transition-all duration-300 group-hover:opacity-100">
+                          <div className="absolute top-0 -right-8 flex flex-col gap-1 opacity-0 transition-all duration-300 group-hover:opacity-100">
                             <button
                               onClick={() => copyToClipboard(message.content)}
-                              className="text-muted-foreground hover:text-foreground hover:bg-accent/10 rounded-full p-1 transition-all duration-200 hover:scale-110"
+                              className="text-muted-foreground hover:text-foreground hover:bg-accent/20 rounded-xl p-1.5 transition-all duration-200 hover:scale-110 active:scale-95"
                               title="Copy message"
                             >
                               <Copy className="h-3.5 w-3.5" />
@@ -996,7 +888,7 @@ const Chat = () => {
                                 setSelectedMessage(message);
                                 setShowMessageInfo(true);
                               }}
-                              className="text-muted-foreground hover:text-foreground hover:bg-accent/10 rounded-full p-1 transition-all duration-200 hover:scale-110"
+                              className="text-muted-foreground hover:text-foreground hover:bg-accent/20 rounded-xl p-1.5 transition-all duration-200 hover:scale-110 active:scale-95"
                               title="Message details"
                             >
                               <Info className="h-3.5 w-3.5" />
@@ -1006,7 +898,6 @@ const Chat = () => {
                       </motion.div>
                     ))}
 
-                    {/* Typing Animation */}
                     {loadingSubmit && (
                       <motion.div
                         initial={{ opacity: 0, y: 10 }}
@@ -1014,25 +905,25 @@ const Chat = () => {
                         transition={{ duration: 0.3, ease: "easeOut" }}
                         className="flex justify-start"
                       >
-                        <div className="flex items-start gap-3">
-                          <div className="from-primary/15 to-accent/15 border-primary/10 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border bg-gradient-to-br">
+                        <div className="flex items-start gap-4">
+                          <div className="from-primary/15 to-accent/15 border-primary/20 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-2xl border bg-gradient-to-br shadow-md">
                             <span className="text-primary text-sm font-semibold">
                               SA
                             </span>
                           </div>
                           <div className="text-foreground">
-                            <div className="flex items-center gap-1 py-1">
+                            <div className="flex items-center gap-1.5 py-2">
                               {[0, 1, 2].map((i) => (
                                 <motion.div
                                   key={i}
-                                  className="bg-primary/50 h-2 w-2 rounded-full"
+                                  className="bg-primary/60 h-2.5 w-2.5 rounded-full"
                                   animate={{
                                     scale: [1, 1.4, 1],
-                                    opacity: [0.3, 1, 0.3],
+                                    opacity: [0.4, 1, 0.4],
                                   }}
                                   transition={{
                                     duration: 1.2,
-                                    repeat: Infinity,
+                                    repeat: Number.POSITIVE_INFINITY,
                                     ease: "easeInOut",
                                     delay: i * 0.2,
                                   }}
@@ -1044,7 +935,6 @@ const Chat = () => {
                       </motion.div>
                     )}
 
-                    {/* Scroll target */}
                     <div ref={messagesEndRef} />
                   </motion.div>
                 )}
@@ -1053,10 +943,9 @@ const Chat = () => {
           </div>
         </div>
 
-        {/* Input Area */}
-        <div className="border-border/20 bg-background/60 relative z-10 border-t px-6 py-3 backdrop-blur-md">
+        <div className="border-border/30 bg-card/40 relative z-10 border-t px-6 py-4 backdrop-blur-xl">
           <div className="mx-auto max-w-4xl">
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-3">
               <HelperBoost
                 submitQuery={submitQuery}
                 setInput={(value: string) =>

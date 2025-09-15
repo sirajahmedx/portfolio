@@ -42,7 +42,7 @@ const PROJECT_CONTENT = [
     ],
   },
   {
-    title: "Tradesman",
+    title: "Servifi",
     description:
       "Service platform connecting tradesmen with customers. Includes backend APIs for bookings, categories, payments, web dashboards, real-time chat, notifications, supplier management.",
     techStack: [
@@ -318,19 +318,19 @@ export const data = [
   {
     category: "Full-Stack Platform",
     title: "Jobify",
-    src: "/avatar-landing.png", // Using available image as placeholder
+    src: "/servifi-splash.png", // Using available image as placeholder
     content: <ProjectContent project={{ title: "Jobify" }} />,
   },
   {
     category: "Service Platform",
-    title: "Tradesman",
-    src: "/dark-home.png", // Using available image as placeholder
+    title: "Servifi",
+    src: "/servifi-splash.jpg", // Using available image as placeholder
     content: <ProjectContent project={{ title: "Tradesman" }} />,
   },
   {
     category: "Talent Discovery App",
     title: "Talent-Tube",
-    src: "/light-home.png", // Using available image as placeholder
+    src: "/tt.jpg", // Using available image as placeholder
     content: <ProjectContent project={{ title: "Talent-Tube" }} />,
   },
   {
@@ -342,8 +342,20 @@ export const data = [
   {
     category: "Automation Tool",
     title: "GitHub Bot",
-    src: "/light-chat.png", // Using available image as placeholder
+    src: "/bot.jpg", // Using available image as placeholder
     content: <ProjectContent project={{ title: "GitHub Bot" }} />,
+  },
+  {
+    category: "School Project",
+    title: "Sensify",
+    src: "/avatar-landing.png", // Using available image as placeholder
+    content: <ProjectContent project={{ title: "Sensify" }} />,
+  },
+  {
+    category: "School Project",
+    title: "Sensify",
+    src: "/avatar-landing.png", // Using available image as placeholder
+    content: <ProjectContent project={{ title: "Sensify" }} />,
   },
   {
     category: "School Project",

@@ -1,6 +1,7 @@
 "use client";
 
 import FluidCursor from "@/components/FluidCursor";
+import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import {
@@ -17,7 +18,6 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
-/* ---------- quick-question data ---------- */
 const questions = {
   Me: "Who are you? I want to know more about you.",
   Projects: "What are your projects? What are you working on right now?",
@@ -32,7 +32,6 @@ const questionConfig = [
   { key: "Contact", color: "#C19433", icon: UserRoundSearch },
 ] as const;
 
-/* ---------- component ---------- */
 export default function Home() {
   const [input, setInput] = useState("");
   const router = useRouter();
@@ -41,7 +40,6 @@ export default function Home() {
   const goToChat = (query: string) =>
     router.push(`/chat?query=${encodeURIComponent(query)}`);
 
-  /* hero animations */
   const heroVariants = {
     hidden: { opacity: 0, y: 60 },
     visible: { opacity: 1, y: 0 },
@@ -66,152 +64,173 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="relative min-h-screen overflow-hidden">
+    <div className="relative min-h-screen flex flex-col">
+      <Header />
+
+      <motion.div
+        initial={{ opacity: 0, x: -50 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ delay: 0.2 }}
+        className="absolute top-20 left-4 z-20 sm:hidden inline-flex items-center gap-1 rounded-full bg-primary px-2 py-1 text-xs font-medium text-primary-foreground"
+      >
+        <Sparkles className="h-2.5 w-2.5" />
+        Available for new opportunities
+      </motion.div>
+
       {/* Background gradient */}
-      <div className="from-primary/5 via-background to-accent/5 absolute inset-0 bg-gradient-to-br" />
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-accent/5" />
 
-      {/* Hero Section */}
-      <section className="relative flex min-h-screen flex-col items-center justify-center px-4 py-16 md:py-24">
-        {/* Floating elements */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="bg-primary/10 absolute -top-20 -right-20 h-40 w-40 rounded-full blur-3xl md:-top-40 md:-right-40 md:h-80 md:w-80" />
-          <div className="bg-accent/10 absolute -bottom-20 -left-20 h-40 w-40 rounded-full blur-3xl md:-bottom-40 md:-left-40 md:h-80 md:w-80" />
-        </div>
-
-        <motion.div
-          className="z-10 flex max-w-6xl flex-col items-center text-center lg:flex-row lg:items-center lg:justify-between lg:text-left lg:gap-12"
-          variants={heroVariants}
-          initial="hidden"
-          animate="visible"
-          transition={{ duration: 0.8 }}
-        >
-          {/* Left side - Text content */}
-          <div className="flex-1 space-y-4 md:space-y-6 lg:pr-8">
-            <motion.div
-              initial={{ opacity: 0, x: -50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2 }}
-              className="bg-primary/10 text-primary inline-flex items-center gap-2 rounded-full px-3 py-1.5 md:px-4 md:py-2 text-xs md:text-sm font-medium"
-            >
-              <Sparkles className="h-3 w-3 md:h-4 md:w-4" />
-              Available for new opportunities
-            </motion.div>
-
-            <motion.h1
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="text-3xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl"
-            >
-              Hi, I&apos;m{" "}
-              <span className="from-primary to-accent bg-gradient-to-r bg-clip-text text-transparent">
-                Siraj
-              </span>
-            </motion.h1>
-
-            <motion.p
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-              className="text-muted-foreground text-lg sm:text-xl md:text-2xl max-w-2xl mx-auto lg:mx-0"
-            >
-              Full-Stack Developer building modern, dynamic web applications.
-            </motion.p>
-
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
-              className="flex flex-wrap justify-center lg:justify-start gap-2 md:gap-3"
-            >
-              <div className="bg-card flex items-center gap-2 rounded-lg px-3 py-2 text-xs md:text-sm">
-                <Code className="text-primary h-3 w-3 md:h-4 md:w-4" />
-                React & Next.js
-              </div>
-              <div className="bg-card flex items-center gap-2 rounded-lg px-3 py-2 text-xs md:text-sm">
-                <Coffee className="text-primary h-3 w-3 md:h-4 md:w-4" />
-                Node.js & GraphQL
-              </div>
-            </motion.div>
+      <div className="flex-1 flex flex-col">
+        {/* Hero Section - Upper portion */}
+        <section className="relative flex-1 flex flex-col justify-center px-4 pt-2 sm:pt-4 md:pt-6 lg:pt-8">
+          {/* Floating elements */}
+          <div className="absolute inset-0 overflow-hidden">
+            <div className="absolute -top-8 -right-8 h-16 w-16 rounded-full bg-primary/10 blur-xl sm:-top-12 sm:-right-12 sm:h-24 sm:w-24 sm:blur-2xl md:-top-16 md:-right-16 md:h-32 md:w-32 lg:-top-32 lg:-right-32 lg:h-64 lg:w-64 lg:blur-3xl xl:-top-40 xl:-right-40 xl:h-80 xl:w-80" />
+            <div className="absolute -bottom-8 -left-8 h-16 w-16 rounded-full bg-accent/10 blur-xl sm:-bottom-12 sm:-left-12 sm:h-24 sm:w-24 sm:blur-2xl md:-bottom-16 md:-left-16 md:h-32 md:w-32 lg:-bottom-32 lg:-left-32 lg:h-64 lg:w-64 lg:blur-3xl xl:-bottom-40 xl:-left-40 xl:h-80 xl:w-80" />
           </div>
 
-          {/* Right side - Memoji */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.6 }}
-            className="relative mt-8 md:mt-12 lg:mt-0 hidden md:block"
+            className="z-10 flex w-full max-w-7xl mx-auto flex-col items-center text-center gap-6 sm:gap-8 lg:flex-row lg:items-center lg:justify-between lg:text-left lg:gap-12 xl:gap-16"
+            variants={heroVariants}
+            initial="hidden"
+            animate="visible"
+            transition={{ duration: 0.8 }}
           >
-            <div className="from-primary/20 to-accent/20 relative h-48 w-48 md:h-64 md:w-64 lg:h-80 lg:w-80 overflow-hidden rounded-full bg-gradient-to-br p-1">
-              <Image
-                src="/avatar-landing.png"
-                alt="Siraj Ahmed - Full Stack Developer"
-                width={400}
-                height={400}
-                priority
-                className="h-full w-full rounded-full object-cover"
-              />
-            </div>
-          </motion.div>
-        </motion.div>
-
-        {/* CTA Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.8 }}
-          className="z-10 mt-12 md:mt-16 w-full max-w-2xl px-4"
-        >
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              if (input.trim()) goToChat(input.trim());
-            }}
-            className="relative"
-          >
-            <div className="bg-card/50 hover:bg-card/70 border-border/50 hover:border-border/80 flex items-center rounded-xl md:rounded-2xl border-2 p-2 shadow-lg backdrop-blur-xl transition-all duration-300">
-              <input
-                ref={inputRef}
-                type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="Ask me anything about my work, skills, or projects..."
-                className="text-foreground placeholder:text-muted-foreground flex-1 border-none bg-transparent px-3 md:px-4 py-2 md:py-3 text-sm md:text-base focus:outline-none"
-              />
-              <Button
-                type="submit"
-                disabled={!input.trim()}
-                size="lg"
-                className="rounded-lg md:rounded-xl px-4 md:px-6 py-2 md:py-3 shadow-md transition-all hover:scale-105 active:scale-95 disabled:opacity-50"
+            {/* Left side - Text content */}
+            <div className="flex-1 space-y-4 sm:space-y-5 md:space-y-6 lg:space-y-8 lg:pr-6 xl:pr-8">
+              <motion.div
+                initial={{ opacity: 0, x: -50 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.2 }}
+                className="hidden sm:inline-flex items-center gap-1.5 sm:gap-2 rounded-full bg-primary px-2.5 py-1 sm:px-3 sm:py-1.5 md:px-4 md:py-2 text-xs sm:text-sm font-medium text-primary-foreground"
               >
-                <ArrowRight className="h-4 w-4 md:h-5 md:w-5" />
-              </Button>
-            </div>
-          </form>
+                <Sparkles className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4" />
+                Available for new opportunities
+              </motion.div>
 
-          {/* Quick questions */}
-          <div className="mt-4 md:mt-6 flex flex-wrap justify-center gap-2 md:gap-3">
-            {questionConfig.map(({ key, color, icon: Icon }) => (
-              <Button
-                key={key}
-                onClick={() => goToChat(questions[key])}
-                variant="outline"
-                className="bg-card/50 hover:bg-card/70 border-border/50 hover:border-border/80 h-auto cursor-pointer rounded-lg md:rounded-xl px-3 md:px-4 py-2 md:py-3 shadow-sm backdrop-blur-md transition-all hover:scale-105 active:scale-95"
+              <motion.h1
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="text-5xl sm:text-6xl md:text-6xl lg:text-6xl xl:text-7xl 2xl:text-8xl font-bold tracking-tight text-balance leading-tight sm:leading-tight md:leading-tight"
               >
-                <div className="text-foreground flex items-center gap-2">
-                  <Icon
-                    size={14}
-                    strokeWidth={2}
-                    style={{ color }}
-                    className="md:w-4 md:h-4"
-                  />
-                  <span className="text-xs md:text-sm font-medium">{key}</span>
+                Hi, I&apos;m{" "}
+                <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                  Siraj
+                </span>
+              </motion.h1>
+
+              <motion.p
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+                className="text-muted-foreground text-sm sm:text-base md:text-lg lg:text-xl xl:text-xl max-w-xl sm:max-w-2xl mx-auto lg:mx-0 text-pretty leading-relaxed"
+              >
+                Full-Stack Developer building modern, dynamic web applications.
+              </motion.p>
+
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+                className="flex flex-wrap justify-center lg:justify-start gap-3 sm:gap-4 md:gap-5"
+              >
+                <div className="flex items-center gap-1.5 sm:gap-2 rounded-lg bg-card px-2.5 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm border border-border/50">
+                  <Code className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 text-primary" />
+                  React & Next.js
                 </div>
-              </Button>
-            ))}
-          </div>
-        </motion.div>
-      </section>
+                <div className="flex items-center gap-1.5 sm:gap-2 rounded-lg bg-card px-2.5 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm border border-border/50">
+                  <Coffee className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 text-primary" />
+                  Node.js & GraphQL
+                </div>
+              </motion.div>
+            </div>
+
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.6 }}
+              className="relative mt-4 sm:mt-6 lg:mt-0 flex-shrink-0 hidden lg:block xl:block"
+            >
+              <div className="relative h-48 w-48 xl:h-56 xl:w-56 2xl:h-60 2xl:w-60 overflow-hidden rounded-full bg-gradient-to-br from-primary/20 to-accent/20 p-1 shadow-xl">
+                <Image
+                  src="/avatar-landing.png"
+                  alt="Siraj Ahmed - Full Stack Developer"
+                  width={256}
+                  height={256}
+                  priority
+                  className="h-full w-full rounded-full object-cover"
+                />
+              </div>
+            </motion.div>
+          </motion.div>
+        </section>
+
+        <section
+          className="relative px-4 pb-6 sm:pb-8 md:pb-12 lg:pb-16 xl:pb-20 
+                           flex flex-col justify-end
+                           h-auto sm:h-auto md:min-h-[25vh] lg:min-h-[30vh] xl:min-h-[25vh]
+                           sm:mt-8 md:mt-12 lg:mt-0"
+        >
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8 }}
+            className="z-10 w-full max-w-2xl mx-auto space-y-4 sm:space-y-5 md:space-y-6"
+          >
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-2.5 md:gap-3">
+              {questionConfig.map(({ key, color, icon: Icon }) => (
+                <Button
+                  key={key}
+                  onClick={() => goToChat(questions[key])}
+                  variant="outline"
+                  className="h-auto cursor-pointer rounded-lg sm:rounded-xl bg-card/50 border-border/50 px-2.5 py-2 sm:px-3 sm:py-2.5 md:px-4 md:py-3 shadow-sm backdrop-blur-md transition-all hover:scale-105 hover:border-border/80 hover:bg-card/70 active:scale-95"
+                >
+                  <div className="flex items-center gap-1.5 sm:gap-2 text-foreground">
+                    <Icon
+                      size={12}
+                      strokeWidth={2}
+                      style={{ color }}
+                      className="sm:h-3.5 sm:w-3.5 md:h-4 md:w-4"
+                    />
+                    <span className="text-xs sm:text-xs md:text-sm font-medium">
+                      {key}
+                    </span>
+                  </div>
+                </Button>
+              ))}
+            </div>
+
+            {/* Input form */}
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (input.trim()) goToChat(input.trim());
+              }}
+              className="relative"
+            >
+              <div className="flex items-center rounded-xl sm:rounded-2xl border-2 border-border/50 bg-card/50 p-1.5 sm:p-2 shadow-lg backdrop-blur-xl transition-all duration-300 hover:border-border/80 hover:bg-card/70">
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  placeholder="Ask me anything about my work, skills, or projects..."
+                  className="flex-1 border-none bg-transparent px-2.5 py-2 sm:px-3 sm:py-2.5 md:px-4 md:py-3 text-sm sm:text-base text-foreground placeholder:text-muted-foreground focus:outline-none"
+                />
+                <Button
+                  type="submit"
+                  disabled={!input.trim()}
+                  size="lg"
+                  className="rounded-lg sm:rounded-xl px-3 py-2 sm:px-4 sm:py-2.5 md:px-6 md:py-3 shadow-md transition-all hover:scale-105 active:scale-95 disabled:opacity-50"
+                >
+                  <ArrowRight className="h-4 w-4 sm:h-4 sm:w-4 md:h-5 md:w-5" />
+                </Button>
+              </div>
+            </form>
+          </motion.div>
+        </section>
+      </div>
 
       <FluidCursor />
     </div>

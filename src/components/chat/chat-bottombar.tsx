@@ -3,7 +3,7 @@
 
 import { ChatRequestOptions } from "ai";
 import { motion } from "framer-motion";
-import { ArrowRight, ArrowUp } from "lucide-react";
+import { ArrowRight, ArrowUp, Loader2 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { FastfolioTracking } from "@/lib/fastfolio-tracking";
 
@@ -59,44 +59,52 @@ export default function ChatBottombar({
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="w-full pb-2 md:pb-5"
+      className="w-full pb-2 md:pb-4"
     >
-      <form onSubmit={handleSubmit} className="relative w-full md:px-4">
-        <div className="border-border bg-background/50 mx-auto flex items-center rounded-full border py-2 pr-2 pl-4 md:pl-6 backdrop-blur-sm">
-          <input
-            ref={inputRef}
-            type="text"
-            value={input}
-            onChange={handleInputChange}
-            onKeyDown={handleKeyPress}
-            placeholder={
-              disabled
-                ? ""
-                : isToolInProgress
-                  ? "Tool is in progress..."
-                  : "Ask me anything"
-            }
-            className={`text-sm md:text-md placeholder:text-muted-foreground w-full border-none bg-transparent focus:outline-none ${
-              disabled ? "font-medium text-red-600" : "text-foreground"
-            }`}
-            disabled={isToolInProgress || isLoading || disabled}
-          />
-
-          <button
-            type="submit"
-            disabled={
-              isLoading || !input.trim() || isToolInProgress || disabled
-            }
-            className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center justify-center rounded-full p-1.5 md:p-2 transition-colors disabled:opacity-50"
-            onClick={(e) => {
-              if (isLoading) {
-                e.preventDefault();
-                stop();
+      <form onSubmit={handleSubmit} className="relative w-full">
+        <div className="relative group">
+          <div className="border-border/60 bg-card/80 backdrop-blur-xl mx-auto flex items-center rounded-2xl border shadow-lg py-3 pr-3 pl-5 md:pl-7 transition-all duration-300 group-hover:border-border group-hover:shadow-xl">
+            <input
+              ref={inputRef}
+              type="text"
+              value={input}
+              onChange={handleInputChange}
+              onKeyDown={handleKeyPress}
+              placeholder={
+                disabled
+                  ? "Chat limit reached"
+                  : isToolInProgress
+                    ? "Tool is in progress..."
+                    : "Ask me anything..."
               }
-            }}
-          >
-            <ArrowUp className="h-4 w-4 md:h-6 md:w-6" />
-          </button>
+              className={`text-sm md:text-base placeholder:text-muted-foreground/70 w-full border-none bg-transparent focus:outline-none transition-colors duration-200 ${
+                disabled ? "font-medium text-destructive" : "text-foreground"
+              }`}
+              disabled={isToolInProgress || isLoading || disabled}
+            />
+
+            <button
+              type="submit"
+              disabled={
+                isLoading || !input.trim() || isToolInProgress || disabled
+              }
+              className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center justify-center rounded-xl p-2 md:p-2.5 transition-all duration-200 disabled:opacity-50 hover:scale-105 active:scale-95 shadow-md hover:shadow-lg"
+              onClick={(e) => {
+                if (isLoading) {
+                  e.preventDefault();
+                  stop();
+                }
+              }}
+            >
+              {isLoading ? (
+                <Loader2 className="h-4 w-4 md:h-5 md:w-5 animate-spin" />
+              ) : (
+                <ArrowUp className="h-4 w-4 md:h-5 md:w-5" />
+              )}
+            </button>
+          </div>
+
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-transparent to-accent/10 rounded-2xl blur-xl opacity-0 group-hover:opacity-30 transition-opacity duration-500 -z-10" />
         </div>
       </form>
     </motion.div>
