@@ -87,7 +87,12 @@ export default function RootLayout({
           enableSystem={true} // Enable system theme detection
         >
           <Header />
-          <main className="flex flex-col">{children}</main>
+          <main
+            className="flex flex-col overflow-hidden"
+            style={{ height: "100dvh" }} // Use dynamic viewport height
+          >
+            {children}
+          </main>
           <Toaster />
         </ThemeProvider>
         <Analytics />

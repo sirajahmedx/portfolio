@@ -87,9 +87,8 @@ const CodeBlock = ({ content }: { content: string }) => {
 export default function ChatMessageContent({
   message,
 }: ChatMessageContentProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const [visibleLines, setVisibleLines] = useState(5);
+  const [visibleLines, setVisibleLines] = useState(6);
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -100,11 +99,10 @@ export default function ChatMessageContent({
 
   // Check if content is long and needs truncation (mobile only, line-based)
   const lines = message.content ? message.content.split("\n") : [];
-  const shouldTruncate = isMobile && lines.length > 5;
-  const truncatedContent =
-    shouldTruncate && !isExpanded
-      ? lines.slice(0, visibleLines).join("\n")
-      : message.content;
+  const shouldTruncate = isMobile && lines.length > 6;
+  const truncatedContent = shouldTruncate
+    ? lines.slice(0, visibleLines).join("\n")
+    : message.content;
 
   // Handle both parts-based and direct content messages
   const renderContent = () => {
@@ -204,8 +202,9 @@ export default function ChatMessageContent({
       );
     } // If no parts but has direct content, render it directly
     if (message.content) {
-      const contentToRender =
-        shouldTruncate && !isExpanded ? truncatedContent : message.content;
+      const contentToRender = shouldTruncate
+        ? truncatedContent
+        : message.content;
       const contentParts = contentToRender.split("```");
 
       const content = (
@@ -287,29 +286,30 @@ export default function ChatMessageContent({
   return (
     <div className="w-full">
       {content}
-      {shouldTruncate && (
+      {shouldTruncate && visibleLines < lines.length && isMobile && (
         <div className="mt-4 text-center">
           <Button
             onClick={() => {
-              if (!isExpanded) {
-                const newVisibleLines = Math.min(
-                  visibleLines + 5,
-                  lines.length
-                );
-                setVisibleLines(newVisibleLines);
-                if (newVisibleLines >= lines.length) {
-                  setIsExpanded(true);
-                }
-              } else {
-                setVisibleLines(5);
-                setIsExpanded(false);
-              }
+              const newVisibleLines = Math.min(visibleLines + 6, lines.length);
+              setVisibleLines(newVisibleLines);
             }}
             variant="outline"
             size="sm"
             className="text-xs"
           >
-            {isExpanded ? "View Less" : "View More"}
+            View More
+          </Button>
+        </div>
+      )}
+      {visibleLines >= lines.length && visibleLines > 6 && isMobile && (
+        <div className="mt-4 text-center">
+          <Button
+            onClick={() => setVisibleLines(6)}
+            variant="outline"
+            size="sm"
+            className="text-xs"
+          >
+            View Less
           </Button>
         </div>
       )}
