@@ -373,15 +373,39 @@ const Chat = () => {
     }
   }, []);
 
-  // Enhanced auto-scroll to bottom
+  // Enhanced auto-scroll to bottom with mobile optimization
   const scrollToBottom = useCallback(() => {
     if (messagesEndRef.current) {
       requestAnimationFrame(() => {
-        messagesEndRef.current?.scrollIntoView({
-          behavior: "smooth",
-          block: "end",
-          inline: "nearest",
-        });
+        const element = messagesEndRef.current;
+        if (element) {
+          // Use scrollIntoView for better mobile compatibility
+          element.scrollIntoView({
+            behavior: "smooth",
+            block: "end",
+            inline: "nearest",
+          });
+
+          // Additional mobile-specific scroll adjustment
+          setTimeout(() => {
+            if (element) {
+              const container = element.closest(".overflow-y-auto");
+              if (container) {
+                const scrollTop = container.scrollTop;
+                const scrollHeight = container.scrollHeight;
+                const clientHeight = container.clientHeight;
+
+                // If we're not at the bottom, scroll again (handles dynamic content)
+                if (scrollTop + clientHeight < scrollHeight - 10) {
+                  container.scrollTo({
+                    top: scrollHeight,
+                    behavior: "smooth",
+                  });
+                }
+              }
+            }
+          }, 100);
+        }
       });
     }
   }, []);
@@ -742,14 +766,40 @@ const Chat = () => {
     }
   }, [isTalking]);
 
-  // Cleanup on unmount
+  // Mobile keyboard handling and viewport adjustments
   useEffect(() => {
-    return () => {
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-      }
+    const handleViewportChange = () => {
+      // Small delay to ensure keyboard has fully appeared/disappeared
+      setTimeout(() => {
+        scrollToBottom();
+      }, 300);
     };
-  }, []);
+
+    const handleFocus = () => {
+      // When input is focused on mobile, ensure we're scrolled to bottom
+      setTimeout(() => {
+        scrollToBottom();
+      }, 100);
+    };
+
+    // Listen for viewport changes (keyboard show/hide)
+    window.addEventListener("resize", handleViewportChange);
+    window.addEventListener("orientationchange", handleViewportChange);
+
+    // Listen for input focus events
+    const inputElements = document.querySelectorAll("input, textarea");
+    inputElements.forEach((input) => {
+      input.addEventListener("focus", handleFocus);
+    });
+
+    return () => {
+      window.removeEventListener("resize", handleViewportChange);
+      window.removeEventListener("orientationchange", handleViewportChange);
+      inputElements.forEach((input) => {
+        input.removeEventListener("focus", handleFocus);
+      });
+    };
+  }, [scrollToBottom]);
 
   // Check if this is the initial empty state
   const isEmptyState = messages.length === 0 && !loadingSubmit;
@@ -785,8 +835,8 @@ const Chat = () => {
         </div>
 
         {/* Messages Area */}
-        <div className="flex-1 overflow-hidden">
-          <div className="h-full overflow-y-auto px-4 pt-8 pb-6 scrollbar-hide">
+        <div className="flex-1 overflow-hidden min-h-0">
+          <div className="h-full overflow-y-auto px-4 pt-8 pb-24 md:pb-8 scrollbar-thin scrollbar-thumb-muted-foreground/30 scrollbar-track-transparent scroll-smooth">
             <div className="mx-auto max-w-4xl">
               <AnimatePresence mode="wait">
                 {isEmptyState ? (
@@ -803,7 +853,7 @@ const Chat = () => {
                 ) : (
                   <motion.div
                     key="conversation"
-                    className="space-y-6 md:space-y-8"
+                    className="space-y-6 md:space-y-8 pb-4"
                     {...MOTION_CONFIG}
                   >
                     {messages.map((message, index) => (
@@ -943,7 +993,8 @@ const Chat = () => {
           </div>
         </div>
 
-        <div className="border-border/30 bg-card/40 relative z-10 border-t px-6 py-4 backdrop-blur-xl">
+        {/* Bottom bar positioned absolutely */}
+        <div className="absolute bottom-0 left-0 right-0 border-border/30 bg-card/40 z-10 border-t px-4 md:px-6 py-3 md:py-4 backdrop-blur-xl">
           <div className="mx-auto max-w-4xl">
             <div className="flex flex-col gap-3">
               <HelperBoost

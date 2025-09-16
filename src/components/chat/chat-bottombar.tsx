@@ -4,7 +4,7 @@
 import { ChatRequestOptions } from "ai";
 import { motion } from "framer-motion";
 import { ArrowRight, ArrowUp, Loader2 } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { FastfolioTracking } from "@/lib/fastfolio-tracking";
 
 interface ChatBottombarProps {
@@ -55,15 +55,21 @@ export default function ChatBottombar({
     }
   }, [inputRef]);
 
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [inputRef]);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="w-full pb-2 md:pb-4"
+      className="w-full"
     >
       <form onSubmit={handleSubmit} className="relative w-full">
         <div className="relative group">
-          <div className="border-border/60 bg-card/80 backdrop-blur-xl mx-auto flex items-center rounded-2xl border shadow-lg py-3 pr-3 pl-5 md:pl-7 transition-all duration-300 group-hover:border-border group-hover:shadow-xl">
+          <div className="border-border/60 bg-card/80 backdrop-blur-xl mx-auto flex items-center rounded-2xl border shadow-lg py-3 pr-3 pl-4 md:pl-7 transition-all duration-300 group-hover:border-border group-hover:shadow-xl">
             <input
               ref={inputRef}
               type="text"

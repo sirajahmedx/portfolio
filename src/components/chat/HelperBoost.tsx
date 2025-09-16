@@ -26,8 +26,7 @@ const questions = {
   Me: "Who are you? I want to know more about you.",
   Projects: "What are your projects? What are you working on right now?",
   Skills: "What are your skills? Give me a list of your soft and hard skills.",
-  Contact:
-    'How can I reach you? What kind of project would make you say "yes" immediately?',
+  Contact: "How can I reach you?",
 };
 
 const questionConfig = [
@@ -48,7 +47,7 @@ const questionConfig = [
 
 export default React.memo(function HelperBoost({
   submitQuery,
-  setInput,
+  // setInput,
   hasReachedLimit = false,
 }: HelperBoostProps) {
   const [isVisible, setIsVisible] = useState(true);
