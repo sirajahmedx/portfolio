@@ -284,7 +284,13 @@ export default function ChatMessageContent({
   const content = renderContent();
 
   return (
-    <div className="w-full">
+    <div
+      className={`${
+        message.role === "user"
+          ? "w-auto max-w-full"
+          : "w-[65vw] sm:w-full md:w-full lg:w-full xl:w-full"
+      } max-w-none`}
+    >
       {content}
       {shouldTruncate && visibleLines < lines.length && isMobile && (
         <div className="mt-4 text-center">
