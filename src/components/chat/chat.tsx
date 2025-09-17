@@ -386,25 +386,25 @@ const Chat = () => {
             inline: "nearest",
           });
 
-          // Additional mobile-specific scroll adjustment
+          // Additional mobile-specific scroll adjustment with increased padding compensation
           setTimeout(() => {
             if (element) {
               const container = element.closest(".overflow-y-auto");
               if (container) {
-                const scrollTop = container.scrollTop;
-                const scrollHeight = container.scrollHeight;
-                const clientHeight = container.clientHeight;
+                const scrollTop = (container as HTMLElement).scrollTop;
+                const scrollHeight = (container as HTMLElement).scrollHeight;
+                const clientHeight = (container as HTMLElement).clientHeight;
 
-                // If we're not at the bottom, scroll again (handles dynamic content)
-                if (scrollTop + clientHeight < scrollHeight - 10) {
-                  container.scrollTo({
+                // If we're not at the bottom, scroll again (handles dynamic content and increased padding)
+                if (scrollTop + clientHeight < scrollHeight - 20) {
+                  (container as HTMLElement).scrollTo({
                     top: scrollHeight,
                     behavior: "smooth",
                   });
                 }
               }
             }
-          }, 100);
+          }, 150); // Increased delay to account for animations
         }
       });
     }
@@ -806,12 +806,12 @@ const Chat = () => {
 
   //chat
   return (
-    <div className="bg-gradient-to-br from-background via-background/98 to-background/95 relative flex h-full flex-col overflow-hidden">
+    <div className="bg-gradient-to-br from-background via-background/98 to-background/95 relative flex h-full min-h-0 flex-col overflow-hidden">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/5 via-background to-background" />
       <div className="absolute inset-0 bg-grid-pattern opacity-[0.02]" />
 
       {/* Main Content Area */}
-      <div className="relative z-10 flex flex-1 flex-col overflow-hidden">
+      <div className="relative z-10 flex flex-1 min-h-0 flex-col overflow-hidden">
         <div className="flex justify-end px-6 py-2 border-b border-border/30 bg-card/30 backdrop-blur-sm">
           <div className="flex items-center gap-2">
             <button
@@ -835,8 +835,11 @@ const Chat = () => {
         </div>
 
         {/* Messages Area */}
-        <div className="flex-1 overflow-hidden min-h-0">
-          <div className="h-full overflow-y-auto px-4 pt-8 pb-24 md:pb-8 scrollbar-thin scrollbar-thumb-muted-foreground/30 scrollbar-track-transparent scroll-smooth">
+        <div className="flex-1 overflow-hidden">
+          <div
+            className="h-full overflow-y-auto px-4 pt-8 pb-48 md:pb-40 scrollbar-hide scroll-smooth"
+            style={{ WebkitOverflowScrolling: "touch" }}
+          >
             <div className="mx-auto max-w-4xl">
               <AnimatePresence mode="wait">
                 {isEmptyState ? (
@@ -853,7 +856,7 @@ const Chat = () => {
                 ) : (
                   <motion.div
                     key="conversation"
-                    className="space-y-6 md:space-y-8 pb-4"
+                    className="flex flex-col space-y-6 md:space-y-8 pb-6 min-h-full"
                     {...MOTION_CONFIG}
                   >
                     {messages.map((message, index) => (
@@ -994,7 +997,7 @@ const Chat = () => {
         </div>
 
         {/* Bottom bar positioned absolutely */}
-        <div className="absolute bottom-0 left-0 right-0 border-border/30 bg-card/40 z-10 border-t px-4 md:px-6 py-3 md:py-4 backdrop-blur-xl">
+        <div className="absolute bottom-0 left-0 right-0 border-border/30 bg-card/40 z-20 border-t px-4 md:px-6 py-3 md:py-4 backdrop-blur-xl">
           <div className="mx-auto max-w-4xl">
             <div className="flex flex-col gap-3">
               <HelperBoost

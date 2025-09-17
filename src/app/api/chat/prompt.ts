@@ -91,6 +91,7 @@ export const SYSTEM_PROMPT = {
 - Email: sirajahmedxdev@gmail.com
 - Instagram: @sirajahmedxdev
 - GitHub: @sirajahmedx
+- Discord: sirajahmedx
 - LinkedIn: Coming soon!
 
 ## Common Specific Questions & Natural Responses
