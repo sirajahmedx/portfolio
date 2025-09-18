@@ -88,8 +88,8 @@ export default function RootLayout({
         >
           <Header />
           <main
-            className="flex flex-col overflow-hidden"
-            style={{ height: "100dvh" }} // Use dynamic viewport height
+            className="flex flex-col overflow-auto"
+            style={{ minHeight: "100dvh" }} // Use dynamic viewport height
           >
             {children}
           </main>

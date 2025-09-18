@@ -13,10 +13,12 @@ import React, {
 } from "react";
 
 type Card = {
-  src: string;
+  src?: string;
   title: string;
   category: string;
+  description?: string;
   content: React.ReactNode;
+  gradient?: string;
 };
 
 export const CarouselContext = createContext<{
@@ -55,7 +57,7 @@ export const Carousel = ({
   };
 
   const getScrollDistance = () => {
-    const cardWidth = 384;
+    const cardWidth = 448; // 28rem = 448px
     const gap = 16;
 
     return cardWidth + gap;
@@ -81,7 +83,7 @@ export const Carousel = ({
 
   const handleCardClose = (index: number) => {
     if (carouselRef.current) {
-      const cardWidth = 384;
+      const cardWidth = 448; // 28rem = 448px
       const gap = 16;
       const scrollPosition = (cardWidth + gap) * index;
       carouselRef.current.scrollTo({
@@ -102,7 +104,7 @@ export const Carousel = ({
     >
       <div className="relative w-full">
         <div
-          className="flex w-full overflow-x-scroll overscroll-x-auto scroll-smooth py-10 [scrollbar-width:none]"
+          className="flex w-full overflow-x-auto overscroll-x-auto scroll-smooth py-10 scrollbar-hide"
           ref={carouselRef}
           onScroll={checkScrollability}
         >
@@ -140,20 +142,20 @@ export const Carousel = ({
             ))}
           </div>
         </div>
-        <div className="mr-10 flex justify-end gap-2 md:mr-20">
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex gap-4 md:bottom-12 z-50">
           <button
-            className="relative z-40 flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 disabled:opacity-50"
+            className="relative z-50 flex h-12 w-12 items-center justify-center rounded-full bg-white/90 dark:bg-gray-800/90 shadow-lg backdrop-blur-sm disabled:opacity-50 transition-all duration-200 hover:scale-105"
             onClick={scrollLeft}
             disabled={!canScrollLeft}
           >
-            <ChevronLeft className="h-6 w-6 text-gray-500" />
+            <ChevronLeft className="h-6 w-6 text-gray-700 dark:text-gray-300" />
           </button>
           <button
-            className="relative z-40 flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 disabled:opacity-50"
+            className="relative z-50 flex h-12 w-12 items-center justify-center rounded-full bg-white/90 dark:bg-gray-800/90 shadow-lg backdrop-blur-sm disabled:opacity-50 transition-all duration-200 hover:scale-105"
             onClick={scrollRight}
             disabled={!canScrollRight}
           >
-            <ChevronRight className="h-6 w-6 text-gray-500" />
+            <ChevronRight className="h-6 w-6 text-gray-700 dark:text-gray-300" />
           </button>
         </div>
       </div>
@@ -259,29 +261,52 @@ export const Card = ({
       <motion.button
         layoutId={layout ? `card-${card.title}` : undefined}
         onClick={handleOpen}
-        className="relative z-10 flex h-96 w-96 flex-col items-start justify-start overflow-hidden rounded-3xl bg-gray-100 dark:bg-neutral-900 md:h-96 md:w-96 sm:h-80 sm:w-80"
+        className="relative z-10 flex w-[28rem] flex-col items-start justify-start overflow-hidden rounded-3xl bg-gray-100 dark:bg-neutral-900 md:w-[32rem] sm:w-[24rem] min-h-[20rem]"
       >
-        <div className="absolute inset-x-0 top-0 z-30 h-full cursor-pointer bg-gradient-to-b from-black/20 hover:scale-110 via-transparent to-transparent" />
-        <div className="relative z-40 p-8 mt-auto mb-8">
+        <div className="absolute inset-x-0 top-0 z-30 h-full cursor-pointer bg-gradient-to-b from-black/5 hover:scale-110 via-transparent to-transparent" />
+
+        {/* Title at the top */}
+        <div className="relative z-40 p-5 pt-5">
           <motion.p
             layoutId={layout ? `category-${card.category}` : undefined}
-            className="text-left font-sans text-sm font-medium text-white md:text-base"
+            className="text-left font-sans text-base font-medium text-white/90 md:text-lg"
           >
             {card.category}
           </motion.p>
           <motion.p
             layoutId={layout ? `title-${card.title}` : undefined}
-            className="max-w-xs text-left font-sans text-xl font-semibold [text-wrap:balance] text-white md:text-3xl"
+            className="max-w-xs text-left font-sans text-3xl font-bold [text-wrap:balance] text-white md:text-4xl mt-2"
           >
             {card.title}
           </motion.p>
         </div>
-        <BlurImage
-          src={card.src}
-          alt={card.title}
-          fill
-          className="absolute inset-0 z-10 object-cover"
-        />
+
+        {/* Description in the middle */}
+        {card.description && (
+          <div className="relative z-40 px-5 pb-5">
+            <motion.p className="text-left font-sans text-base text-white/90 leading-relaxed font-normal max-w-full">
+              {card.description}
+            </motion.p>
+          </div>
+        )}
+
+        {card.gradient ? (
+          <div
+            className={cn(
+              "absolute inset-0 z-10 bg-gradient-to-br opacity-80",
+              card.gradient
+            )}
+          />
+        ) : card.src ? (
+          <BlurImage
+            src={card.src}
+            alt={card.title}
+            fill
+            className="absolute inset-0 z-10 object-cover"
+          />
+        ) : (
+          <div className="absolute inset-0 z-10 bg-gradient-to-br from-neutral-500/60 to-neutral-700/60" />
+        )}
       </motion.button>
     </>
   );

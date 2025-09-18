@@ -313,54 +313,74 @@ const ProjectContent = ({ project }: { project: ProjectProps }) => {
   );
 };
 
-// Main data export with updated content
-export const data = [
+// Main data export with updated content and gradients
+export const mainProjects = [
   {
     category: "Full-Stack Platform",
     title: "Jobify",
-    src: "/servifi-splash.png", // Using available image as placeholder
+    description:
+      "Jobify is a comprehensive service marketplace platform that connects service providers with clients. Features booking management, secure payments, and real-time chat functionality. Built with React, Next.js, GraphQL, and MongoDB for scalable performance.",
+    gradient: "from-emerald-600/60 to-teal-700/60",
     content: <ProjectContent project={{ title: "Jobify" }} />,
   },
   {
     category: "Service Platform",
     title: "Servifi",
-    src: "/servifi-splash.jpg", // Using available image as placeholder
-    content: <ProjectContent project={{ title: "Tradesman" }} />,
+    description:
+      "Servifi is a comprehensive service platform connecting tradesmen with customers through advanced backend APIs. Features provider profiles, service listings, booking systems, and payment processing. Includes admin dashboards and real-time communication systems.",
+    gradient: "from-yellow-500/60 to-amber-600/60",
+    content: <ProjectContent project={{ title: "Servifi" }} />,
   },
   {
     category: "Talent Discovery App",
     title: "Talent-Tube",
-    src: "/tt.jpg", // Using available image as placeholder
+    description:
+      "Talent-Tube is a multi-platform talent discovery app combining video content and hiring capabilities. Features real-time chat system, user profiles, skill tagging, and content management. Built with React, Next.js, GraphQL, and Android native development.",
+    gradient: "from-purple-600/60 to-pink-600/60",
     content: <ProjectContent project={{ title: "Talent-Tube" }} />,
   },
   {
     category: "Mobile App",
     title: "Tuneit",
-    src: "/dark-chat.png", // Using available image as placeholder
+    description:
+      "Tuneit is a mobile app connecting users with services, developed entirely by me from concept to implementation. Features service browsing, provider profiles, booking systems, and real-time notifications. Built with React Native, Node.js, GraphQL, and MongoDB.",
+    gradient: "from-slate-500/60 to-slate-700/60",
     content: <ProjectContent project={{ title: "Tuneit" }} />,
   },
   {
     category: "Automation Tool",
     title: "GitHub Bot",
-    src: "/bot.jpg", // Using available image as placeholder
+    description:
+      "GitHub automation toolkit with three standalone bots for following users, unfollowing users, and generating fake commits. Features rate limiting, progress persistence, and human-like behavior for safe automation. Built with Node.js and GitHub API.",
+    gradient: "from-[#6E7681]/60 to-[#484F58]/60",
     content: <ProjectContent project={{ title: "GitHub Bot" }} />,
   },
   {
     category: "School Project",
     title: "Sensify",
-    src: "/avatar-landing.png", // Using available image as placeholder
-    content: <ProjectContent project={{ title: "Sensify" }} />,
-  },
-  {
-    category: "School Project",
-    title: "Sensify",
-    src: "/avatar-landing.png", // Using available image as placeholder
-    content: <ProjectContent project={{ title: "Sensify" }} />,
-  },
-  {
-    category: "School Project",
-    title: "Sensify",
-    src: "/avatar-landing.png", // Using available image as placeholder
-    content: <ProjectContent project={{ title: "Sensify" }} />,
+    description:
+      "React Native mobile app suite with sensor-based tools for measuring light, detecting magnets, leveling surfaces, and more. Features real-time sensor data processing and cross-platform compatibility. Built with React Native, Node.js, and MongoDB.",
+    gradient: "from-cyan-500/60 to-blue-500/60",
+    content: <ProjectContent project={{ title: "Sensify (School Project)" }} />,
   },
 ];
+export const sideProjects = [
+  {
+    category: "Automation Tool",
+    title: "GitHub Bot",
+    gradient: "from-gray-800 to-gray-600",
+    content: <ProjectContent project={{ title: "GitHub Bot" }} />,
+  },
+  {
+    category: "School Project",
+    title: "Sensify",
+    gradient: "from-white to-gray-200",
+    content: <ProjectContent project={{ title: "Sensify (School Project)" }} />,
+  },
+];
+
+// Legacy export for backward compatibility
+export const data = mainProjects.map((project) => ({
+  ...project,
+  src: undefined, // Remove src for legacy compatibility
+}));

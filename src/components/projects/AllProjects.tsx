@@ -1,41 +1,60 @@
 "use client";
 import { Card, Carousel } from "@/components/projects/apple-cards-carousel";
-import { data } from "@/components/projects/Data";
+import { mainProjects } from "@/components/projects/Data";
 import { motion } from "framer-motion";
 import { ExternalLink, Github } from "lucide-react";
 
 export default function AllProjects() {
-  const cards = data.map((card, index) => (
-    <Card key={card.src} card={card} index={index} layout={true} />
+  const cards = mainProjects.map((card, index) => (
+    <Card key={card.title} card={card} index={index} layout={true} />
   ));
 
   return (
     <div className="w-full">
-      {/* Category Filter */}
+      {/* Projects Section */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="max-w-7xl mx-auto mb-8 px-4"
-      ></motion.div>
+        transition={{ delay: 0.1 }}
+        className="mb-16"
+      >
+        <div className="max-w-7xl mx-auto mb-8 px-4">
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="text-2xl md:text-3xl font-bold text-foreground mb-4"
+          >
+            Featured Projects
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="text-muted-foreground"
+          >
+            A showcase of my full-stack applications and platforms
+          </motion.p>
+        </div>
 
-      {/* Projects Grid/Carousel */}
-      <div className="max-w-7xl mx-auto">
-        <Carousel items={cards} />
-      </div>
+        {/* Projects Carousel */}
+        <div className="max-w-7xl mx-auto">
+          <Carousel items={cards} />
+        </div>
+      </motion.div>
 
       {/* Additional Projects Info */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5 }}
+        transition={{ delay: 0.4 }}
         className="max-w-7xl mx-auto mt-20 px-4"
       >
         {/* Call to Action */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.8 }}
+          transition={{ delay: 0.7 }}
           className="text-center"
         >
           <p className="text-muted-foreground mb-8 text-lg">
