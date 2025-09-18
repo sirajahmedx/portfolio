@@ -115,7 +115,7 @@ export default React.memo(function HelperBoost({
   }, [isVisible]);
 
   return (
-    <div className="w-full">
+    <div className="w-full transition-all duration-300 ease-in-out">
       <div
         className={
           isVisible ? "mb-3 flex justify-center" : "mb-0 flex justify-center"

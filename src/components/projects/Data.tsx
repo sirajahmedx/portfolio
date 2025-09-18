@@ -8,7 +8,43 @@ import { motion } from "framer-motion";
 // Enhanced project content array with all projects
 const PROJECT_CONTENT = [
   {
-    title: "Jobify",
+    title: "Portfolio Website",
+    description:
+      "Personal portfolio website showcasing my projects, skills, and experience as a full-stack developer. Features responsive design, dark/light theme toggle, interactive project cards, contact forms, and smooth animations. Built with modern web technologies for optimal performance and user experience.",
+    techStack: [
+      "Next.js",
+      "React",
+      "TypeScript",
+      "Tailwind CSS",
+      "Framer Motion",
+      "Lucide Icons",
+      "React Hook Form",
+      "Email.js",
+    ],
+    date: "2025",
+    links: [
+      {
+        name: "Live Demo",
+        url: "https://sirajahmedx.vercel.app",
+      },
+      {
+        name: "GitHub",
+        url: "https://github.com/sirajahmedx/portfolio",
+      },
+    ],
+    images: [
+      {
+        src: "/portfolio/home.png",
+        alt: "Portfolio homepage",
+      },
+      {
+        src: "/portfolio/chat.png",
+        alt: "Portfolio contact/chat section",
+      },
+    ],
+  },
+  {
+    title: "Jobifyy",
     description:
       "Full-stack platform for service providers and clients, featuring booking management, notifications, payments, and real-time chat. Web frontend, GraphQL API backend, socket server for real-time messaging, supports roles, categories, services, dashboards.",
     techStack: [
@@ -16,28 +52,41 @@ const PROJECT_CONTENT = [
       "Next.js",
       "Tailwind CSS",
       "Apollo Client",
+      "Stripe API",
       "Node.js",
       "Express.js",
       "GraphQL",
       "Socket.io",
       "MongoDB",
-      "JWT (auth.js)",
+      "JWT",
     ],
-    date: "2024",
+    date: "2025",
     links: [
       {
-        name: "GitHub",
-        url: "https://github.com/sirajahmedx",
+        name: "Live Demo",
+        url: "https://jobifyy.com",
+      },
+      {
+        name: "Private Repository",
+        url: "#",
       },
     ],
     images: [
       {
-        src: "/avatar-landing.png",
-        alt: "Jobify dashboard interface",
+        src: "/jobifyy/landing.png",
+        alt: "Jobifyy landing page",
       },
       {
-        src: "/dark-home.png",
-        alt: "Jobify platform overview",
+        src: "/jobifyy/about.png",
+        alt: "Jobifyy about section",
+      },
+      {
+        src: "/jobifyy/online-service.png",
+        alt: "Jobifyy online services",
+      },
+      {
+        src: "/jobifyy/inPerson.png",
+        alt: "Jobifyy in-person services",
       },
     ],
   },
@@ -50,28 +99,61 @@ const PROJECT_CONTENT = [
       "Next.js",
       "Tailwind CSS",
       "Apollo Client",
+      "Stripe API",
       "Node.js",
       "Express.js",
       "GraphQL",
       "Socket.io",
       "MongoDB",
-      "JWT (auth.js)",
+      "JWT",
     ],
-    date: "2024",
+    date: "2025",
     links: [
       {
-        name: "GitHub",
-        url: "https://github.com/sirajahmedx",
+        name: "Live Demo",
+        url: "https://nsevensecurity.com",
+      },
+      {
+        name: "Private Repository",
+        url: "#",
       },
     ],
     images: [
       {
-        src: "/dark-home.png",
-        alt: "Tradesman dashboard",
+        src: "/servifi/landing.png",
+        alt: "Servifi landing page",
       },
       {
-        src: "/light-home.png",
-        alt: "Tradesman booking system",
+        src: "/servifi/services.png",
+        alt: "Servifi services overview",
+      },
+      {
+        src: "/servifi/booking-1.png",
+        alt: "Servifi booking interface",
+      },
+      {
+        src: "/servifi/booking-2.png",
+        alt: "Servifi booking system",
+      },
+      {
+        src: "/servifi/booking-3.png",
+        alt: "Servifi booking workflow",
+      },
+      {
+        src: "/servifi/bookings.png",
+        alt: "Servifi dashboard bookings page",
+      },
+      {
+        src: "/servifi/dashboard-1.png",
+        alt: "Servifi dashboard calendar view",
+      },
+      {
+        src: "/servifi/dashboard-2.png",
+        alt: "Servifi dashboard overview page",
+      },
+      {
+        src: "/servifi/dashboard-3.png",
+        alt: "Servifi dashboard overview page",
       },
     ],
   },
@@ -84,29 +166,48 @@ const PROJECT_CONTENT = [
       "Next.js",
       "Tailwind CSS",
       "Apollo Client",
-      "Android (Kotlin/Java)",
+      "FFmpeg",
+      "WebRTC",
+      "Stripe API",
+      "Twilio API",
       "Node.js",
       "Express.js",
       "GraphQL",
       "Socket.io",
       "MongoDB",
-      "JWT (auth.js)",
+      "JWT",
     ],
-    date: "2024",
+    date: "2025",
     links: [
       {
-        name: "GitHub",
-        url: "https://github.com/sirajahmedx",
+        name: "Live Demo",
+        url: "https://tt.mlxsoft.com/",
+      },
+      {
+        name: "Private Repository",
+        url: "#",
       },
     ],
     images: [
       {
-        src: "/light-chat.png",
-        alt: "Talent-Tube main interface",
+        src: "/talent-tube/landing.png",
+        alt: "Talent-Tube landing page",
       },
       {
-        src: "/dark-chat.png",
-        alt: "Talent-Tube mobile app",
+        src: "/talent-tube/foryou.png",
+        alt: "Talent-Tube for you page",
+      },
+      {
+        src: "/talent-tube/suggested.png",
+        alt: "Talent-Tube suggested talents",
+      },
+      {
+        src: "/talent-tube/chat.png",
+        alt: "Talent-Tube chat interface",
+      },
+      {
+        src: "/talent-tube/blogs.png",
+        alt: "Talent-Tube blogs section",
       },
     ],
   },
@@ -116,28 +217,42 @@ const PROJECT_CONTENT = [
       "Mobile app connecting users with services, fully created by me. Handles all features and flows, including real-time updates for service notifications.",
     techStack: [
       "React Native",
+      "Expo",
+      "AsyncStorage",
       "Node.js",
       "Express.js",
       "GraphQL",
       "Socket.io",
       "MongoDB",
-      "JWT (auth.js)",
+      "JWT",
     ],
-    date: "2024",
+    date: "2025",
     links: [
       {
-        name: "GitHub",
-        url: "https://github.com/sirajahmedx",
+        name: "Tuneit App",
+        url: "https://github.com/sirajahmedx/tuneit-app",
+      },
+      {
+        name: "Tuneit Web",
+        url: "https://github.com/sirajahmedx/tuneit-web",
+      },
+      {
+        name: "Tuneit API",
+        url: "https://github.com/sirajahmedx/tuneit-api",
       },
     ],
     images: [
       {
-        src: "/avatar-landing.png",
-        alt: "Tuneit mobile app",
+        src: "/tuneit/landing.png",
+        alt: "Tuneit landing page",
       },
       {
-        src: "/dark-home.png",
-        alt: "Tuneit service interface",
+        src: "/tuneit/signin.png",
+        alt: "Tuneit sign in page",
+      },
+      {
+        src: "/tuneit/signup.png",
+        alt: "Tuneit sign up page",
       },
     ],
   },
@@ -146,17 +261,25 @@ const PROJECT_CONTENT = [
     description:
       "GitHub automation toolkit with three standalone bots for following users, unfollowing users, and generating fake commits. Features rate limiting, progress persistence, and human-like behavior for safe automation.",
     techStack: ["Node.js", "GitHub API"],
-    date: "2024",
+    date: "2025",
     links: [
       {
         name: "GitHub",
-        url: "https://github.com/sirajahmedx",
+        url: "https://github.com/sirajahmedx/bots",
       },
     ],
     images: [
       {
-        src: "/light-home.png",
-        alt: "GitHub Bot interface",
+        src: "/bot/follow.png",
+        alt: "GitHub Bot follow functionality",
+      },
+      {
+        src: "/bot/follow-2.png",
+        alt: "GitHub Bot follow interface",
+      },
+      {
+        src: "/bot/unfollow.png",
+        alt: "GitHub Bot unfollow functionality",
       },
     ],
   },
@@ -165,19 +288,28 @@ const PROJECT_CONTENT = [
     description:
       "React Native mobile app suite with sensor-based tools for measuring light, detecting magnets, leveling surfaces, and more.",
     techStack: ["React Native", "Node.js", "Express.js", "MongoDB"],
-    date: "2024",
+    date: "2025",
     links: [
       {
         name: "GitHub",
-        url: "https://github.com/sirajahmedx",
+        url: "https://github.com/sirajahmedx/sensify",
       },
     ],
-    images: [
+    images: [],
+  },
+  {
+    title: "Global Parcel Services GPS App",
+    description:
+      "GPS-based parcel tracking mobile app for efficient package delivery and tracking. Features real-time location updates, delivery status monitoring, and route optimization for delivery personnel.",
+    techStack: ["React Native", "Node.js", "Express.js", "MongoDB"],
+    date: "2025",
+    links: [
       {
-        src: "/dark-chat.png",
-        alt: "Sensify sensor tools",
+        name: "Google Play Store",
+        url: "https://play.google.com/store/search?q=Global+Parcel+Services&c=apps",
       },
     ],
+    images: [],
   },
 ];
 
@@ -317,11 +449,11 @@ const ProjectContent = ({ project }: { project: ProjectProps }) => {
 export const mainProjects = [
   {
     category: "Full-Stack Platform",
-    title: "Jobify",
+    title: "Jobifyy",
     description:
-      "Jobify is a comprehensive service marketplace platform that connects service providers with clients. Features booking management, secure payments, and real-time chat functionality. Built with React, Next.js, GraphQL, and MongoDB for scalable performance.",
+      "Jobifyy is a comprehensive service marketplace platform that connects service providers with clients. Features booking management, secure payments, and real-time chat functionality. Built with React, Next.js, GraphQL, and MongoDB for scalable performance.",
     gradient: "from-emerald-600/60 to-teal-700/60",
-    content: <ProjectContent project={{ title: "Jobify" }} />,
+    content: <ProjectContent project={{ title: "Jobifyy" }} />,
   },
   {
     category: "Service Platform",
@@ -340,7 +472,7 @@ export const mainProjects = [
     content: <ProjectContent project={{ title: "Talent-Tube" }} />,
   },
   {
-    category: "Mobile App",
+    category: "Mechanic Services App",
     title: "Tuneit",
     description:
       "Tuneit is a mobile app connecting users with services, developed entirely by me from concept to implementation. Features service browsing, provider profiles, booking systems, and real-time notifications. Built with React Native, Node.js, GraphQL, and MongoDB.",
@@ -356,12 +488,30 @@ export const mainProjects = [
     content: <ProjectContent project={{ title: "GitHub Bot" }} />,
   },
   {
+    category: "Portfolio Website",
+    title: "Portfolio Website",
+    description:
+      "Personal portfolio website showcasing my projects, skills, and experience as a full-stack developer. Features responsive design, dark/light theme toggle, interactive project cards, contact forms, and smooth animations. Built with Next.js, React, TypeScript, and Tailwind CSS for modern web development.",
+    gradient: "from-blue-600/60 to-purple-600/60",
+    content: <ProjectContent project={{ title: "Portfolio Website" }} />,
+  },
+  {
     category: "School Project",
     title: "Sensify",
     description:
       "React Native mobile app suite with sensor-based tools for measuring light, detecting magnets, leveling surfaces, and more. Features real-time sensor data processing and cross-platform compatibility. Built with React Native, Node.js, and MongoDB.",
     gradient: "from-cyan-500/60 to-blue-500/60",
     content: <ProjectContent project={{ title: "Sensify (School Project)" }} />,
+  },
+  {
+    category: "GPS Tracking App",
+    title: "Global Parcel Services GPS App",
+    description:
+      "GPS-based parcel tracking mobile app for efficient package delivery and tracking. Features real-time location updates, delivery status monitoring, and route optimization for delivery personnel. Built with React Native, Node.js, Express.js, and MongoDB.",
+    gradient: "from-green-500/60 to-emerald-600/60",
+    content: (
+      <ProjectContent project={{ title: "Global Parcel Services GPS App" }} />
+    ),
   },
 ];
 export const sideProjects = [

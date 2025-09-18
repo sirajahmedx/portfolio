@@ -7,12 +7,10 @@ A modern, interactive portfolio website featuring an AI-powered chat interface b
 ### Home Page
 
 ![Dark Theme Home Page](https://raw.githubusercontent.com/sirajahmedx/portfolio/main/public/dark-home.png)
-![Light Theme Home Page](https://raw.githubusercontent.com/sirajahmedx/portfolio/main/public/light-home.png)
 
 ### Chat Page
 
 ![Dark Theme Chat Page](https://raw.githubusercontent.com/sirajahmedx/portfolio/main/public/dark-chat.png)
-![Light Theme Chat Page](https://raw.githubusercontent.com/sirajahmedx/portfolio/main/public/light-chat.png)
 
 ## Overview
 

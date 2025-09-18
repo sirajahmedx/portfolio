@@ -375,46 +375,15 @@ const Chat = () => {
 
   // Enhanced auto-scroll to bottom with mobile optimization
   const scrollToBottom = useCallback(() => {
-    if (messagesEndRef.current) {
-      requestAnimationFrame(() => {
-        const element = messagesEndRef.current;
-        if (element) {
-          // Use scrollIntoView for better mobile compatibility
-          element.scrollIntoView({
-            behavior: "smooth",
-            block: "end",
-            inline: "nearest",
-          });
-
-          // Additional mobile-specific scroll adjustment with increased padding compensation
-          setTimeout(() => {
-            if (element) {
-              const container = element.closest(".overflow-y-auto");
-              if (container) {
-                const scrollTop = (container as HTMLElement).scrollTop;
-                const scrollHeight = (container as HTMLElement).scrollHeight;
-                const clientHeight = (container as HTMLElement).clientHeight;
-
-                // If we're not at the bottom, scroll again (handles dynamic content and increased padding)
-                if (scrollTop + clientHeight < scrollHeight - 20) {
-                  (container as HTMLElement).scrollTo({
-                    top: scrollHeight,
-                    behavior: "smooth",
-                  });
-                }
-              }
-            }
-          }, 150); // Increased delay to account for animations
-        }
-      });
-    }
+    // Auto-scroll functionality removed
+    // Users can now manually scroll through messages
   }, []);
 
-  // Auto-scroll when messages change or loading state changes
-  useEffect(() => {
-    const timer = setTimeout(scrollToBottom, 100);
-    return () => clearTimeout(timer);
-  }, [messages, loadingSubmit, scrollToBottom]);
+  // Auto-scroll when messages change or loading state changes - REMOVED
+  // useEffect(() => {
+  //   const timer = setTimeout(scrollToBottom, 100);
+  //   return () => clearTimeout(timer);
+  // }, [messages, loadingSubmit, scrollToBottom]);
 
   // Clear conversation
   const clearConversation = useCallback(() => {
@@ -515,8 +484,8 @@ const Chat = () => {
                 dispatch({ type: "SET_LOADING", payload: false });
               }
 
-              // Auto-scroll to bottom
-              setTimeout(scrollToBottom, 50);
+              // Auto-scroll to bottom - REMOVED
+              // setTimeout(scrollToBottom, 50);
             }
           } catch (parseError) {
             console.warn(
@@ -533,7 +502,7 @@ const Chat = () => {
 
       return remainingBuffer;
     },
-    [chunkCount, scrollToBottom]
+    [chunkCount]
   );
 
   // Submit query to API
@@ -766,19 +735,21 @@ const Chat = () => {
     }
   }, [isTalking]);
 
-  // Mobile keyboard handling and viewport adjustments
+  // Mobile keyboard handling and viewport adjustments - AUTO-SCROLL REMOVED
   useEffect(() => {
     const handleViewportChange = () => {
       // Small delay to ensure keyboard has fully appeared/disappeared
+      // Auto-scroll functionality removed - users can manually scroll
       setTimeout(() => {
-        scrollToBottom();
+        // scrollToBottom(); // REMOVED
       }, 300);
     };
 
     const handleFocus = () => {
-      // When input is focused on mobile, ensure we're scrolled to bottom
+      // When input is focused on mobile, ensure we're scrolled to bottom - REMOVED
+      // Auto-scroll functionality removed - users can manually scroll
       setTimeout(() => {
-        scrollToBottom();
+        // scrollToBottom(); // REMOVED
       }, 100);
     };
 
@@ -799,20 +770,21 @@ const Chat = () => {
         input.removeEventListener("focus", handleFocus);
       });
     };
-  }, [scrollToBottom]);
+  }, []);
 
   // Check if this is the initial empty state
   const isEmptyState = messages.length === 0 && !loadingSubmit;
 
   //chat
   return (
-    <div className="bg-gradient-to-br from-background via-background/98 to-background/95 relative flex h-full min-h-0 flex-col overflow-hidden">
+    <div className="bg-gradient-to-br from-background via-background/98 to-background/95 relative flex flex-col h-screen max-h-screen min-h-0 overflow-hidden">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/5 via-background to-background" />
       <div className="absolute inset-0 bg-grid-pattern opacity-[0.02]" />
 
-      {/* Main Content Area */}
-      <div className="relative z-10 flex flex-1 min-h-0 flex-col overflow-hidden">
-        <div className="flex justify-end px-6 py-2 border-b border-border/30 bg-card/30 backdrop-blur-sm">
+      {/* Main Content Area - Full height container with proper scrolling isolation */}
+      <div className="relative z-10 flex flex-col h-full overflow-hidden isolate">
+        {/* Header - Fixed at top */}
+        <div className="flex justify-end px-6 py-2 border-b border-border/30 bg-card/30 backdrop-blur-sm flex-shrink-0">
           <div className="flex items-center gap-2">
             <button
               onClick={clearConversation}
@@ -834,18 +806,22 @@ const Chat = () => {
           </div>
         </div>
 
-        {/* Messages Area */}
-        <div className="flex-1 overflow-hidden">
+        {/* Messages Area - Independent scrollable container */}
+        <div className="flex-1 overflow-hidden min-h-0 flex flex-col relative will-change-scroll">
           <div
-            className="h-full overflow-y-auto px-4 pt-8 pb-48 md:pb-40 scrollbar-hide scroll-smooth"
-            style={{ WebkitOverflowScrolling: "touch" }}
+            className="h-full overflow-y-auto px-4 pt-8 pb-[450px] md:pb-[380px] scroll-smooth"
+            style={{
+              WebkitOverflowScrolling: "touch",
+              scrollbarWidth: "thin",
+              scrollbarColor: "rgb(107 114 128 / 0.3) transparent",
+            }}
           >
             <div className="mx-auto max-w-4xl">
               <AnimatePresence mode="wait">
                 {isEmptyState ? (
                   <motion.div
                     key="landing"
-                    className="flex h-full items-center justify-center min-h-[60vh]"
+                    className="flex h-full items-center justify-center py-8 px-4"
                     {...MOTION_CONFIG}
                   >
                     <ChatLanding
@@ -996,8 +972,8 @@ const Chat = () => {
           </div>
         </div>
 
-        {/* Bottom bar positioned absolutely */}
-        <div className="absolute bottom-0 left-0 right-0 border-border/30 bg-card/40 z-20 border-t px-4 md:px-6 py-3 md:py-4 backdrop-blur-xl">
+        {/* Bottom bar positioned absolutely - stays fixed at bottom */}
+        <div className="absolute bottom-0 left-0 right-0 border-border/30 bg-card/60 z-[100] border-t px-4 md:px-6 py-3 md:py-4 backdrop-blur-xl min-h-[120px] md:min-h-[100px] flex-shrink-0 shadow-2xl">
           <div className="mx-auto max-w-4xl">
             <div className="flex flex-col gap-3">
               <HelperBoost

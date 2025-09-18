@@ -65,7 +65,7 @@ export default function ChatBottombar({
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="w-full"
+      className="w-full flex-shrink-0"
     >
       <form onSubmit={handleSubmit} className="relative w-full">
         <div className="relative group">

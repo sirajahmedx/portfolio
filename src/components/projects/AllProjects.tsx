@@ -73,7 +73,7 @@ export default function AllProjects() {
               View on GitHub
             </motion.a>
             <motion.a
-              href="/chat?query=I'd like to discuss your projects"
+              href="/chat?query=How Can I Contact You."
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="inline-flex items-center gap-2 px-8 py-4 border-2 border-border rounded-xl hover:border-primary hover:bg-primary/5 transition-all duration-300 font-medium"
