@@ -809,7 +809,7 @@ const Chat = () => {
         {/* Messages Area - Independent scrollable container */}
         <div className="flex-1 overflow-hidden min-h-0 flex flex-col relative will-change-scroll">
           <div
-            className="h-full overflow-y-auto px-4 pt-8 pb-[450px] md:pb-[380px] scroll-smooth"
+            className="h-full overflow-y-auto px-4 pt-8 pb-32 md:pb-28 scroll-smooth"
             style={{
               WebkitOverflowScrolling: "touch",
               scrollbarWidth: "thin",

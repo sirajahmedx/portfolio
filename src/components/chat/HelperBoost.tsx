@@ -50,7 +50,7 @@ export default React.memo(function HelperBoost({
   // setInput,
   hasReachedLimit = false,
 }: HelperBoostProps) {
-  const [isVisible, setIsVisible] = useState(true);
+  const [isVisible, setIsVisible] = useState(false);
   const [open, setOpen] = useState(false);
   const [lastClickedQuestion, setLastClickedQuestion] = useState<string>("");
   const [lastClickTime, setLastClickTime] = useState<number>(0);
