@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Github, Star, MessageCircle } from "lucide-react";
+import { Github, Star, MessageCircle, Briefcase } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import Link from "next/link";
 
@@ -46,6 +46,13 @@ export default function Header() {
         </div>
 
         <div className="flex items-center gap-1 sm:gap-3">
+          <Link
+            href="/projects"
+            className="group text-muted-foreground hover:text-foreground flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 sm:px-3 sm:py-2 text-sm font-medium transition-all duration-300 hover:bg-accent/50 hover:scale-105 active:scale-95"
+          >
+            <Briefcase className="h-4 w-4 transition-transform duration-300 group-hover:-rotate-12" />
+            <span className="hidden sm:inline">Projects</span>
+          </Link>
           <Link
             href="/chat"
             className="group text-muted-foreground hover:text-foreground flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 sm:px-3 sm:py-2 text-sm font-medium transition-all duration-300 hover:bg-accent/50 hover:scale-105 active:scale-95"
