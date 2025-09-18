@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import Header from "@/components/Header";
 import "./globals.css";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 // Use system fonts instead of Google Fonts to avoid network issues
 // const inter = Inter({
@@ -92,6 +93,7 @@ export default function RootLayout({
             style={{ minHeight: "100dvh" }} // Use dynamic viewport height
           >
             {children}
+            <SpeedInsights />
           </main>
           <Toaster />
         </ThemeProvider>
