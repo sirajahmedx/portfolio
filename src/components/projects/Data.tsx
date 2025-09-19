@@ -452,7 +452,8 @@ export const mainProjects = [
     title: "Jobifyy",
     description:
       "Jobifyy is a comprehensive service marketplace platform that connects service providers with clients. Features booking management, secure payments, and real-time chat functionality. Built with React, Next.js, GraphQL, and MongoDB for scalable performance.",
-    gradient: "from-emerald-600/60 to-teal-700/60",
+    gradient:
+      "from-emerald-500/70 to-teal-600/70 dark:from-emerald-600/60 dark:to-teal-700/60",
     content: <ProjectContent project={{ title: "Jobifyy" }} />,
   },
   {
@@ -460,7 +461,8 @@ export const mainProjects = [
     title: "Servifi",
     description:
       "Servifi is a comprehensive service platform connecting tradesmen with customers through advanced backend APIs. Features provider profiles, service listings, booking systems, and payment processing. Includes admin dashboards and real-time communication systems.",
-    gradient: "from-yellow-500/60 to-amber-600/60",
+    gradient:
+      "from-amber-400/70 to-orange-500/70 dark:from-yellow-500/60 dark:to-amber-600/60",
     content: <ProjectContent project={{ title: "Servifi" }} />,
   },
   {
@@ -468,7 +470,8 @@ export const mainProjects = [
     title: "Talent-Tube",
     description:
       "Talent-Tube is a multi-platform talent discovery app combining video content and hiring capabilities. Features real-time chat system, user profiles, skill tagging, and content management. Built with React, Next.js, GraphQL, and Android native development.",
-    gradient: "from-purple-600/60 to-pink-600/60",
+    gradient:
+      "from-purple-500/70 to-pink-500/70 dark:from-purple-600/60 dark:to-pink-600/60",
     content: <ProjectContent project={{ title: "Talent-Tube" }} />,
   },
   {
@@ -476,7 +479,8 @@ export const mainProjects = [
     title: "Tuneit",
     description:
       "Tuneit is a mobile app connecting users with services, developed entirely by me from concept to implementation. Features service browsing, provider profiles, booking systems, and real-time notifications. Built with React Native, Node.js, GraphQL, and MongoDB.",
-    gradient: "from-slate-500/60 to-slate-700/60",
+    gradient:
+      "from-slate-400/70 to-slate-600/70 dark:from-slate-500/60 dark:to-slate-700/60",
     content: <ProjectContent project={{ title: "Tuneit" }} />,
   },
   {
@@ -484,7 +488,8 @@ export const mainProjects = [
     title: "GitHub Bot",
     description:
       "GitHub automation toolkit with three standalone bots for following users, unfollowing users, and generating fake commits. Features rate limiting, progress persistence, and human-like behavior for safe automation. Built with Node.js and GitHub API.",
-    gradient: "from-[#6E7681]/60 to-[#484F58]/60",
+    gradient:
+      "from-gray-500/70 to-gray-700/70 dark:from-[#6E7681]/60 dark:to-[#484F58]/60",
     content: <ProjectContent project={{ title: "GitHub Bot" }} />,
   },
   {
@@ -492,7 +497,8 @@ export const mainProjects = [
     title: "Portfolio Website",
     description:
       "Personal portfolio website showcasing my projects, skills, and experience as a full-stack developer. Features responsive design, dark/light theme toggle, interactive project cards, contact forms, and smooth animations. Built with Next.js, React, TypeScript, and Tailwind CSS for modern web development.",
-    gradient: "from-blue-600/60 to-purple-600/60",
+    gradient:
+      "from-blue-500/70 to-purple-500/70 dark:from-blue-600/60 dark:to-purple-600/60",
     content: <ProjectContent project={{ title: "Portfolio Website" }} />,
   },
   {
@@ -500,7 +506,8 @@ export const mainProjects = [
     title: "Sensify",
     description:
       "React Native mobile app suite with sensor-based tools for measuring light, detecting magnets, leveling surfaces, and more. Features real-time sensor data processing and cross-platform compatibility. Built with React Native, Node.js, and MongoDB.",
-    gradient: "from-cyan-500/60 to-blue-500/60",
+    gradient:
+      "from-cyan-400/70 to-blue-500/70 dark:from-cyan-500/60 dark:to-blue-500/60",
     content: <ProjectContent project={{ title: "Sensify (School Project)" }} />,
   },
   {
@@ -508,7 +515,8 @@ export const mainProjects = [
     title: "Global Parcel Services GPS App",
     description:
       "GPS-based parcel tracking mobile app for efficient package delivery and tracking. Features real-time location updates, delivery status monitoring, and route optimization for delivery personnel. Built with React Native, Node.js, Express.js, and MongoDB.",
-    gradient: "from-green-500/60 to-emerald-600/60",
+    gradient:
+      "from-green-500/70 to-emerald-500/70 dark:from-green-500/60 dark:to-emerald-600/60",
     content: (
       <ProjectContent project={{ title: "Global Parcel Services GPS App" }} />
     ),
@@ -518,13 +526,15 @@ export const sideProjects = [
   {
     category: "Automation Tool",
     title: "GitHub Bot",
-    gradient: "from-gray-800 to-gray-600",
+    gradient:
+      "from-gray-600/70 to-gray-800/70 dark:from-gray-800 dark:to-gray-600",
     content: <ProjectContent project={{ title: "GitHub Bot" }} />,
   },
   {
     category: "School Project",
     title: "Sensify",
-    gradient: "from-white to-gray-200",
+    gradient:
+      "from-gray-300/70 to-gray-400/70 dark:from-white dark:to-gray-200",
     content: <ProjectContent project={{ title: "Sensify (School Project)" }} />,
   },
 ];

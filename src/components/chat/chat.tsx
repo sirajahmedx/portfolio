@@ -30,7 +30,6 @@ interface Message {
 interface ChatState {
   messages: Message[];
   input: string;
-  isLoading: boolean;
   loadingSubmit: boolean;
   isTalking: boolean;
   hasReachedLimit: boolean;
@@ -52,7 +51,6 @@ type ChatAction =
       type: "START_ASSISTANT_MESSAGE";
       payload: { id: string; message: Message };
     }
-  | { type: "SET_LOADING"; payload: boolean }
   | { type: "SET_LOADING_SUBMIT"; payload: boolean }
   | { type: "SET_TALKING"; payload: boolean }
   | { type: "SET_MESSAGES"; payload: Message[] }
@@ -67,7 +65,6 @@ type ChatAction =
 const initialState: ChatState = {
   messages: [],
   input: "",
-  isLoading: false,
   loadingSubmit: false,
   isTalking: false,
   hasReachedLimit: false,
@@ -106,9 +103,6 @@ function chatReducer(state: ChatState, action: ChatAction): ChatState {
         ),
       };
 
-    case "SET_LOADING":
-      return { ...state, isLoading: action.payload };
-
     case "SET_LOADING_SUBMIT":
       return { ...state, loadingSubmit: action.payload };
 
@@ -143,7 +137,6 @@ function chatReducer(state: ChatState, action: ChatAction): ChatState {
         ...state,
         currentAssistantId: null,
         chunkCount: 0,
-        isLoading: false,
         loadingSubmit: false,
         isTalking: false,
       };
@@ -295,7 +288,6 @@ const Chat = () => {
   const {
     messages,
     input,
-    isLoading,
     loadingSubmit,
     isTalking,
     hasReachedLimit,
@@ -376,15 +368,26 @@ const Chat = () => {
 
   // Enhanced auto-scroll to bottom with mobile optimization
   const scrollToBottom = useCallback(() => {
-    // Auto-scroll functionality removed
-    // Users can now manually scroll through messages
+    if (messagesEndRef.current) {
+      // Use scrollTop for more reliable bottom scrolling
+      const container = messagesEndRef.current.closest(".overflow-y-auto");
+      if (container) {
+        container.scrollTop = container.scrollHeight;
+      } else {
+        // Fallback to scrollIntoView
+        messagesEndRef.current.scrollIntoView({
+          behavior: "smooth",
+          block: "end",
+        });
+      }
+    }
   }, []);
 
-  // Auto-scroll when messages change or loading state changes - REMOVED
-  // useEffect(() => {
-  //   const timer = setTimeout(scrollToBottom, 100);
-  //   return () => clearTimeout(timer);
-  // }, [messages, loadingSubmit, scrollToBottom]);
+  // Auto-scroll when messages change or loading state changes
+  useEffect(() => {
+    const timer = setTimeout(scrollToBottom, 100);
+    return () => clearTimeout(timer);
+  }, [messages, loadingSubmit, scrollToBottom]);
 
   // Clear conversation
   const clearConversation = useCallback(() => {
@@ -482,11 +485,11 @@ const Chat = () => {
 
               // Stop loading animation after first chunk
               if (chunkCount === 0) {
-                dispatch({ type: "SET_LOADING", payload: false });
+                // Loading animation handled by loadingSubmit state
               }
 
-              // Auto-scroll to bottom - REMOVED
-              // setTimeout(scrollToBottom, 50);
+              // Auto-scroll to bottom
+              setTimeout(scrollToBottom, 50);
             }
           } catch (parseError) {
             console.warn(
@@ -509,7 +512,7 @@ const Chat = () => {
   // Submit query to API
   const submitQuery = useCallback(
     async (query: string) => {
-      if (!query.trim() || isLoading || loadingSubmit) {
+      if (!query.trim() || loadingSubmit) {
         console.log("[CLIENT] Submit blocked - invalid conditions");
         return;
       }
@@ -544,7 +547,6 @@ const Chat = () => {
 
       dispatch({ type: "ADD_MESSAGE", payload: userMessage });
       dispatch({ type: "SET_INPUT", payload: "" });
-      dispatch({ type: "SET_LOADING", payload: true });
       dispatch({ type: "SET_LOADING_SUBMIT", payload: true });
       dispatch({ type: "SET_TALKING", payload: true });
 
@@ -656,7 +658,6 @@ const Chat = () => {
       }
     },
     [
-      isLoading,
       loadingSubmit,
       lastRequestTime,
       messages,
@@ -671,13 +672,13 @@ const Chat = () => {
       e.preventDefault();
       const currentInput = input.trim();
 
-      if (!currentInput || isLoading || loadingSubmit) {
+      if (!currentInput || loadingSubmit) {
         return;
       }
 
       submitQuery(currentInput);
     },
-    [input, isLoading, loadingSubmit, submitQuery]
+    [input, loadingSubmit, submitQuery]
   );
 
   // Stop current request
@@ -736,21 +737,19 @@ const Chat = () => {
     }
   }, [isTalking]);
 
-  // Mobile keyboard handling and viewport adjustments - AUTO-SCROLL REMOVED
+  // Mobile keyboard handling and viewport adjustments
   useEffect(() => {
     const handleViewportChange = () => {
       // Small delay to ensure keyboard has fully appeared/disappeared
-      // Auto-scroll functionality removed - users can manually scroll
       setTimeout(() => {
-        // scrollToBottom(); // REMOVED
+        scrollToBottom();
       }, 300);
     };
 
     const handleFocus = () => {
-      // When input is focused on mobile, ensure we're scrolled to bottom - REMOVED
-      // Auto-scroll functionality removed - users can manually scroll
+      // When input is focused on mobile, ensure we're scrolled to bottom
       setTimeout(() => {
-        // scrollToBottom(); // REMOVED
+        scrollToBottom();
       }, 100);
     };
 
@@ -789,7 +788,7 @@ const Chat = () => {
           <div className="flex items-center gap-2">
             <button
               onClick={clearConversation}
-              disabled={isLoading || loadingSubmit}
+              disabled={loadingSubmit}
               className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-xl px-3 py-1.5 text-xs font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 active:scale-95"
             >
               Clear
@@ -882,7 +881,7 @@ const Chat = () => {
                                       message={message}
                                       isLast={index === messages.length - 1}
                                       isLoading={
-                                        isLoading &&
+                                        loadingSubmit &&
                                         message.role === "assistant" &&
                                         message.content === ""
                                       }
@@ -988,7 +987,7 @@ const Chat = () => {
                 input={input}
                 handleInputChange={handleInputChange}
                 handleSubmit={onSubmit}
-                isLoading={isLoading || loadingSubmit}
+                isLoading={loadingSubmit}
                 stop={handleStop}
                 isToolInProgress={isToolInProgress}
                 disabled={hasReachedLimit}

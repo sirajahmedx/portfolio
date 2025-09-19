@@ -123,7 +123,7 @@ export default React.memo(function HelperBoost({
       >
         <button
           onClick={toggleVisibility}
-          className="text-muted-foreground hover:text-foreground hover:bg-accent/60 flex items-center gap-2 md:gap-3 rounded-2xl px-4 md:px-6 py-2 md:py-3 text-xs md:text-sm transition-all duration-300 active:scale-95 hover:shadow-md backdrop-blur-sm border border-border/30 hover:border-border/60"
+          className="text-muted-foreground hover:text-foreground hover:bg-card/10 flex items-center gap-1.5 md:gap-2 rounded-xl px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm transition-all duration-300 active:scale-95 hover:shadow-md backdrop-blur-xl border border-border/10 hover:border-border/30 bg-card/2"
         >
           {isVisible ? (
             <>
@@ -153,27 +153,27 @@ export default React.memo(function HelperBoost({
 
       {isVisible && (
         <div className="w-full">
-          <div className="flex w-full flex-wrap gap-3 md:gap-4 justify-center">
+          <div className="flex w-full flex-wrap gap-2 md:gap-3 justify-center">
             {questionConfig.map(({ key, color, icon: Icon }) => (
               <Button
                 key={key}
                 onClick={() => handleQuestionClick(key)}
                 variant="outline"
-                className={`group h-auto min-w-[100px] md:min-w-[120px] flex-shrink-0 rounded-2xl border-2 px-4 md:px-6 py-3 md:py-4 shadow-md backdrop-blur-md transition-all duration-300 hover:shadow-xl ${
+                className={`group h-auto min-w-[90px] md:min-w-[110px] flex-shrink-0 rounded-xl border-2 px-3 md:px-4 py-2.5 md:py-3 shadow-md backdrop-blur-xl transition-all duration-300 hover:shadow-xl ${
                   hasReachedLimit || disabledQuestions.has(key)
-                    ? "border-border/40 bg-muted/40 cursor-not-allowed opacity-50"
-                    : "border-border/60 hover:border-border bg-card/80 hover:bg-card cursor-pointer hover:scale-105 active:scale-95"
+                    ? "border-border/20 bg-muted/5 cursor-not-allowed opacity-50"
+                    : "border-border/30 hover:border-border bg-card/5 hover:bg-card/15 cursor-pointer hover:scale-105 active:scale-95"
                 }`}
                 disabled={hasReachedLimit || disabledQuestions.has(key)}
               >
-                <div className="text-foreground flex items-center gap-2 md:gap-3">
+                <div className="text-foreground flex items-center gap-1.5 md:gap-2">
                   <div
-                    className="p-1 rounded-lg transition-all duration-300 group-hover:scale-110"
+                    className="p-0.5 rounded-md transition-all duration-300 group-hover:scale-110"
                     style={{ backgroundColor: `${color}20` }}
                   >
                     <Icon
-                      size={16}
-                      className="md:w-5 md:h-5"
+                      size={14}
+                      className="md:w-4 md:h-4"
                       strokeWidth={2.5}
                       color={color}
                     />

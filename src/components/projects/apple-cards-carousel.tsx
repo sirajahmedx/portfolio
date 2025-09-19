@@ -144,18 +144,18 @@ export const Carousel = ({
         </div>
         <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex gap-4 md:bottom-12 z-50">
           <button
-            className="relative z-50 flex h-12 w-12 items-center justify-center rounded-full bg-white/90 dark:bg-gray-800/90 shadow-lg backdrop-blur-sm disabled:opacity-50 transition-all duration-200 hover:scale-105"
+            className="relative z-50 flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-full bg-card/90 dark:bg-gray-800/90 shadow-lg backdrop-blur-sm disabled:opacity-50 transition-all duration-200 hover:scale-105 border border-border/50"
             onClick={scrollLeft}
             disabled={!canScrollLeft}
           >
-            <ChevronLeft className="h-6 w-6 text-gray-700 dark:text-gray-300" />
+            <ChevronLeft className="h-5 w-5 md:h-6 md:w-6 text-foreground dark:text-gray-300" />
           </button>
           <button
-            className="relative z-50 flex h-12 w-12 items-center justify-center rounded-full bg-white/90 dark:bg-gray-800/90 shadow-lg backdrop-blur-sm disabled:opacity-50 transition-all duration-200 hover:scale-105"
+            className="relative z-50 flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-full bg-card/90 dark:bg-gray-800/90 shadow-lg backdrop-blur-sm disabled:opacity-50 transition-all duration-200 hover:scale-105 border border-border/50"
             onClick={scrollRight}
             disabled={!canScrollRight}
           >
-            <ChevronRight className="h-6 w-6 text-gray-700 dark:text-gray-300" />
+            <ChevronRight className="h-5 w-5 md:h-6 md:w-6 text-foreground dark:text-gray-300" />
           </button>
         </div>
       </div>
@@ -227,10 +227,10 @@ export const Card = ({
             >
               <div className="sticky top-4 z-52 flex justify-end px-8 pt-8 md:px-14 md:pt-8">
                 <button
-                  className="flex h-8 w-8 items-center justify-center rounded-full bg-black/90 shadow-md dark:bg-white/90"
+                  className="flex h-8 w-8 items-center justify-center rounded-full bg-card/90 dark:bg-neutral-800/90 shadow-md backdrop-blur-sm hover:bg-card dark:hover:bg-neutral-700 transition-colors"
                   onClick={handleClose}
                 >
-                  <X className="h-6 w-6 text-neutral-100 dark:text-neutral-900" />
+                  <X className="h-5 w-5 text-foreground dark:text-neutral-100" />
                 </button>
               </div>
 
@@ -261,21 +261,21 @@ export const Card = ({
       <motion.button
         layoutId={layout ? `card-${card.title}` : undefined}
         onClick={handleOpen}
-        className="relative z-10 flex w-[28rem] flex-col items-start justify-start overflow-hidden rounded-3xl bg-gray-100 dark:bg-neutral-900 md:w-[32rem] sm:w-[24rem] min-h-[20rem]"
+        className="relative z-10 flex w-[28rem] flex-col items-start justify-start overflow-hidden rounded-3xl bg-gray-200/90 dark:bg-neutral-900 md:w-[32rem] sm:w-[24rem] min-h-[20rem] shadow-lg hover:shadow-xl transition-all duration-300"
       >
-        <div className="absolute inset-x-0 top-0 z-30 h-full cursor-pointer bg-gradient-to-b from-black/5 hover:scale-110 via-transparent to-transparent" />
+        <div className="absolute inset-x-0 top-0 z-30 h-full cursor-pointer bg-gradient-to-b from-black/10 hover:scale-110 via-transparent to-transparent dark:from-black/20" />
 
         {/* Title at the top */}
         <div className="relative z-40 p-5 pt-5">
           <motion.p
             layoutId={layout ? `category-${card.category}` : undefined}
-            className="text-left font-sans text-base font-medium text-white/90 md:text-lg"
+            className="text-left font-sans text-base font-medium text-gray-800 dark:text-white/90 md:text-lg"
           >
             {card.category}
           </motion.p>
           <motion.p
             layoutId={layout ? `title-${card.title}` : undefined}
-            className="max-w-xs text-left font-sans text-3xl font-bold [text-wrap:balance] text-white md:text-4xl mt-2"
+            className="max-w-xs text-left font-sans text-3xl font-bold [text-wrap:balance] text-gray-900 dark:text-white md:text-4xl mt-2"
           >
             {card.title}
           </motion.p>
@@ -284,7 +284,7 @@ export const Card = ({
         {/* Description in the middle */}
         {card.description && (
           <div className="relative z-40 px-5 pb-5">
-            <motion.p className="text-left font-sans text-base text-white/90 leading-relaxed font-normal max-w-full">
+            <motion.p className="text-left font-sans text-base text-gray-700 dark:text-white/90 leading-relaxed font-normal max-w-full">
               {card.description}
             </motion.p>
           </div>

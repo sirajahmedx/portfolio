@@ -18,7 +18,7 @@ export default function ProjectsPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
-              className="text-4xl md:text-5xl lg:text-7xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent leading-tight"
+              className="text-4xl md:text-5xl lg:text-7xl font-bold bg-gradient-to-r from-foreground via-foreground/90 to-foreground/80 bg-clip-text text-transparent leading-tight"
             >
               What I have built
             </motion.h1>
@@ -30,17 +30,17 @@ export default function ProjectsPage() {
               className="text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-4xl mx-auto leading-relaxed px-4"
             >
               A curated collection of my best work, showcasing expertise in
-              <span className="text-primary font-semibold">
+              <span className="text-primary font-semibold dark:text-primary/90">
                 {" "}
                 full-stack development
               </span>
               ,
-              <span className="text-accent font-semibold">
+              <span className="text-primary font-semibold dark:text-primary/80">
                 {" "}
                 modern web technologies
               </span>
               , and
-              <span className="text-primary font-semibold">
+              <span className="text-primary font-semibold dark:text-primary/90">
                 {" "}
                 innovative solutions
               </span>
@@ -53,16 +53,16 @@ export default function ProjectsPage() {
               transition={{ duration: 0.8, delay: 0.8 }}
               className="flex flex-wrap justify-center gap-2 md:gap-4 mt-6 md:mt-8 px-4"
             >
-              <div className="flex items-center gap-1 md:gap-2 px-3 md:px-4 py-1 md:py-2 bg-card rounded-full border text-xs md:text-sm">
-                <span className="w-1.5 h-1.5 md:w-2 md:h-2 bg-green-500 rounded-full"></span>
+              <div className="flex items-center gap-1 md:gap-2 px-3 md:px-4 py-1 md:py-2 bg-card/80 dark:bg-card/60 rounded-full border border-border/50 text-foreground text-xs md:text-sm backdrop-blur-sm">
+                <span className="w-1.5 h-1.5 md:w-2 md:h-2 bg-green-500 rounded-full animate-pulse"></span>
                 Full-Stack Applications
               </div>
-              <div className="flex items-center gap-1 md:gap-2 px-3 md:px-4 py-1 md:py-2 bg-card rounded-full border text-xs md:text-sm">
-                <span className="w-1.5 h-1.5 md:w-2 md:h-2 bg-blue-500 rounded-full"></span>
+              <div className="flex items-center gap-1 md:gap-2 px-3 md:px-4 py-1 md:py-2 bg-card/80 dark:bg-card/60 rounded-full border border-border/50 text-foreground text-xs md:text-sm backdrop-blur-sm">
+                <span className="w-1.5 h-1.5 md:w-2 md:h-2 bg-blue-500 rounded-full animate-pulse"></span>
                 Mobile Development
               </div>
-              <div className="flex items-center gap-1 md:gap-2 px-3 md:px-4 py-1 md:py-2 bg-card rounded-full border text-xs md:text-sm">
-                <span className="w-1.5 h-1.5 md:w-2 md:h-2 bg-purple-500 rounded-full"></span>
+              <div className="flex items-center gap-1 md:gap-2 px-3 md:px-4 py-1 md:py-2 bg-card/80 dark:bg-card/60 rounded-full border border-border/50 text-foreground text-xs md:text-sm backdrop-blur-sm">
+                <span className="w-1.5 h-1.5 md:w-2 md:h-2 bg-purple-500 rounded-full animate-pulse"></span>
                 Automation Tools
               </div>
             </motion.div>
@@ -75,19 +75,19 @@ export default function ProjectsPage() {
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 1.5, delay: 0.5 }}
-            className="absolute -top-40 -right-40 h-80 w-80 rounded-full bg-primary/20 blur-3xl"
+            className="absolute -top-40 -right-40 h-80 w-80 rounded-full bg-primary/10 dark:bg-primary/20 blur-3xl"
           />
           <motion.div
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 1.5, delay: 0.7 }}
-            className="absolute -bottom-40 -left-40 h-80 w-80 rounded-full bg-accent/20 blur-3xl"
+            className="absolute -bottom-40 -left-40 h-80 w-80 rounded-full bg-accent/10 dark:bg-accent/20 blur-3xl"
           />
           <motion.div
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 1.5, delay: 0.9 }}
-            className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-96 w-96 rounded-full bg-gradient-to-r from-primary/15 to-accent/15 blur-3xl"
+            className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-96 w-96 rounded-full bg-gradient-to-r from-primary/5 to-accent/5 dark:from-primary/15 dark:to-accent/15 blur-3xl"
           />
         </div>
       </section>
@@ -107,7 +107,7 @@ export default function ProjectsPage() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
             viewport={{ once: true }}
-            className="text-center text-lg md:text-base text-muted-foreground mt-6"
+            className="text-center text-base md:text-lg text-muted-foreground mt-6 px-4"
           >
             Discover my work below
           </motion.p>

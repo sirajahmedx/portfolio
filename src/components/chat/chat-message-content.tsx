@@ -6,7 +6,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp, ExternalLink } from "lucide-react";
 import { useEffect, useState } from "react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -186,7 +186,7 @@ export default function ChatMessageContent({
       return (
         <div className="w-full space-y-4">
           {content}
-          {/* {mentionsProjects && (
+          {mentionsProjects && (
             <div className="mt-4">
               <Button
                 onClick={() => (window.location.href = "/projects")}
@@ -197,7 +197,7 @@ export default function ChatMessageContent({
                 View My Projects
               </Button>
             </div>
-          )} */}
+          )}
         </div>
       );
     } // If no parts but has direct content, render it directly
@@ -262,7 +262,7 @@ export default function ChatMessageContent({
       return (
         <div className="w-full space-y-4">
           {content}
-          {/* {mentionsProjects && (
+          {mentionsProjects && (
             <div className="mt-4">
               <Button
                 onClick={() => (window.location.href = "/projects")}
@@ -273,7 +273,7 @@ export default function ChatMessageContent({
                 View My Projects
               </Button>
             </div>
-          )} */}
+          )}
         </div>
       );
     }

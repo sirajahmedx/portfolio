@@ -57,7 +57,7 @@ export default function AllProjects() {
           transition={{ delay: 0.7 }}
           className="text-center"
         >
-          <p className="text-muted-foreground mb-8 text-lg">
+          <p className="text-muted-foreground mb-8 text-base md:text-lg px-4">
             Interested in collaborating or have questions about my work?
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -67,18 +67,18 @@ export default function AllProjects() {
               rel="noopener noreferrer"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-primary to-primary/90 text-primary-foreground rounded-xl hover:shadow-lg transition-all duration-300 font-medium"
+              className="inline-flex items-center gap-2 px-6 md:px-8 py-3 md:py-4 bg-gradient-to-r from-primary to-primary/90 text-primary-foreground rounded-xl hover:shadow-lg transition-all duration-300 font-medium backdrop-blur-sm"
             >
-              <Github className="h-5 w-5" />
+              <Github className="h-4 w-4 md:h-5 md:w-5" />
               View on GitHub
             </motion.a>
             <motion.a
               href="/chat?query=How Can I Contact You."
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="inline-flex items-center gap-2 px-8 py-4 border-2 border-border rounded-xl hover:border-primary hover:bg-primary/5 transition-all duration-300 font-medium"
+              className="inline-flex items-center gap-2 px-6 md:px-8 py-3 md:py-4 border-2 border-border rounded-xl hover:border-primary hover:bg-primary/5 dark:hover:bg-primary/10 transition-all duration-300 font-medium backdrop-blur-sm"
             >
-              <ExternalLink className="h-5 w-5" />
+              <ExternalLink className="h-4 w-4 md:h-5 md:w-5" />
               Let's Chat
             </motion.a>
           </div>
