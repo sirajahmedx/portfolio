@@ -1,6 +1,4 @@
-Here is your complete README.md fully formatted in markdown:
 
-```markdown
 # AI Portfolio Website
 
 A modern portfolio with an AI-powered chat interface built using Next.js and Tailwind CSS.
@@ -53,4 +51,3 @@ A modern portfolio with an AI-powered chat interface built using Next.js and Tai
 ## License
 
 MIT License
-```
