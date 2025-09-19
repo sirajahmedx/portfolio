@@ -1,44 +1,56 @@
-# AI Portfolio Website  
+Here is your complete README.md fully formatted in markdown:
 
-A modern portfolio with an AI-powered chat interface built using Next.js and Tailwind CSS.  
+```markdown
+# AI Portfolio Website
 
-## Screenshots  
+A modern portfolio with an AI-powered chat interface built using Next.js and Tailwind CSS.
 
-### Home Page  
-![Dark Theme Home Page](https://raw.githubusercontent.com/sirajahmedx/portfolio/main/public/portfolio/home.png)  
+## Screenshots
 
-### Chat Page  
-![Dark Theme Chat Page](https://raw.githubusercontent.com/sirajahmedx/portfolio/main/public/portfolio/chat.png)  
+### Home Page
+![Dark Theme Home Page](https://raw.githubusercontent.com/sirajahmedx/portfolio/main/public/portfolio/home.png)
 
-## Setup  
+### Chat Page
+![Dark Theme Chat Page](https://raw.githubusercontent.com/sirajahmedx/portfolio/main/public/portfolio/chat.png)
 
-1. **Clone the repository**  
+## Features
+
+- Responsive design
+- Dark/Light theme toggle
+- AI chat powered by Gemini
+- Project showcase
+- Skills and contact sections
+
+## Setup
+
+1. **Clone the repository**
    ```bash
    git clone https://github.com/sirajahmedx/portfolio.git
    cd portfolio
+   ```
 
-2. Install dependencies
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-npm install
+3. **Create a `.env.local` file in the root with:**
+   ```env
+   GITHUB_TOKEN=your_github_token
+   GEMINI_API_KEY=your_gemini_api_key
+   ```
 
+4. **Run the development server**
+   ```bash
+   npm run dev
+   ```
 
-3. Create a .env.local file in the root with:
+5. **Open in your browser:**
+   ```
+   http://localhost:3000
+   ```
 
-GITHUB_TOKEN=your_github_token
-GEMINI_API_KEY=your_gemini_api_key
-
-
-4. Run the development server
-
-npm run dev
-
-
-5. Open in browser
-http://localhost:3000
-
-
-
-License
+## License
 
 MIT License
-
+```
