@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import Groq from 'groq-sdk';
 import { SYSTEM_PROMPT } from './prompt';
 
 // Tool imports (currently unused but keeping for future implementation)
@@ -6,11 +6,13 @@ import { SYSTEM_PROMPT } from './prompt';
 export const maxDuration = 30;
 
 // Validate environment variables
-if (!process.env.GEMINI_API_KEY) {
-  throw new Error('GEMINI_API_KEY environment variable is required');
+if (!process.env.GROQ_API_KEY) {
+  throw new Error('GROQ_API_KEY environment variable is required');
 }
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const groq = new Groq({
+  apiKey: process.env.GROQ_API_KEY,
+});
 
 // Enhanced error handler with specific error types
 interface ErrorResponse {
@@ -175,7 +177,7 @@ function validateMessages(messages: any[]): Message[] {
   });
 }
 
-// Enhanced streaming response handler
+// Enhanced streaming response handler for Groq
 async function createStreamingResponse(result: any): Promise<ReadableStream> {
   return new ReadableStream({
     async start(controller) {
@@ -183,8 +185,8 @@ async function createStreamingResponse(result: any): Promise<ReadableStream> {
       let totalText = '';
 
       try {
-        for await (const chunk of result.stream) {
-          const chunkText = chunk.text();
+        for await (const chunk of result) {
+          const chunkText = chunk.choices[0]?.delta?.content;
           if (chunkText && chunkText.trim()) {
             totalChunks++;
             totalText += chunkText;
@@ -298,21 +300,12 @@ export async function POST(req: Request) {
     console.log(`[CHAT-API] Processing ${validatedMessages.length} messages`);
     console.log(`[CHAT-API] Last message preview: "${validatedMessages[validatedMessages.length - 1].content.substring(0, 100)}..."`);
 
-    // Initialize Gemini model with error handling
-let model;
-try {
-  model = genAI.getGenerativeModel({
-    model: 'gemini-2.5-flash-lite',
-    generationConfig: {
-      temperature: 0.7,
-      topK: 40,
-      topP: 0.95,
-      maxOutputTokens: 2048,
-    }
-  });
-}
- catch (modelError) {
-      console.error('[CHAT-API] Failed to initialize Gemini model:', modelError);
+    // Initialize Groq model with error handling
+    let model;
+    try {
+      model = groq; // Groq client is ready
+    } catch (modelError) {
+      console.error('[CHAT-API] Failed to initialize Groq client:', modelError);
       const errorInfo = errorHandler(modelError);
       return new Response(
         JSON.stringify({ 
@@ -326,31 +319,31 @@ try {
       );
     }
 
-    // Convert messages to Gemini format (all messages except the last one for history)
-    const history = validatedMessages.slice(0, -1).map((msg) => ({
-      role: msg.role === 'user' ? 'user' : 'model',
-      parts: [{ text: msg.content }],
-    }));
+    // Convert messages to Groq format (include system prompt and all messages)
+    const messages: Array<{role: 'system' | 'user' | 'assistant', content: string}> = [
+      { role: 'system' as const, content: SYSTEM_PROMPT.content },
+      ...validatedMessages.map((msg) => ({
+        role: msg.role,
+        content: msg.content,
+      })),
+    ];
 
-    console.log(`[CHAT-API] Conversation history length: ${history.length}`);
+    console.log(`[CHAT-API] Total messages for Groq: ${messages.length}`);
 
-    // Start chat with history
-    const chat = model.startChat({ history });
-
-    // Get the last message to respond to
-    const lastMessage = validatedMessages[validatedMessages.length - 1];
-    
-    // Construct the full prompt
-    const fullPrompt = `${SYSTEM_PROMPT.content}\n\nUser: ${lastMessage.content}`;
-    
-    console.log('[CHAT-API] Sending request to Gemini API...');
+    console.log('[CHAT-API] Sending request to Groq API...');
 
     // Send message and get streaming response
     let result;
     try {
-      result = await chat.sendMessageStream(fullPrompt);
+      result = await groq.chat.completions.create({
+     model: 'llama-3.3-70b-versatile',
+        messages,
+        max_tokens: 2048,
+        temperature: 0.7,
+        stream: true,
+      });
     } catch (apiError) {
-      console.error('[CHAT-API] Gemini API error:', apiError);
+      console.error('[CHAT-API] Groq API error:', apiError);
       const errorInfo = errorHandler(apiError);
       return new Response(
         JSON.stringify({ 

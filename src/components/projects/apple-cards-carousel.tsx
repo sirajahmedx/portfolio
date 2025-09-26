@@ -94,10 +94,6 @@ export const Carousel = ({
     }
   };
 
-  const isMobile = () => {
-    return window && window.innerWidth < 768;
-  };
-
   return (
     <CarouselContext.Provider
       value={{ onCardClose: handleCardClose, currentIndex }}

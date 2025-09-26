@@ -478,7 +478,7 @@ export const mainProjects = [
     category: "Mechanic Services App",
     title: "Tuneit",
     description:
-      "Tuneit is a mobile app connecting users with services, developed entirely by me from concept to implementation. Features service browsing, provider profiles, booking systems, and real-time notifications. Built with React Native, Node.js, GraphQL, and MongoDB.",
+      "Tuneit is a full platform with both web app and mobile app that connects users with services. Built everything from scratch - it's 100% my idea and project. The web app uses Next.js with shadcn/ui, backend runs on Apollo Server with Node.js and GraphQL, mobile app is React Native, and everything stores in MongoDB. Features service browsing, provider profiles, booking systems, and real-time notifications.",
     gradient:
       "from-slate-400/70 to-slate-600/70 dark:from-slate-500/60 dark:to-slate-700/60",
     content: <ProjectContent project={{ title: "Tuneit" }} />,
