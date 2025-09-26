@@ -1,11 +1,8 @@
 import Groq from 'groq-sdk';
 import { SYSTEM_PROMPT } from './prompt';
 
-// Tool imports (currently unused but keeping for future implementation)
-
 export const maxDuration = 30;
 
-// Validate environment variables
 if (!process.env.GROQ_API_KEY) {
   throw new Error('GROQ_API_KEY environment variable is required');
 }
@@ -14,7 +11,27 @@ const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY,
 });
 
-// Enhanced error handler with specific error types
+const MODEL_CONFIGS = {
+  polite: {
+    model: 'llama-3.1-8b-instant',
+    description: 'Fast and friendly responses'
+  },
+  concise: {
+    model: 'openai/gpt-oss-20b',
+    description: 'Direct and to-the-point answers'
+  },
+  versatile: {
+    model: 'llama-3.3-70b-versatile',
+    description: 'Balanced responses with good detail'
+  },
+  creative: {
+    model: 'openai/gpt-oss-120b',
+    description: 'Creative and engaging conversations'
+  }
+} as const;
+
+type StyleOption = keyof typeof MODEL_CONFIGS;
+
 interface ErrorResponse {
   message: string;
   type: string;
@@ -39,7 +56,6 @@ function errorHandler(error: unknown): ErrorResponse {
   }
   
   if (error instanceof Error) {
-    // Quota exceeded error
     if (error.message.includes('429') || 
         error.message.includes('Too Many Requests') || 
         error.message.includes('quota') ||
@@ -51,7 +67,6 @@ function errorHandler(error: unknown): ErrorResponse {
       };
     }
 
-    // Authentication errors
     if (error.message.includes('401') || 
         error.message.includes('unauthorized') ||
         error.message.includes('API key')) {
@@ -62,7 +77,6 @@ function errorHandler(error: unknown): ErrorResponse {
       };
     }
 
-    // Network/connection errors
     if (error.message.includes('fetch') || 
         error.message.includes('network') ||
         error.message.includes('connection')) {
@@ -87,12 +101,10 @@ function errorHandler(error: unknown): ErrorResponse {
   };
 }
 
-// Rate limiting configuration
 const RATE_LIMIT_WINDOW_MS = 60000; // 1 minute
 const RATE_LIMIT_MAX_REQUESTS = 10;
 const rateLimitMap = new Map<string, { count: number; timestamp: number }>();
 
-// Cleanup old rate limit entries periodically
 setInterval(() => {
   const now = Date.now();
   for (const [ip, data] of rateLimitMap.entries()) {
@@ -113,18 +125,15 @@ function isRateLimited(ip: string): boolean {
 
   const { count, timestamp } = rateLimitData;
 
-  // Reset window if expired
   if (now - timestamp > RATE_LIMIT_WINDOW_MS) {
     rateLimitMap.set(ip, { count: 1, timestamp: now });
     return false;
   }
 
-  // Check if rate limited
   if (count >= RATE_LIMIT_MAX_REQUESTS) {
     return true;
   }
 
-  // Increment count
   rateLimitMap.set(ip, { count: count + 1, timestamp });
   return false;
 }
@@ -163,7 +172,6 @@ function validateMessages(messages: any[]): Message[] {
       throw new Error(`Empty content at index ${index}`);
     }
 
-    // Validate content length (prevent extremely long messages)
     if (msg.content.length > 10000) {
       throw new Error(`Message too long at index ${index}: maximum 10,000 characters`);
     }
@@ -177,7 +185,6 @@ function validateMessages(messages: any[]): Message[] {
   });
 }
 
-// Enhanced streaming response handler for Groq
 async function createStreamingResponse(result: any): Promise<ReadableStream> {
   return new ReadableStream({
     async start(controller) {
@@ -191,10 +198,8 @@ async function createStreamingResponse(result: any): Promise<ReadableStream> {
             totalChunks++;
             totalText += chunkText;
             
-            // Log chunk info for debugging
             console.log(`[CHAT-API] Chunk ${totalChunks}: "${chunkText.substring(0, 100)}${chunkText.length > 100 ? '...' : ''}"`);
 
-            // Send chunk to client
             const chunkData = JSON.stringify({ 
               text: chunkText,
               chunk: totalChunks 
@@ -205,7 +210,6 @@ async function createStreamingResponse(result: any): Promise<ReadableStream> {
 
         console.log(`[CHAT-API] Streaming complete. Total chunks: ${totalChunks}, Total text length: ${totalText.length}`);
         
-        // Send completion signal
         controller.enqueue(new TextEncoder().encode('data: [DONE]\n\n'));
         controller.close();
 
@@ -213,7 +217,6 @@ async function createStreamingResponse(result: any): Promise<ReadableStream> {
         console.error('[CHAT-API] Streaming error:', streamError);
         const errorInfo = errorHandler(streamError);
         
-        // Send error to client
         const errorData = JSON.stringify({ 
           error: errorInfo.message,
           type: errorInfo.type 
@@ -225,7 +228,6 @@ async function createStreamingResponse(result: any): Promise<ReadableStream> {
   });
 }
 
-// Main POST handler
 export async function POST(req: Request) {
   const startTime = Date.now();
   
@@ -297,13 +299,33 @@ export async function POST(req: Request) {
       );
     }
 
-    console.log(`[CHAT-API] Processing ${validatedMessages.length} messages`);
+    // Validate and set style option
+    let selectedStyle: StyleOption = 'versatile'; // default
+    if (body.style) {
+      if (typeof body.style !== 'string' || !MODEL_CONFIGS[body.style as StyleOption]) {
+        return new Response(
+          JSON.stringify({ 
+            error: 'Invalid style option. Available options: polite, concise, versatile, creative',
+            type: 'VALIDATION_ERROR'
+          }), 
+          { 
+            status: 400,
+            headers: { 'Content-Type': 'application/json' }
+          }
+        );
+      }
+      selectedStyle = body.style as StyleOption;
+    }
+
+    const selectedModel = MODEL_CONFIGS[selectedStyle];
+
+    console.log(`[CHAT-API] Processing ${validatedMessages.length} messages with style: ${selectedStyle} (${selectedModel.description})`);
     console.log(`[CHAT-API] Last message preview: "${validatedMessages[validatedMessages.length - 1].content.substring(0, 100)}..."`);
 
     // Initialize Groq model with error handling
     let model;
     try {
-      model = groq; // Groq client is ready
+      model = groq; // Groq client is ready - model will be selected based on style
     } catch (modelError) {
       console.error('[CHAT-API] Failed to initialize Groq client:', modelError);
       const errorInfo = errorHandler(modelError);
@@ -336,7 +358,7 @@ export async function POST(req: Request) {
     let result;
     try {
       result = await groq.chat.completions.create({
-     model: 'llama-3.3-70b-versatile',
+        model: selectedModel.model,
         messages,
         max_tokens: 2048,
         temperature: 0.7,
@@ -355,9 +377,7 @@ export async function POST(req: Request) {
           headers: { 'Content-Type': 'application/json' }
         }
       );
-    }
-
-    console.log('[CHAT-API] Creating streaming response...');
+    }    console.log('[CHAT-API] Creating streaming response...');
 
     // Create streaming response
     const stream = await createStreamingResponse(result);

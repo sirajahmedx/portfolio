@@ -11,14 +11,12 @@ import React, {
 } from "react";
 import { toast } from "sonner";
 
-// Component imports
 import ChatBottombar from "@/components/chat/chat-bottombar";
 import ChatLanding from "@/components/chat/chat-landing";
 import ChatMessageContent from "@/components/chat/chat-message-content";
 import { Copy, Info } from "lucide-react";
 import HelperBoost from "./HelperBoost";
 
-// Message type definition
 interface Message {
   id: string;
   role: "user" | "assistant";
@@ -26,7 +24,6 @@ interface Message {
   timestamp: Date;
 }
 
-// Chat state interface
 interface ChatState {
   messages: Message[];
   input: string;
@@ -37,9 +34,9 @@ interface ChatState {
   lastRequestTime: number;
   currentAssistantId: string | null;
   chunkCount: number;
+  selectedStyle: "polite" | "concise" | "versatile" | "creative";
 }
 
-// Action types
 type ChatAction =
   | { type: "SET_INPUT"; payload: string }
   | { type: "ADD_MESSAGE"; payload: Message }
@@ -59,7 +56,11 @@ type ChatAction =
   | { type: "SET_CONVERSATION_LOADED"; payload: boolean }
   | { type: "SET_LAST_REQUEST_TIME"; payload: number }
   | { type: "INCREMENT_CHUNK_COUNT" }
-  | { type: "RESET_STREAMING_STATE" };
+  | { type: "RESET_STREAMING_STATE" }
+  | {
+      type: "SET_SELECTED_STYLE";
+      payload: "polite" | "concise" | "versatile" | "creative";
+    };
 
 // Initial state
 const initialState: ChatState = {
@@ -72,9 +73,9 @@ const initialState: ChatState = {
   lastRequestTime: 0,
   currentAssistantId: null,
   chunkCount: 0,
+  selectedStyle: "versatile",
 };
 
-// Reducer
 function chatReducer(state: ChatState, action: ChatAction): ChatState {
   switch (action.type) {
     case "SET_INPUT":
@@ -141,12 +142,14 @@ function chatReducer(state: ChatState, action: ChatAction): ChatState {
         isTalking: false,
       };
 
+    case "SET_SELECTED_STYLE":
+      return { ...state, selectedStyle: action.payload };
+
     default:
       return state;
   }
 }
 
-// Message info dialog component
 const MessageInfoDialog = ({
   message,
   isOpen,
@@ -173,7 +176,7 @@ const MessageInfoDialog = ({
     const words = content.trim().split(/\s+/).length;
     const characters = content.length;
     const charactersNoSpaces = content.replace(/\s/g, "").length;
-    const readingTime = Math.ceil(words / 200); // Average reading speed
+    const readingTime = Math.ceil(words / 200);
 
     return { words, characters, charactersNoSpaces, readingTime };
   };
@@ -283,7 +286,6 @@ const Chat = () => {
   const abortControllerRef = useRef<AbortController | null>(null);
   const assistantContentRef = useRef<string>("");
 
-  // Chat state using reducer
   const [state, dispatch] = useReducer(chatReducer, initialState);
   const {
     messages,
@@ -295,23 +297,20 @@ const Chat = () => {
     lastRequestTime,
     currentAssistantId,
     chunkCount,
+    selectedStyle,
   } = state;
 
-  // Local state for UI interactions
   const [autoSubmitted, setAutoSubmitted] = useState(false);
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
   const [showMessageInfo, setShowMessageInfo] = useState(false);
 
-  // In-memory storage for conversation
   const conversationStorageRef = useRef<Message[]>([]);
 
-  // Copy message content to clipboard
   const copyToClipboard = useCallback(async (text: string) => {
     try {
       await navigator.clipboard.writeText(text);
       toast.success("Copied to clipboard!");
     } catch (err) {
-      // Fallback for older browsers
       const textArea = document.createElement("textarea");
       textArea.value = text;
       document.body.appendChild(textArea);
@@ -332,7 +331,6 @@ const Chat = () => {
     []
   );
 
-  // Load conversation from memory storage
   const loadConversation = useCallback(() => {
     if (conversationLoaded) return;
 
@@ -356,7 +354,6 @@ const Chat = () => {
     }
   }, [conversationLoaded]);
 
-  // Save conversation to memory storage
   const saveConversation = useCallback((messages: Message[]) => {
     try {
       conversationStorageRef.current = messages;
@@ -374,7 +371,6 @@ const Chat = () => {
       if (container) {
         container.scrollTop = container.scrollHeight;
       } else {
-        // Fallback to scrollIntoView
         messagesEndRef.current.scrollIntoView({
           behavior: "smooth",
           block: "end",
@@ -383,22 +379,27 @@ const Chat = () => {
     }
   }, []);
 
-  // Auto-scroll when messages change or loading state changes
   useEffect(() => {
     const timer = setTimeout(scrollToBottom, 100);
     return () => clearTimeout(timer);
   }, [messages, loadingSubmit, scrollToBottom]);
 
-  // Clear conversation
   const clearConversation = useCallback(() => {
     dispatch({ type: "CLEAR_CONVERSATION" });
     conversationStorageRef.current = [];
-    // Cancel any ongoing request
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
       abortControllerRef.current = null;
     }
   }, []);
+
+  // Handle style change
+  const handleStyleChange = useCallback(
+    (style: "polite" | "concise" | "versatile" | "creative") => {
+      dispatch({ type: "SET_SELECTED_STYLE", payload: style });
+    },
+    []
+  );
 
   // Handle input change
   const handleInputChange = useCallback(
@@ -589,6 +590,7 @@ const Chat = () => {
               timestamp: msg.timestamp.toISOString(),
               id: msg.id,
             })),
+            style: selectedStyle,
           }),
           signal: abortControllerRef.current.signal,
         });
@@ -991,6 +993,8 @@ const Chat = () => {
                 stop={handleStop}
                 isToolInProgress={isToolInProgress}
                 disabled={hasReachedLimit}
+                selectedStyle={selectedStyle}
+                onStyleChange={handleStyleChange}
               />
             </div>
           </div>

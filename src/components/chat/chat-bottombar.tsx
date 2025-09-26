@@ -1,4 +1,3 @@
-// src/components/chat/chat-bottombar.tsx
 "use client";
 
 import { ChatRequestOptions } from "ai";
@@ -6,6 +5,7 @@ import { motion } from "framer-motion";
 import { ArrowRight, ArrowUp, Loader2 } from "lucide-react";
 import React, { useCallback, useEffect, useState } from "react";
 import { FastfolioTracking } from "@/lib/fastfolio-tracking";
+import StyleSelector from "./style-selector";
 
 interface ChatBottombarProps {
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -18,6 +18,10 @@ interface ChatBottombarProps {
   input: string;
   isToolInProgress: boolean;
   disabled?: boolean;
+  selectedStyle: "polite" | "concise" | "versatile" | "creative";
+  onStyleChange: (
+    style: "polite" | "concise" | "versatile" | "creative"
+  ) => void;
 }
 
 export default function ChatBottombar({
@@ -28,14 +32,15 @@ export default function ChatBottombar({
   stop,
   isToolInProgress,
   disabled = false,
+  selectedStyle,
+  onStyleChange,
 }: ChatBottombarProps) {
   const inputRef = React.useRef<HTMLInputElement>(null);
   const [remainingMessages, setRemainingMessages] = useState(0);
 
   useEffect(() => {
-    // Update remaining messages count
     setRemainingMessages(FastfolioTracking.getRemainingMessages());
-  }, [input]); // Update when input changes (user is typing)
+  }, [input]);
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (
@@ -88,6 +93,15 @@ export default function ChatBottombar({
               }`}
               disabled={isToolInProgress || isLoading || disabled}
             />
+
+            {/* Style Selector */}
+            <div className="flex items-center mr-2">
+              <StyleSelector
+                selectedStyle={selectedStyle}
+                onStyleChange={onStyleChange}
+                disabled={disabled}
+              />
+            </div>
 
             <button
               type="submit"
