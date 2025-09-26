@@ -299,18 +299,19 @@ export async function POST(req: Request) {
     console.log(`[CHAT-API] Last message preview: "${validatedMessages[validatedMessages.length - 1].content.substring(0, 100)}..."`);
 
     // Initialize Gemini model with error handling
-    let model;
-    try {
-      model = genAI.getGenerativeModel({ 
-        model: 'gemini-1.5-flash',
-        generationConfig: {
-          temperature: 0.7,
-          topK: 40,
-          topP: 0.95,
-          maxOutputTokens: 2048, // Increased for better responses
-        }
-      });
-    } catch (modelError) {
+let model;
+try {
+  model = genAI.getGenerativeModel({
+    model: 'gemini-2.5-flash-lite',
+    generationConfig: {
+      temperature: 0.7,
+      topK: 40,
+      topP: 0.95,
+      maxOutputTokens: 2048,
+    }
+  });
+}
+ catch (modelError) {
       console.error('[CHAT-API] Failed to initialize Gemini model:', modelError);
       const errorInfo = errorHandler(modelError);
       return new Response(
