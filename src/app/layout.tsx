@@ -81,7 +81,7 @@ export default function RootLayout({
         />
         <link rel="icon" href="/favicon.svg" sizes="any" />
       </head>
-      <body className={cn("bg-background min-h-screen font-sans antialiased")}>
+      <body className={cn("bg-background min-h-screen font-sans antialiased")} style={{ transform: 'scale(0.95)', transformOrigin: 'top center' }}>
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
@@ -90,7 +90,7 @@ export default function RootLayout({
           <Header />
           <main
             className="flex flex-col overflow-auto"
-            style={{ minHeight: "100dvh" }} // Use dynamic viewport height
+            style={{ minHeight: "calc(100dvh / 0.95)" }} // Adjust for 5% scale reduction
           >
             {children}
             <SpeedInsights />

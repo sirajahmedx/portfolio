@@ -8,7 +8,7 @@ import { FastfolioTracking } from "@/lib/fastfolio-tracking";
 import StyleSelector from "./style-selector";
 
 interface ChatBottombarProps {
-  handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleInputChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   handleSubmit: (
     e: React.FormEvent<HTMLFormElement>,
     chatRequestOptions?: ChatRequestOptions
@@ -35,16 +35,17 @@ export default function ChatBottombar({
   selectedStyle,
   onStyleChange,
 }: ChatBottombarProps) {
-  const inputRef = React.useRef<HTMLInputElement>(null);
+  const inputRef = React.useRef<HTMLTextAreaElement>(null);
   const [remainingMessages, setRemainingMessages] = useState(0);
 
   useEffect(() => {
     setRemainingMessages(FastfolioTracking.getRemainingMessages());
   }, [input]);
 
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (
       e.key === "Enter" &&
+      !e.shiftKey &&
       !e.nativeEvent.isComposing &&
       !isToolInProgress &&
       input.trim()
@@ -56,9 +57,10 @@ export default function ChatBottombar({
 
   useEffect(() => {
     if (inputRef.current) {
-      inputRef.current.focus();
+      inputRef.current.style.height = "auto";
+      inputRef.current.style.height = `${Math.min(inputRef.current.scrollHeight, 80)}px`;
     }
-  }, [inputRef]);
+  }, [input]);
 
   useEffect(() => {
     if (inputRef.current) {
@@ -74,10 +76,9 @@ export default function ChatBottombar({
     >
       <form onSubmit={handleSubmit} className="relative w-full">
         <div className="relative group">
-          <div className="border-border/60 bg-card/80 backdrop-blur-xl mx-auto flex items-center rounded-2xl border shadow-lg py-3 pr-3 pl-4 md:pl-7 transition-all duration-300 group-hover:border-border group-hover:shadow-xl">
-            <input
+          <div className="border-border/60 bg-card/80 backdrop-blur-xl mx-auto flex items-end rounded-2xl border shadow-lg py-2 pr-2 pl-3 md:pl-4 transition-all duration-300 group-hover:border-border group-hover:shadow-xl">
+            <textarea
               ref={inputRef}
-              type="text"
               value={input}
               onChange={handleInputChange}
               onKeyDown={handleKeyPress}
@@ -88,10 +89,12 @@ export default function ChatBottombar({
                     ? "Tool is in progress..."
                     : "Ask me anything..."
               }
-              className={`text-sm md:text-base placeholder:text-muted-foreground/70 w-full border-none bg-transparent focus:outline-none transition-colors duration-200 ${
+              className={`text-sm placeholder:text-muted-foreground/70 w-full border-none bg-transparent focus:outline-none transition-colors duration-200 resize-none leading-relaxed ${
                 disabled ? "font-medium text-destructive" : "text-foreground"
               }`}
               disabled={isToolInProgress || isLoading || disabled}
+              rows={1}
+              style={{ minHeight: "1.5rem", maxHeight: "5rem" }}
             />
 
             {/* Style Selector */}
@@ -108,7 +111,7 @@ export default function ChatBottombar({
               disabled={
                 isLoading || !input.trim() || isToolInProgress || disabled
               }
-              className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center justify-center rounded-xl p-2 md:p-2.5 transition-all duration-200 disabled:opacity-50 hover:scale-105 active:scale-95 shadow-md hover:shadow-lg"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center justify-center rounded-lg p-1.5 md:p-2 transition-all duration-200 disabled:opacity-50 hover:scale-105 active:scale-95 shadow-md hover:shadow-lg"
               onClick={(e) => {
                 if (isLoading) {
                   e.preventDefault();
@@ -117,9 +120,9 @@ export default function ChatBottombar({
               }}
             >
               {isLoading ? (
-                <Loader2 className="h-4 w-4 md:h-5 md:w-5 animate-spin" />
+                <Loader2 className="h-3.5 w-3.5 md:h-4 md:w-4 animate-spin" />
               ) : (
-                <ArrowUp className="h-4 w-4 md:h-5 md:w-5" />
+                <ArrowUp className="h-3.5 w-3.5 md:h-4 md:w-4" />
               )}
             </button>
           </div>

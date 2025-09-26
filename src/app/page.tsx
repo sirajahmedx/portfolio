@@ -17,6 +17,7 @@ import {
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import StyleSelector from "@/components/chat/style-selector";
 
 const questions = {
   Me: "Who are you? I want to know more about you.",
@@ -34,11 +35,23 @@ const questionConfig = [
 
 export default function Home() {
   const [input, setInput] = useState("");
+  const [selectedStyle, setSelectedStyle] = useState<"polite" | "concise" | "versatile" | "creative">("polite");
   const router = useRouter();
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const goToChat = (query: string) =>
-    router.push(`/chat?query=${encodeURIComponent(query)}`);
+    router.push(`/chat?query=${encodeURIComponent(query)}&style=${selectedStyle}`);
+
+  const handleStyleChange = (style: "polite" | "concise" | "versatile" | "creative") => {
+    setSelectedStyle(style);
+  };
+
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.style.height = "auto";
+      inputRef.current.style.height = `${Math.min(inputRef.current.scrollHeight, 80)}px`;
+    }
+  }, [input]);
 
   const heroVariants = {
     hidden: { opacity: 0, y: 60 },
@@ -209,15 +222,28 @@ export default function Home() {
               }}
               className="relative"
             >
-              <div className="flex items-center rounded-xl sm:rounded-2xl border-2 border-border/50 bg-card/50 p-1.5 sm:p-2 shadow-lg backdrop-blur-xl transition-all duration-300 hover:border-border/80 hover:bg-card/70">
-                <input
+              <div className="flex items-end rounded-xl sm:rounded-2xl border-2 border-border/50 bg-card/50 p-1.5 sm:p-2 shadow-lg backdrop-blur-xl transition-all duration-300 hover:border-border/80 hover:bg-card/70">
+                <textarea
                   ref={inputRef}
-                  type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing && input.trim()) {
+                      e.preventDefault();
+                      goToChat(input.trim());
+                    }
+                  }}
                   placeholder="Ask me anything about my work, skills, or projects..."
-                  className="flex-1 border-none bg-transparent px-2.5 py-2 sm:px-3 sm:py-2.5 md:px-4 md:py-3 text-sm sm:text-base text-foreground placeholder:text-muted-foreground focus:outline-none"
+                  className="flex-1 border-none bg-transparent px-2.5 py-2 sm:px-3 sm:py-2.5 md:px-4 md:py-3 text-sm sm:text-base text-foreground placeholder:text-muted-foreground focus:outline-none resize-none leading-relaxed"
+                  rows={1}
+                  style={{ minHeight: "1.25rem", maxHeight: "5rem" }}
                 />
+                <div className="flex items-center mr-2">
+                  <StyleSelector
+                    selectedStyle={selectedStyle}
+                    onStyleChange={handleStyleChange}
+                  />
+                </div>
                 <Button
                   type="submit"
                   disabled={!input.trim()}

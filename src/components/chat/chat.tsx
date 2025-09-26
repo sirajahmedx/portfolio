@@ -14,7 +14,8 @@ import { toast } from "sonner";
 import ChatBottombar from "@/components/chat/chat-bottombar";
 import ChatLanding from "@/components/chat/chat-landing";
 import ChatMessageContent from "@/components/chat/chat-message-content";
-import { Copy, Info } from "lucide-react";
+import StyleSelector from "@/components/chat/style-selector";
+import { Copy, Info, Loader2, ArrowRight } from "lucide-react";
 import HelperBoost from "./HelperBoost";
 
 interface Message {
@@ -73,7 +74,7 @@ const initialState: ChatState = {
   lastRequestTime: 0,
   currentAssistantId: null,
   chunkCount: 0,
-  selectedStyle: "versatile",
+  selectedStyle: "polite",
 };
 
 function chatReducer(state: ChatState, action: ChatAction): ChatState {
@@ -283,10 +284,14 @@ const Chat = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get("query");
+  const initialStyle = searchParams.get("style") as "polite" | "concise" | "versatile" | "creative" | null;
   const abortControllerRef = useRef<AbortController | null>(null);
   const assistantContentRef = useRef<string>("");
 
-  const [state, dispatch] = useReducer(chatReducer, initialState);
+  const [state, dispatch] = useReducer(chatReducer, {
+    ...initialState,
+    selectedStyle: initialStyle || "polite",
+  });
   const {
     messages,
     input,
@@ -985,17 +990,49 @@ const Chat = () => {
                 }
                 hasReachedLimit={hasReachedLimit}
               />
-              <ChatBottombar
-                input={input}
-                handleInputChange={handleInputChange}
-                handleSubmit={onSubmit}
-                isLoading={loadingSubmit}
-                stop={handleStop}
-                isToolInProgress={isToolInProgress}
-                disabled={hasReachedLimit}
-                selectedStyle={selectedStyle}
-                onStyleChange={handleStyleChange}
-              />
+              <form
+                onSubmit={onSubmit}
+                className="relative"
+              >
+                <div className="flex items-center rounded-xl sm:rounded-2xl border-2 border-border/50 bg-card/50 p-1.5 sm:p-2 shadow-lg backdrop-blur-xl transition-all duration-300 hover:border-border/80 hover:bg-card/70">
+                  <input
+                    type="text"
+                    value={input}
+                    onChange={handleInputChange}
+                    placeholder={
+                      hasReachedLimit
+                        ? "Chat limit reached"
+                        : "Ask me anything..."
+                    }
+                    className="flex-1 border-none bg-transparent px-2.5 py-2 sm:px-3 sm:py-2.5 md:px-4 md:py-3 text-sm sm:text-base text-foreground placeholder:text-muted-foreground focus:outline-none"
+                    disabled={isToolInProgress || loadingSubmit || hasReachedLimit}
+                  />
+                  <div className="flex items-center mr-2">
+                    <StyleSelector
+                      selectedStyle={selectedStyle}
+                      onStyleChange={handleStyleChange}
+                      disabled={hasReachedLimit}
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={loadingSubmit || !input.trim() || isToolInProgress || hasReachedLimit}
+                    className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center justify-center rounded-lg p-1.5 md:p-2 transition-all duration-200 disabled:opacity-50 hover:scale-105 active:scale-95 shadow-md hover:shadow-lg"
+                    onClick={(e) => {
+                      if (loadingSubmit) {
+                        e.preventDefault();
+                        handleStop();
+                      }
+                    }}
+                  >
+                    {loadingSubmit ? (
+                      <Loader2 className="h-3.5 w-3.5 md:h-4 md:w-4 animate-spin" />
+                    ) : (
+                      <ArrowRight className="h-3.5 w-3.5 md:h-4 md:w-4" />
+                    )}
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         </div>
