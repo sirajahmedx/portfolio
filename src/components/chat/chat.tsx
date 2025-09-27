@@ -931,13 +931,13 @@ const Chat = () => {
                         }}
                         className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
                       >
-                        <div className="group relative max-w-[85%]">
+                        <div className={`group relative ${message.role === "assistant" ? "max-w-full md:max-w-[85%] ml-4 md:ml-0" : "max-w-[85%]"}`}>
+                        <div
+                          className={`flex items-start gap-4 ${message.role === "user" ? "flex-row-reverse" : "flex-row"}`}
+                        >
                           <div
-                            className={`flex items-start gap-4 ${message.role === "user" ? "flex-row-reverse" : "flex-row"}`}
+                            className={`relative ${message.role === "user" ? "ml-8" : "mr-8"}`}
                           >
-                            <div
-                              className={`relative ${message.role === "user" ? "ml-8" : "mr-8"}`}
-                            >
                               {message.role === "user" ? (
                                 <div className="bg-primary/10 text-primary-foreground border-primary/20 rounded-3xl rounded-br-lg px-5 py-4 shadow-lg border backdrop-blur-sm">
                                   <div className="prose prose-sm max-w-none text-foreground">

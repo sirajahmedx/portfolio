@@ -288,7 +288,7 @@ export default function ChatMessageContent({
       className={`${
         message.role === "user"
           ? "w-auto max-w-full"
-          : "w-[65vw] sm:w-full md:w-full lg:w-full xl:w-full"
+          : "w-full"
       } max-w-none`}
     >
       {content}
