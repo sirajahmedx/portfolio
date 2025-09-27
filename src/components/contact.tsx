@@ -1,34 +1,47 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { motion } from 'framer-motion';
-import { ChevronRight } from 'lucide-react';
+import React from "react";
+import { motion } from "framer-motion";
+import { ChevronRight, Github, Mail, Linkedin } from "lucide-react";
 
 export function Contact() {
-  // Contact information
   const contactInfo = {
-    name: 'Siraj Ahmed',
-    email: 'sirajahmedxdev@gmail.com',
-    handle: '@sirajahmedx',
+    name: "Siraj Ahmed",
+    email: "sirajahmedxdev@gmail.com",
+    handle: "@sirajahmedx",
     socials: [
       {
-        name: 'GitHub',
-        url: 'https://github.com/sirajahmedx',
+        name: "GitHub",
+        url: "https://github.com/sirajahmedx",
+        icon: <Github className="h-5 w-5" />,
+        username: "sirajahmedx",
       },
       {
-        name: 'LinkedIn',
-        url: 'https://www.linkedin.com/in/sirajahmedx', // Placeholder - user mentioned "Working on it"
+        name: "LinkedIn",
+        url: "#", // Placeholder
+        icon: <Linkedin className="h-5 w-5 opacity-50" />,
+        username: "Coming Soon",
+        disabled: true, // Optional flag to style differently
       },
       {
-        name: 'Email',
-        url: 'mailto:sirajahmedxdev@gmail.com',
+        name: "Discord",
+        url: "https://discord.com/users/your-discord-id", // replace with actual URL
+        // icon: <Discord className="h-5 w-5" />,
+        username: "sirajahmedx#1234",
+      },
+      {
+        name: "Email",
+        url: "mailto:sirajahmedxdev@gmail.com",
+        icon: <Mail className="h-5 w-5" />,
+        username: "sirajahmedxdev@gmail.com",
       },
     ],
   };
 
-  // Function to handle opening links
-  const openLink = (url: string) => {
-    window.open(url, '_blank', 'noopener,noreferrer');
+  const openLink = (url: string, disabled?: boolean) => {
+    if (!disabled) {
+      window.open(url, "_blank", "noopener,noreferrer");
+    }
   };
 
   return (
@@ -39,7 +52,7 @@ export function Contact() {
           <h2 className="text-foreground text-3xl font-semibold md:text-4xl">
             Contacts
           </h2>
-          <span className="mt-2 sm:mt-0">
+          <span className="mt-2 sm:mt-0 text-muted-foreground">
             {contactInfo.handle}
           </span>
         </div>
@@ -59,15 +72,21 @@ export function Contact() {
           </div>
 
           {/* Social Links */}
-          <div className="flex flex-wrap gap-x-6 gap-y-5 sm:gap-x-8">
+          <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
             {contactInfo.socials.map((social) => (
               <button
                 key={social.name}
-                className="text-muted-foreground hover:text-foreground cursor-pointer text-sm transition-colors"
-                onClick={() => openLink(social.url)}
+                onClick={() => openLink(social.url, social.disabled)}
+                className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors
+                  ${
+                    social.disabled
+                      ? "text-muted-foreground cursor-not-allowed"
+                      : "text-muted-foreground hover:bg-foreground hover:text-background"
+                  }`}
                 title={social.name}
               >
-                {social.name}
+                {social.icon}
+                <span>{social.username}</span>
               </button>
             ))}
           </div>

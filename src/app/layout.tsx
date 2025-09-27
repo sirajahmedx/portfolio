@@ -82,8 +82,9 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.svg" sizes="any" />
       </head>
       <body
-        className={cn("bg-gradient-to-br from-primary/5 via-background to-accent/5 min-h-screen font-sans antialiased")}
-        style={{ transform: "scale(0.95)", transformOrigin: "top center" }}
+        className={cn(
+          "bg-gradient-to-br from-primary/5 via-background to-accent/5 min-h-screen font-sans antialiased"
+        )}
       >
         <ThemeProvider
           attribute="class"
