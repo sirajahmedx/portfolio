@@ -332,34 +332,34 @@ const ProjectContent = ({ project }: { project: ProjectProps }) => {
   }
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-8 md:space-y-10">
       {/* Header section with description */}
-      <div className="rounded-3xl bg-[#F5F5F7] p-8 dark:bg-[#1D1D1F]">
-        <div className="space-y-6">
+      <div className="rounded-3xl bg-[#F5F5F7] p-6 sm:p-8 dark:bg-[#1D1D1F]">
+        <div className="space-y-5 sm:space-y-6">
           <div className="flex items-center gap-2 text-sm text-neutral-500 dark:text-neutral-400">
             <span>{projectData.date}</span>
           </div>
 
-          <p className="text-secondary-foreground font-sans text-base leading-relaxed md:text-lg">
+          <p className="text-secondary-foreground font-sans text-base leading-relaxed md:text-lg text-pretty">
             {projectData.description}
           </p>
 
           {/* Tech stack */}
-          <div className="pt-6">
-            <div className="flex items-center gap-2 mb-4">
+          <div className="pt-4 sm:pt-6">
+            <div className="flex items-center gap-2 mb-3 sm:mb-4">
               <h3 className="text-sm tracking-wide text-neutral-500 dark:text-neutral-400">
                 Technologies Used
               </h3>
               <div className="flex-1 h-px bg-neutral-200 dark:bg-neutral-700"></div>
             </div>
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-2.5 sm:gap-3">
               {projectData.techStack.map((tech, index) => (
                 <motion.span
                   key={index}
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: index * 0.1 }}
-                  className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-neutral-100 to-neutral-200 dark:from-neutral-800 dark:to-neutral-700 px-4 py-2 text-sm font-medium text-neutral-800 dark:text-neutral-200 border border-neutral-300 dark:border-neutral-600 hover:shadow-md transition-shadow"
+                  className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-neutral-100 to-neutral-200 dark:from-neutral-800 dark:to-neutral-700 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-neutral-800 dark:text-neutral-200 border border-neutral-300 dark:border-neutral-600 hover:shadow-md transition-shadow"
                 >
                   <div className="w-2 h-2 bg-primary rounded-full"></div>
                   {tech}
@@ -372,15 +372,15 @@ const ProjectContent = ({ project }: { project: ProjectProps }) => {
 
       {/* Links section */}
       {projectData.links && projectData.links.length > 0 && (
-        <div className="mb-24">
-          <div className="flex items-center gap-2 mb-6">
+        <div className="mb-16 md:mb-24">
+          <div className="flex items-center gap-2 mb-4">
             <h3 className="text-sm tracking-wide text-neutral-500 dark:text-neutral-400">
               Project Links
             </h3>
             <div className="flex-1 h-px bg-neutral-200 dark:bg-neutral-700"></div>
           </div>
-          <Separator className="my-4" />
-          <div className="space-y-4">
+          <Separator className="my-3 sm:my-4" />
+          <div className="space-y-3 sm:space-y-4">
             {projectData.links.map((link, index) => (
               <motion.a
                 key={index}
@@ -390,12 +390,12 @@ const ProjectContent = ({ project }: { project: ProjectProps }) => {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.1 }}
-                className="group bg-gradient-to-r from-neutral-50 to-neutral-100 dark:from-neutral-800 dark:to-neutral-700 flex items-center justify-between rounded-xl p-4 transition-all duration-300 hover:shadow-lg hover:scale-[1.02] border border-neutral-200 dark:border-neutral-600"
+                className="group bg-gradient-to-r from-neutral-50 to-neutral-100 dark:from-neutral-800 dark:to-neutral-700 flex flex-wrap items-center justify-between gap-3 rounded-xl p-4 sm:p-5 transition-all duration-300 hover:shadow-lg hover:scale-[1.02] border border-neutral-200 dark:border-neutral-600"
               >
-                <span className="font-medium capitalize text-neutral-800 dark:text-neutral-200">
+                <span className="font-medium capitalize text-neutral-800 dark:text-neutral-200 text-sm sm:text-base">
                   {link.name}
                 </span>
-                <ChevronRight className="h-5 w-5 transition-transform group-hover:translate-x-1 text-neutral-600 dark:text-neutral-400" />
+                <ChevronRight className="h-5 w-5 shrink-0 transition-transform group-hover:translate-x-1 text-neutral-600 dark:text-neutral-400" />
               </motion.a>
             ))}
           </div>
@@ -404,8 +404,8 @@ const ProjectContent = ({ project }: { project: ProjectProps }) => {
 
       {/* Images gallery */}
       {projectData.images && projectData.images.length > 0 && (
-        <div className="space-y-6">
-          <div className="flex items-center gap-2 mb-4">
+        <div className="space-y-5 sm:space-y-6">
+          <div className="flex items-center gap-2 mb-3 sm:mb-4">
             <h3 className="text-sm tracking-wide text-neutral-500 dark:text-neutral-400">
               Project Gallery
             </h3>
@@ -415,21 +415,21 @@ const ProjectContent = ({ project }: { project: ProjectProps }) => {
           {projectData.images.length === 1 ? (
             <div className="relative aspect-video overflow-hidden rounded-2xl bg-neutral-100 dark:bg-neutral-800">
               <Image
-                src={projectData.images[0].src}
+                src={projectData.images[0].src || "/placeholder.svg"}
                 alt={projectData.images[0].alt}
                 fill
                 className="object-cover transition-transform hover:scale-105"
               />
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               {projectData.images.map((image, index) => (
                 <div
                   key={index}
                   className="relative aspect-video overflow-hidden rounded-2xl bg-neutral-100 dark:bg-neutral-800 group cursor-pointer"
                 >
                   <Image
-                    src={image.src}
+                    src={image.src || "/placeholder.svg"}
                     alt={image.alt}
                     fill
                     className="object-cover transition-all duration-300 group-hover:scale-110"
