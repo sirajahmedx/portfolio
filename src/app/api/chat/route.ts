@@ -13,11 +13,13 @@ const groq = new Groq({
 
 const MODEL_CONFIGS = {
   polite: {
-    model: 'llama-3.1-8b-instant',
+    model: 'openai/gpt-oss-20b',
+
     description: 'Fast and friendly responses'
   },
   concise: {
-    model: 'openai/gpt-oss-20b',
+    model: 'llama-3.1-8b-instant',
+
     description: 'Direct and to-the-point answers'
   },
   versatile: {

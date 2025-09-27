@@ -15,7 +15,14 @@ import ChatBottombar from "@/components/chat/chat-bottombar";
 import ChatLanding from "@/components/chat/chat-landing";
 import ChatMessageContent from "@/components/chat/chat-message-content";
 import StyleSelector from "@/components/chat/style-selector";
-import { Copy, Info, Loader2, ChevronUp } from "lucide-react";
+import {
+  Copy,
+  Info,
+  Loader2,
+  ChevronUp,
+  Home,
+  ChevronLeft,
+} from "lucide-react";
 
 interface Message {
   id: string;
@@ -846,7 +853,14 @@ const Chat = () => {
       {/* Main Content Area - Full height container with proper scrolling isolation */}
       <div className="relative z-10 flex flex-col h-full overflow-hidden isolate">
         {/* Header - Fixed at top */}
-        <div className="flex justify-end px-6 py-2 border-b border-border/30 bg-card/30 backdrop-blur-sm flex-shrink-0">
+        <div className="flex justify-between items-center px-6 py-2 border-b border-border/30 bg-card/30 backdrop-blur-sm flex-shrink-0">
+          <Link
+            href="/"
+            className="text-muted-foreground hover:text-foreground hover:bg-accent/20 rounded-xl p-1.5 transition-all duration-200 hover:scale-105 active:scale-95"
+            title="Go to Home"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </Link>
           <div className="flex items-center gap-2">
             <button
               onClick={clearConversation}
@@ -921,15 +935,6 @@ const Chat = () => {
                           <div
                             className={`flex items-start gap-4 ${message.role === "user" ? "flex-row-reverse" : "flex-row"}`}
                           >
-                            {message.role === "assistant" &&
-                              message.content.trim() !== "" && (
-                                <div className="from-primary/20 via-primary/10 to-accent/20 border-primary/30 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-2xl border bg-gradient-to-br shadow-md">
-                                  <span className="text-primary text-sm font-bold">
-                                    SA
-                                  </span>
-                                </div>
-                              )}
-
                             <div
                               className={`relative ${message.role === "user" ? "ml-8" : "mr-8"}`}
                             >
@@ -1005,11 +1010,6 @@ const Chat = () => {
                         className="flex justify-start"
                       >
                         <div className="flex items-start gap-4">
-                          <div className="from-primary/15 to-accent/15 border-primary/20 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-2xl border bg-gradient-to-br shadow-md">
-                            <span className="text-primary text-sm font-semibold">
-                              SA
-                            </span>
-                          </div>
                           <div className="text-foreground">
                             <div className="flex items-center gap-1.5 py-2">
                               {[0, 1, 2].map((i) => (
@@ -1043,10 +1043,10 @@ const Chat = () => {
         </div>
 
         {/* Bottom bar positioned absolutely - stays fixed at bottom */}
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-br from-primary/5 via-card/60 to-accent/5 z-[100] border-t border-border/30 backdrop-blur-xl min-h-[120px] md:min-h-[100px] flex-shrink-0 shadow-2xl">
+        <div className="absolute bottom-0 left-0 right-0 z-[100] border-t border-border/30 backdrop-blur-xl min-h-[120px] md:min-h-[100px] flex-shrink-0 shadow-2xl">
           <div className="mx-auto max-w-3xl">
             <form onSubmit={onSubmit} className="relative">
-              <div className="flex items-end rounded-2xl sm:rounded-3xl border-2 border-border/50 bg-card/50 p-2 sm:p-2.5 shadow-lg backdrop-blur-xl transition-all duration-300 hover:border-border/80 hover:bg-card/70">
+              <div className="flex items-end rounded-2xl sm:rounded-3xl border-2 border-border/50 p-2 sm:p-2.5 shadow-lg backdrop-blur-xl transition-all duration-300 hover:border-border/80">
                 <textarea
                   ref={setTextareaRef}
                   value={input}
