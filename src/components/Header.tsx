@@ -4,10 +4,13 @@ import { useEffect, useState } from "react";
 import { Github, Star, MessageCircle } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export default function Header() {
   const [stars, setStars] = useState<number | null>(null);
   const [error, setError] = useState<boolean>(false);
+  const pathname = usePathname();
+  const isChatPage = pathname === "/chat";
 
   useEffect(() => {
     const fetchStars = async () => {
@@ -25,6 +28,8 @@ export default function Header() {
     };
     fetchStars();
   }, []);
+
+  if (isChatPage) return null;
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-xl border-b border-border/30 shadow-sm h-16">

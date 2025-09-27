@@ -79,37 +79,37 @@
 }
 
 .dark {
-  --background: oklch(0.08 0.01 264);
+  --background: oklch(0.13 0.015 264);
   --foreground: oklch(0.95 0.005 264);
-  --card: oklch(0.12 0.02 264);
+  --card: oklch(0.17 0.025 264);
   --card-foreground: oklch(0.95 0.005 264);
-  --popover: oklch(0.12 0.02 264);
+  --popover: oklch(0.17 0.025 264);
   --popover-foreground: oklch(0.95 0.005 264);
-  --primary: oklch(0.7 0.25 264);
+  --primary: oklch(0.75 0.25 264);
   --primary-foreground: oklch(0.08 0.01 264);
-  --secondary: oklch(0.18 0.03 264);
+  --secondary: oklch(0.23 0.035 264);
   --secondary-foreground: oklch(0.95 0.005 264);
-  --muted: oklch(0.18 0.03 264);
+  --muted: oklch(0.23 0.035 264);
   --muted-foreground: oklch(0.65 0.05 264);
-  --accent: oklch(0.22 0.04 264);
+  --accent: oklch(0.27 0.045 264);
   --accent-foreground: oklch(0.95 0.005 264);
-  --destructive: oklch(0.7 0.22 25);
-  --border: oklch(0.2 0.02 264);
-  --input: oklch(0.2 0.02 264);
-  --ring: oklch(0.7 0.25 264);
-  --chart-1: oklch(0.65 0.25 264);
-  --chart-2: oklch(0.7 0.22 320);
-  --chart-3: oklch(0.75 0.2 200);
-  --chart-4: oklch(0.6 0.24 120);
-  --chart-5: oklch(0.65 0.22 40);
-  --sidebar: oklch(0.1 0.015 264);
+  --destructive: oklch(0.75 0.22 25);
+  --border: oklch(0.25 0.025 264);
+  --input: oklch(0.25 0.025 264);
+  --ring: oklch(0.75 0.25 264);
+  --chart-1: oklch(0.7 0.25 264);
+  --chart-2: oklch(0.75 0.22 320);
+  --chart-3: oklch(0.8 0.2 200);
+  --chart-4: oklch(0.65 0.24 120);
+  --chart-5: oklch(0.7 0.22 40);
+  --sidebar: oklch(0.15 0.02 264);
   --sidebar-foreground: oklch(0.95 0.005 264);
-  --sidebar-primary: oklch(0.7 0.25 264);
+  --sidebar-primary: oklch(0.75 0.25 264);
   --sidebar-primary-foreground: oklch(0.08 0.01 264);
-  --sidebar-accent: oklch(0.22 0.04 264);
+  --sidebar-accent: oklch(0.27 0.045 264);
   --sidebar-accent-foreground: oklch(0.95 0.005 264);
-  --sidebar-border: oklch(0.2 0.02 264);
-  --sidebar-ring: oklch(0.7 0.25 264);
+  --sidebar-border: oklch(0.25 0.025 264);
+  --sidebar-ring: oklch(0.75 0.25 264);
 }
 
 @layer base {

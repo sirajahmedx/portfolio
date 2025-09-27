@@ -60,16 +60,15 @@ export default function StyleSelector({
         onClick={() => !disabled && setIsOpen(!isOpen)}
         disabled={disabled}
         className={`
-          flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium
+          flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium
           transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed
-          bg-card/50 border border-border/30 hover:bg-card hover:border-border/50
-          ${isOpen ? "ring-1 ring-primary/20" : ""}
+          bg-transparent hover:bg-card/30 border border-transparent hover:border-border/20
+          ${isOpen ? "bg-card/30 border-border/20" : ""}
         `}
-        whileTap={{ scale: 0.98 }}
+        whileTap={{ scale: 0.95 }}
       >
-        <Icon className={`h-3.5 w-3.5 ${selectedOption?.color}`} />
-        <span className="hidden sm:inline">{selectedOption?.label}</span>
-        <span className="sm:hidden">{selectedOption?.label.charAt(0)}</span>
+        <Icon className={`h-4 w-4 ${selectedOption?.color}`} />
+        <span className="text-xs font-semibold">{selectedOption?.label}</span>
         <ChevronDown
           className={`h-3 w-3 transition-transform duration-200 ${isOpen ? "rotate-0" : "rotate-180"}`}
         />
@@ -89,12 +88,17 @@ export default function StyleSelector({
 
             {/* Dropdown */}
             <motion.div
-              initial={{ opacity: 0, y: 10, scale: 0.95 }}
+              initial={{ opacity: 0, y: 8, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 10, scale: 0.95 }}
-              transition={{ duration: 0.15 }}
-              className="absolute bottom-full mb-2 right-0 z-50 w-48 bg-card border border-border/30 rounded-lg shadow-lg overflow-hidden"
+              exit={{ opacity: 0, y: 8, scale: 0.95 }}
+              transition={{ duration: 0.12 }}
+              className="absolute bottom-full mb-2 right-0 z-50 w-48 bg-card/95 backdrop-blur-xl border border-border/20 rounded-lg shadow-xl overflow-hidden"
             >
+              <div className="px-3 py-2 border-b border-border/10">
+                <p className="text-xs text-muted-foreground/70 font-medium">
+                  For testing models
+                </p>
+              </div>
               {STYLE_OPTIONS.map((option) => {
                 const OptionIcon = option.icon;
                 const isSelected = selectedStyle === option.id;
@@ -107,20 +111,15 @@ export default function StyleSelector({
                       setIsOpen(false);
                     }}
                     className={`
-                      w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm
-                      transition-colors duration-150 hover:bg-muted/50
-                      ${isSelected ? "bg-primary/5 text-primary border-l-2 border-primary" : "text-foreground"}
+                      w-full flex items-center gap-3 px-3 py-3 text-left text-sm
+                      transition-colors duration-150 hover:bg-muted/30
+                      ${isSelected ? "bg-primary/8 text-primary" : "text-foreground"}
                     `}
                   >
                     <OptionIcon className={`h-4 w-4 ${option.color}`} />
-                    <div className="flex-1 min-w-0">
-                      <div className="font-medium text-xs">{option.label}</div>
-                      <div className="text-xs text-muted-foreground truncate">
-                        {option.description}
-                      </div>
-                    </div>
+                    <span className="font-medium">{option.label}</span>
                     {isSelected && (
-                      <div className="w-2 h-2 bg-primary rounded-full" />
+                      <div className="w-2 h-2 bg-primary rounded-full ml-auto" />
                     )}
                   </button>
                 );

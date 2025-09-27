@@ -76,7 +76,7 @@ export default function ChatBottombar({
     >
       <form onSubmit={handleSubmit} className="relative w-full">
         <div className="relative group">
-          <div className="border-border/60 bg-card/80 backdrop-blur-xl mx-auto flex items-end rounded-2xl border shadow-lg py-2 pr-2 pl-3 md:pl-4 transition-all duration-300 group-hover:border-border group-hover:shadow-xl">
+          <div className="border-border/60 bg-card/80 backdrop-blur-xl mx-auto flex items-end rounded-2xl border shadow-lg py-6 pr-2 pl-3 md:pl-4 transition-all duration-300 group-hover:border-border group-hover:shadow-xl">
             <textarea
               ref={inputRef}
               value={input}
@@ -94,7 +94,7 @@ export default function ChatBottombar({
               }`}
               disabled={isToolInProgress || isLoading || disabled}
               rows={1}
-              style={{ minHeight: "1.5rem", maxHeight: "5rem" }}
+              style={{ minHeight: "2rem", maxHeight: "5rem" }}
             />
 
             {/* Style Selector */}

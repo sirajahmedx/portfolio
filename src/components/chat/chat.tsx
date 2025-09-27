@@ -15,8 +15,7 @@ import ChatBottombar from "@/components/chat/chat-bottombar";
 import ChatLanding from "@/components/chat/chat-landing";
 import ChatMessageContent from "@/components/chat/chat-message-content";
 import StyleSelector from "@/components/chat/style-selector";
-import { Copy, Info, Loader2, ArrowRight } from "lucide-react";
-import HelperBoost from "./HelperBoost";
+import { Copy, Info, Loader2, ChevronUp } from "lucide-react";
 
 interface Message {
   id: string;
@@ -284,7 +283,12 @@ const Chat = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get("query");
-  const initialStyle = searchParams.get("style") as "polite" | "concise" | "versatile" | "creative" | null;
+  const initialStyle = searchParams.get("style") as
+    | "polite"
+    | "concise"
+    | "versatile"
+    | "creative"
+    | null;
   const abortControllerRef = useRef<AbortController | null>(null);
   const assistantContentRef = useRef<string>("");
 
@@ -308,6 +312,10 @@ const Chat = () => {
   const [autoSubmitted, setAutoSubmitted] = useState(false);
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
   const [showMessageInfo, setShowMessageInfo] = useState(false);
+  const [textareaHeight, setTextareaHeight] = useState("auto");
+  const [textareaRef, setTextareaRef] = useState<HTMLTextAreaElement | null>(
+    null
+  );
 
   const conversationStorageRef = useRef<Message[]>([]);
 
@@ -368,13 +376,41 @@ const Chat = () => {
     }
   }, []);
 
-  // Enhanced auto-scroll to bottom with mobile optimization
+  // Enhanced auto-scroll to bottom with ultra-smooth animation
   const scrollToBottom = useCallback(() => {
     if (messagesEndRef.current) {
-      // Use scrollTop for more reliable bottom scrolling
-      const container = messagesEndRef.current.closest(".overflow-y-auto");
+      const container = messagesEndRef.current.closest(
+        ".overflow-y-auto"
+      ) as HTMLElement;
       if (container) {
-        container.scrollTop = container.scrollHeight;
+        const targetScrollTop = container.scrollHeight - container.clientHeight;
+        const currentScrollTop = container.scrollTop;
+        const distance = targetScrollTop - currentScrollTop;
+
+        if (Math.abs(distance) > 1) {
+          // Ultra-smooth scrolling with easing
+          const duration = 800; // Increased duration for slower, smoother scroll
+          const startTime = Date.now();
+          const startScrollTop = currentScrollTop;
+
+          const easeInOutCubic = (t: number): number => {
+            return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+          };
+
+          const animateScroll = () => {
+            const elapsed = Date.now() - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            const easedProgress = easeInOutCubic(progress);
+
+            container.scrollTop = startScrollTop + distance * easedProgress;
+
+            if (progress < 1) {
+              requestAnimationFrame(animateScroll);
+            }
+          };
+
+          requestAnimationFrame(animateScroll);
+        }
       } else {
         messagesEndRef.current.scrollIntoView({
           behavior: "smooth",
@@ -385,7 +421,7 @@ const Chat = () => {
   }, []);
 
   useEffect(() => {
-    const timer = setTimeout(scrollToBottom, 100);
+    const timer = setTimeout(scrollToBottom, 300); // Increased delay for more deliberate scrolling
     return () => clearTimeout(timer);
   }, [messages, loadingSubmit, scrollToBottom]);
 
@@ -408,11 +444,30 @@ const Chat = () => {
 
   // Handle input change
   const handleInputChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
+    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       dispatch({ type: "SET_INPUT", payload: e.target.value });
+
+      // Auto-resize textarea
+      const textarea = e.target;
+      textarea.style.height = "auto";
+      const scrollHeight = textarea.scrollHeight;
+      const newHeight = Math.min(scrollHeight, 120); // Max height of 120px (about 4-5 lines)
+      textarea.style.height = `${newHeight}px`;
+      setTextareaHeight(`${newHeight}px`);
     },
     []
   );
+
+  // Effect to handle textarea resizing
+  useEffect(() => {
+    if (textareaRef) {
+      textareaRef.style.height = "auto";
+      const scrollHeight = textareaRef.scrollHeight;
+      const newHeight = Math.min(scrollHeight, 120);
+      textareaRef.style.height = `${newHeight}px`;
+      setTextareaHeight(`${newHeight}px`);
+    }
+  }, [input, textareaRef]);
 
   // Enhanced streaming response handler
   const handleStreamingResponse = useCallback(
@@ -784,7 +839,7 @@ const Chat = () => {
 
   //chat
   return (
-    <div className="bg-gradient-to-br from-background via-background/98 to-background/95 relative flex flex-col h-screen max-h-screen min-h-0 overflow-hidden">
+    <div className="bg-gradient-to-br from-background via-background/98 to-background/95 relative flex flex-col h-[100dvh] max-h-[100dvh] min-h-0 overflow-hidden">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/5 via-background to-background" />
       <div className="absolute inset-0 bg-grid-pattern opacity-[0.02]" />
 
@@ -816,11 +871,19 @@ const Chat = () => {
         {/* Messages Area - Independent scrollable container */}
         <div className="flex-1 overflow-hidden min-h-0 flex flex-col relative will-change-scroll">
           <div
-            className="h-full overflow-y-auto px-4 pt-8 pb-32 md:pb-28 scroll-smooth"
+            className="h-full overflow-y-auto px-4 pt-8 pb-48 md:pb-44 scroll-smooth"
             style={{
               WebkitOverflowScrolling: "touch",
               scrollbarWidth: "thin",
               scrollbarColor: "rgb(107 114 128 / 0.3) transparent",
+              scrollBehavior: "smooth",
+              scrollPadding: "1rem",
+              // Enhanced smooth scrolling properties
+              scrollSnapType: "y proximity",
+              // Custom scroll timing for ultra-smooth experience
+              scrollMargin: "1rem",
+              // Reduce scroll friction for smoother feel
+              overscrollBehavior: "contain",
             }}
           >
             <div className="mx-auto max-w-4xl">
@@ -980,60 +1043,74 @@ const Chat = () => {
         </div>
 
         {/* Bottom bar positioned absolutely - stays fixed at bottom */}
-        <div className="absolute bottom-0 left-0 right-0 border-border/30 bg-card/60 z-[100] border-t px-4 md:px-6 py-3 md:py-4 backdrop-blur-xl min-h-[120px] md:min-h-[100px] flex-shrink-0 shadow-2xl">
-          <div className="mx-auto max-w-4xl">
-            <div className="flex flex-col gap-3">
-              <HelperBoost
-                submitQuery={submitQuery}
-                setInput={(value: string) =>
-                  dispatch({ type: "SET_INPUT", payload: value })
-                }
-                hasReachedLimit={hasReachedLimit}
-              />
-              <form
-                onSubmit={onSubmit}
-                className="relative"
-              >
-                <div className="flex items-center rounded-xl sm:rounded-2xl border-2 border-border/50 bg-card/50 p-1.5 sm:p-2 shadow-lg backdrop-blur-xl transition-all duration-300 hover:border-border/80 hover:bg-card/70">
-                  <input
-                    type="text"
-                    value={input}
-                    onChange={handleInputChange}
-                    placeholder={
-                      hasReachedLimit
-                        ? "Chat limit reached"
-                        : "Ask me anything..."
-                    }
-                    className="flex-1 border-none bg-transparent px-2.5 py-2 sm:px-3 sm:py-2.5 md:px-4 md:py-3 text-sm sm:text-base text-foreground placeholder:text-muted-foreground focus:outline-none"
-                    disabled={isToolInProgress || loadingSubmit || hasReachedLimit}
-                  />
-                  <div className="flex items-center mr-2">
-                    <StyleSelector
-                      selectedStyle={selectedStyle}
-                      onStyleChange={handleStyleChange}
-                      disabled={hasReachedLimit}
-                    />
-                  </div>
-                  <button
-                    type="submit"
-                    disabled={loadingSubmit || !input.trim() || isToolInProgress || hasReachedLimit}
-                    className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center justify-center rounded-lg p-1.5 md:p-2 transition-all duration-200 disabled:opacity-50 hover:scale-105 active:scale-95 shadow-md hover:shadow-lg"
-                    onClick={(e) => {
-                      if (loadingSubmit) {
-                        e.preventDefault();
-                        handleStop();
+        <div className="absolute bottom-0 left-0 right-0 border-border/30 bg-card/60 z-[100] border-t px-4 md:px-6 py-5 md:py-6 backdrop-blur-xl min-h-[120px] md:min-h-[100px] flex-shrink-0 shadow-2xl">
+          <div className="mx-auto max-w-3xl">
+            <form onSubmit={onSubmit} className="relative">
+              <div className="flex items-end rounded-2xl sm:rounded-3xl border-2 border-border/50 bg-card/50 p-2 sm:p-2.5 shadow-lg backdrop-blur-xl transition-all duration-300 hover:border-border/80 hover:bg-card/70">
+                <textarea
+                  ref={setTextareaRef}
+                  value={input}
+                  onChange={handleInputChange}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      if (
+                        !loadingSubmit &&
+                        input.trim() &&
+                        !isToolInProgress &&
+                        !hasReachedLimit
+                      ) {
+                        onSubmit(e as any);
                       }
-                    }}
-                  >
-                    {loadingSubmit ? (
-                      <Loader2 className="h-3.5 w-3.5 md:h-4 md:w-4 animate-spin" />
-                    ) : (
-                      <ArrowRight className="h-3.5 w-3.5 md:h-4 md:w-4" />
-                    )}
-                  </button>
+                    }
+                  }}
+                  placeholder={
+                    hasReachedLimit
+                      ? "Chat limit reached"
+                      : "Ask me anything..."
+                  }
+                  className="flex-1 border-none bg-transparent px-3 py-2.5 sm:px-4 sm:py-3 text-sm sm:text-base text-foreground placeholder:text-muted-foreground focus:outline-none resize-none overflow-hidden"
+                  style={{
+                    height: textareaHeight,
+                    minHeight: "48px",
+                    maxHeight: "140px",
+                  }}
+                  disabled={
+                    isToolInProgress || loadingSubmit || hasReachedLimit
+                  }
+                  rows={1}
+                />
+                <div className="flex items-center mr-2">
+                  <StyleSelector
+                    selectedStyle={selectedStyle}
+                    onStyleChange={handleStyleChange}
+                    disabled={hasReachedLimit}
+                  />
                 </div>
-              </form>
-            </div>
+                <button
+                  type="submit"
+                  disabled={
+                    loadingSubmit ||
+                    !input.trim() ||
+                    isToolInProgress ||
+                    hasReachedLimit
+                  }
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center justify-center rounded-lg p-2 transition-all duration-200 disabled:opacity-50 hover:scale-105 active:scale-95 shadow-md hover:shadow-lg"
+                  onClick={(e) => {
+                    if (loadingSubmit) {
+                      e.preventDefault();
+                      handleStop();
+                    }
+                  }}
+                >
+                  {loadingSubmit ? (
+                    <Loader2 className="h-4 w-4 md:h-4 md:w-4 animate-spin" />
+                  ) : (
+                    <ChevronUp className="h-4 w-4 md:h-4 md:w-4" />
+                  )}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       </div>
