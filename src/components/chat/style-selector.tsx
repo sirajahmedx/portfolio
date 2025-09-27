@@ -1,7 +1,14 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, MessageCircle, Zap, Users, Sparkles } from "lucide-react";
+import {
+  ChevronDown,
+  MessageCircle,
+  Zap,
+  Users,
+  Sparkles,
+  Info,
+} from "lucide-react";
 import React, { useState } from "react";
 
 interface StyleSelectorProps {
@@ -95,8 +102,8 @@ export default function StyleSelector({
               className="absolute bottom-full mb-2 right-0 z-50 w-48 bg-card/95 backdrop-blur-xl border border-border/20 rounded-lg shadow-xl overflow-hidden"
             >
               <div className="px-3 py-2 border-b border-border/10">
-                <p className="text-xs text-muted-foreground/70 font-medium">
-                  For testing models
+                <p className="text-xs text-red-500 font-medium">
+                  experimental
                 </p>
               </div>
               {STYLE_OPTIONS.map((option) => {

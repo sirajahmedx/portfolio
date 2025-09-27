@@ -1043,7 +1043,7 @@ const Chat = () => {
         </div>
 
         {/* Bottom bar positioned absolutely - stays fixed at bottom */}
-        <div className="absolute bottom-0 left-0 right-0 z-[100] border-t border-border/30 backdrop-blur-xl min-h-[120px] md:min-h-[100px] flex-shrink-0 shadow-2xl">
+        <div className="absolute bottom-0 left-0 right-0 z-[100] bg-background/80 border-t border-border/30 min-h-[120px] md:min-h-[100px] flex-shrink-0 shadow-2xl backdrop-blur-md px-4 py-3">
           <div className="mx-auto max-w-3xl">
             <form onSubmit={onSubmit} className="relative">
               <div className="flex items-end rounded-2xl sm:rounded-3xl border-2 border-border/50 p-2 sm:p-2.5 shadow-lg backdrop-blur-xl transition-all duration-300 hover:border-border/80">
