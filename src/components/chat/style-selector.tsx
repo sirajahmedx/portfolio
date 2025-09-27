@@ -24,28 +24,28 @@ const STYLE_OPTIONS = [
     id: "polite" as const,
     label: "Polite",
     description: "Friendly & conversational",
-    icon: MessageCircle,
+    // icon: MessageCircle,
     color: "text-blue-500",
   },
   {
     id: "concise" as const,
     label: "Concise",
     description: "Direct & to the point",
-    icon: Zap,
+    // icon: Zap,
     color: "text-green-500",
   },
   {
     id: "versatile" as const,
     label: "Versatile",
     description: "Balanced & detailed",
-    icon: Users,
+    // icon: Users,
     color: "text-purple-500",
   },
   {
     id: "creative" as const,
     label: "Creative",
     description: "Fun & imaginative",
-    icon: Sparkles,
+    // icon: Sparkles,
     color: "text-orange-500",
   },
 ];
@@ -59,7 +59,7 @@ export default function StyleSelector({
   const selectedOption = STYLE_OPTIONS.find(
     (option) => option.id === selectedStyle
   );
-  const Icon = selectedOption?.icon || MessageCircle;
+  // const Icon = selectedOption?.icon || MessageCircle;
 
   return (
     <div className="relative inline-block">
@@ -74,7 +74,7 @@ export default function StyleSelector({
         `}
         whileTap={{ scale: 0.95 }}
       >
-        <Icon className={`h-4 w-4 ${selectedOption?.color}`} />
+        {/* <Icon className={`h-4 w-4 ${selectedOption?.color}`} /> */}
         <span className="text-xs font-semibold">{selectedOption?.label}</span>
         <ChevronDown
           className={`h-3 w-3 transition-transform duration-200 ${isOpen ? "rotate-0" : "rotate-180"}`}
@@ -103,11 +103,11 @@ export default function StyleSelector({
             >
               <div className="px-3 py-2 border-b border-border/10">
                 <p className="text-xs text-red-500 font-medium">
-                  experimental
+                  Experimental
                 </p>
               </div>
               {STYLE_OPTIONS.map((option) => {
-                const OptionIcon = option.icon;
+                // const OptionIcon = option.icon;
                 const isSelected = selectedStyle === option.id;
 
                 return (
@@ -123,7 +123,7 @@ export default function StyleSelector({
                       ${isSelected ? "bg-primary/8 text-primary" : "text-foreground"}
                     `}
                   >
-                    <OptionIcon className={`h-4 w-4 ${option.color}`} />
+                    {/* <OptionIcon className={`h-4 w-4 ${option.color}`} /> */}
                     <span className="font-medium">{option.label}</span>
                     {isSelected && (
                       <div className="w-2 h-2 bg-primary rounded-full ml-auto" />

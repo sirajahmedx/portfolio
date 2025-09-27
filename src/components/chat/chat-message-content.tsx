@@ -27,6 +27,7 @@ export type ChatMessageContentProps = {
   reload?: () => Promise<string | null | undefined>;
   addToolResult?: (args: { toolCallId: string; result: string }) => void;
   skipToolRendering?: boolean;
+  showProjectsButton?: boolean;
 };
 
 const CodeBlock = ({ content }: { content: string }) => {
@@ -86,6 +87,7 @@ const CodeBlock = ({ content }: { content: string }) => {
 
 export default function ChatMessageContent({
   message,
+  showProjectsButton = false,
 }: ChatMessageContentProps) {
   const [isMobile, setIsMobile] = useState(false);
   const [visibleLines, setVisibleLines] = useState(6);
@@ -106,19 +108,6 @@ export default function ChatMessageContent({
 
   // Handle both parts-based and direct content messages
   const renderContent = () => {
-    // Check if the message mentions projects
-    const mentionsProjects =
-      message.role === "assistant" &&
-      (message.content.toLowerCase().includes("project") ||
-        message.content.toLowerCase().includes("work") ||
-        message.content.toLowerCase().includes("portfolio") ||
-        message.content.toLowerCase().includes("jobify") ||
-        message.content.toLowerCase().includes("tradesman") ||
-        message.content.toLowerCase().includes("talent-tube") ||
-        message.content.toLowerCase().includes("tuneit") ||
-        message.content.toLowerCase().includes("github bot") ||
-        message.content.toLowerCase().includes("sensify"));
-
     // If message has parts, use the parts-based rendering
     if (message.parts && message.parts.length > 0) {
       const content = message.parts.map((part, partIndex) => {
@@ -186,7 +175,7 @@ export default function ChatMessageContent({
       return (
         <div className="w-full space-y-4">
           {content}
-          {mentionsProjects && (
+          {showProjectsButton && message.role === "assistant" && (
             <div className="mt-4">
               <Button
                 onClick={() => (window.location.href = "/projects")}
@@ -262,7 +251,7 @@ export default function ChatMessageContent({
       return (
         <div className="w-full space-y-4">
           {content}
-          {mentionsProjects && (
+          {showProjectsButton && message.role === "assistant" && (
             <div className="mt-4">
               <Button
                 onClick={() => (window.location.href = "/projects")}
@@ -286,9 +275,7 @@ export default function ChatMessageContent({
   return (
     <div
       className={`${
-        message.role === "user"
-          ? "w-auto max-w-full"
-          : "w-full"
+        message.role === "user" ? "w-auto max-w-full" : "w-full"
       } max-w-none`}
     >
       {content}

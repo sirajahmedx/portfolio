@@ -13,6 +13,8 @@ import {
   Layers,
   Sparkles,
   UserRoundSearch,
+  ChevronUp,
+  ArrowUp,
 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -40,11 +42,23 @@ export default function Home() {
   >("polite");
   const router = useRouter();
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const [textareaHeight, setTextareaHeight] = useState("auto");
 
   const goToChat = (query: string) =>
     router.push(
       `/chat?query=${encodeURIComponent(query)}&style=${selectedStyle}`
     );
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (input.trim()) {
+      goToChat(input.trim());
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setInput(e.target.value);
+  };
 
   const handleStyleChange = (
     style: "polite" | "concise" | "versatile" | "creative"
@@ -81,6 +95,14 @@ export default function Home() {
     linkMp4.href = "/final_memojis_ios.mp4";
     document.head.appendChild(linkMp4);
   }, []);
+
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.style.height = "auto";
+      inputRef.current.style.height = `${Math.min(inputRef.current.scrollHeight, 140)}px`;
+      setTextareaHeight(`${Math.min(inputRef.current.scrollHeight, 140)}px`);
+    }
+  }, [input]);
 
   return (
     <div className="relative min-h-screen flex flex-col">
@@ -219,34 +241,29 @@ export default function Home() {
               ))}
             </div>
 
-            {/* Input form */}
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                if (input.trim()) goToChat(input.trim());
-              }}
-              className="relative"
-            >
-              <div className="flex items-end rounded-xl sm:rounded-2xl border-2 border-border/50 bg-card/50 p-1.5 sm:p-2 shadow-lg backdrop-blur-xl transition-all duration-300 hover:border-border/80 hover:bg-card/70">
+            {/* Page.tsx */}
+            <form onSubmit={handleSubmit} className="relative">
+              <div className="flex items-end rounded-2xl sm:rounded-3xl border-2 border-border/50 p-2 sm:p-2.5 shadow-lg backdrop-blur-xl transition-all duration-300 hover:border-border/80">
                 <textarea
                   ref={inputRef}
                   value={input}
-                  onChange={(e) => setInput(e.target.value)}
+                  onChange={handleInputChange}
                   onKeyDown={(e) => {
-                    if (
-                      e.key === "Enter" &&
-                      !e.shiftKey &&
-                      !e.nativeEvent.isComposing &&
-                      input.trim()
-                    ) {
+                    if (e.key === "Enter" && !e.shiftKey) {
                       e.preventDefault();
-                      goToChat(input.trim());
+                      if (input.trim()) {
+                        handleSubmit(e as any);
+                      }
                     }
                   }}
-                  placeholder="Ask me anything about my work, skills, or projects..."
-                  className="flex-1 border-none bg-transparent px-2.5 py-2 sm:px-3 sm:py-2.5 md:px-4 md:py-3 text-sm sm:text-base text-foreground placeholder:text-muted-foreground focus:outline-none resize-none leading-relaxed"
+                  placeholder="Ask me anything..."
+                  className="flex-1 border-none bg-transparent px-3 py-2.5 sm:px-4 sm:py-3 text-sm sm:text-base text-foreground placeholder:text-muted-foreground focus:outline-none resize-none overflow-hidden"
+                  style={{
+                    height: "auto",
+                    minHeight: "48px",
+                    maxHeight: "140px",
+                  }}
                   rows={1}
-                  style={{ minHeight: "1.25rem", maxHeight: "5rem" }}
                 />
                 <div className="flex items-center mr-2">
                   <StyleSelector
@@ -254,14 +271,13 @@ export default function Home() {
                     onStyleChange={handleStyleChange}
                   />
                 </div>
-                <Button
+                <button
                   type="submit"
                   disabled={!input.trim()}
-                  size="lg"
-                  className="rounded-lg sm:rounded-xl px-3 py-2 sm:px-4 sm:py-2.5 md:px-6 md:py-3 shadow-md transition-all hover:scale-105 active:scale-95 disabled:opacity-50"
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center justify-center px-3 py-3 rounded-lg transition-all duration-200 disabled:opacity-50 hover:scale-105 active:scale-95 shadow-md hover:shadow-lg"
                 >
-                  <ArrowRight className="h-4 w-4 sm:h-4 sm:w-4 md:h-5 md:w-5" />
-                </Button>
+                  <ArrowUp className="h-4 w-4 md:h-4 md:w-4" />
+                </button>
               </div>
             </form>
           </motion.div>
