@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 
 export default function ProjectsPage() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5">
       {/* Hero Section */}
       <section className="relative py-16 pb-8 md:pt-24 md:pb-12 px-4 overflow-hidden">
         <div className="max-w-7xl mx-auto text-center">

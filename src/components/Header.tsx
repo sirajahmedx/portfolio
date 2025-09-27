@@ -32,7 +32,7 @@ export default function Header() {
   if (isChatPage) return null;
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-xl border-b border-border/30 shadow-sm h-16">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-br from-primary/5 via-background/95 to-accent/5 backdrop-blur-xl border-b border-border/30 shadow-sm h-16">
       <div className="flex h-full items-center justify-between px-4 max-w-5xl mx-auto">
         <Link
           href="/"

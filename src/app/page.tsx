@@ -35,14 +35,20 @@ const questionConfig = [
 
 export default function Home() {
   const [input, setInput] = useState("");
-  const [selectedStyle, setSelectedStyle] = useState<"polite" | "concise" | "versatile" | "creative">("polite");
+  const [selectedStyle, setSelectedStyle] = useState<
+    "polite" | "concise" | "versatile" | "creative"
+  >("polite");
   const router = useRouter();
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const goToChat = (query: string) =>
-    router.push(`/chat?query=${encodeURIComponent(query)}&style=${selectedStyle}`);
+    router.push(
+      `/chat?query=${encodeURIComponent(query)}&style=${selectedStyle}`
+    );
 
-  const handleStyleChange = (style: "polite" | "concise" | "versatile" | "creative") => {
+  const handleStyleChange = (
+    style: "polite" | "concise" | "versatile" | "creative"
+  ) => {
     setSelectedStyle(style);
   };
 
@@ -98,8 +104,7 @@ export default function Home() {
         <section className="relative flex-1 flex flex-col justify-center px-4 pt-2 sm:pt-4 md:pt-6 lg:pt-8">
           {/* Floating elements */}
           <div className="absolute inset-0 overflow-hidden">
-            <div className="absolute -top-8 -right-8 h-16 w-16 rounded-full bg-primary/10 blur-xl sm:-top-12 sm:-right-12 sm:h-24 sm:w-24 sm:blur-2xl md:-top-16 md:-right-16 md:h-32 md:w-32 lg:-top-32 lg:-right-32 lg:h-64 lg:w-64 lg:blur-3xl xl:-top-40 xl:-right-40 xl:h-80 xl:w-80" />
-            <div className="absolute -bottom-8 -left-8 h-16 w-16 rounded-full bg-accent/10 blur-xl sm:-bottom-12 sm:-left-12 sm:h-24 sm:w-24 sm:blur-2xl md:-bottom-16 md:-left-16 md:h-32 md:w-32 lg:-bottom-32 lg:-left-32 lg:h-64 lg:w-64 lg:blur-3xl xl:-bottom-40 xl:-left-40 xl:h-80 xl:w-80" />
+            {/* Removed floating blur elements for uniform background */}
           </div>
 
           <motion.div
@@ -228,7 +233,12 @@ export default function Home() {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={(e) => {
-                    if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing && input.trim()) {
+                    if (
+                      e.key === "Enter" &&
+                      !e.shiftKey &&
+                      !e.nativeEvent.isComposing &&
+                      input.trim()
+                    ) {
                       e.preventDefault();
                       goToChat(input.trim());
                     }

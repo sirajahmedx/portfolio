@@ -839,7 +839,7 @@ const Chat = () => {
 
   //chat
   return (
-    <div className="bg-gradient-to-br from-background via-background/98 to-background/95 relative flex flex-col h-[100dvh] max-h-[100dvh] min-h-0 overflow-hidden">
+    <div className="bg-gradient-to-br from-primary/5 via-background to-accent/5 relative flex flex-col h-[100dvh] max-h-[100dvh] min-h-0 overflow-hidden">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/5 via-background to-background" />
       <div className="absolute inset-0 bg-grid-pattern opacity-[0.02]" />
 
@@ -1043,7 +1043,7 @@ const Chat = () => {
         </div>
 
         {/* Bottom bar positioned absolutely - stays fixed at bottom */}
-        <div className="absolute bottom-0 left-0 right-0 border-border/30 bg-card/60 z-[100] border-t px-4 md:px-6 py-5 md:py-6 backdrop-blur-xl min-h-[120px] md:min-h-[100px] flex-shrink-0 shadow-2xl">
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-br from-primary/5 via-card/60 to-accent/5 z-[100] border-t border-border/30 backdrop-blur-xl min-h-[120px] md:min-h-[100px] flex-shrink-0 shadow-2xl">
           <div className="mx-auto max-w-3xl">
             <form onSubmit={onSubmit} className="relative">
               <div className="flex items-end rounded-2xl sm:rounded-3xl border-2 border-border/50 bg-card/50 p-2 sm:p-2.5 shadow-lg backdrop-blur-xl transition-all duration-300 hover:border-border/80 hover:bg-card/70">
