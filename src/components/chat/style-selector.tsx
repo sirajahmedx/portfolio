@@ -1,14 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  ChevronDown,
-  MessageCircle,
-  Zap,
-  Users,
-  Sparkles,
-  Info,
-} from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import React, { useState } from "react";
 
 interface StyleSelectorProps {
@@ -24,28 +17,24 @@ const STYLE_OPTIONS = [
     id: "polite" as const,
     label: "Polite",
     description: "Friendly & conversational",
-    // icon: MessageCircle,
     color: "text-blue-500",
   },
   {
     id: "concise" as const,
     label: "Concise",
     description: "Direct & to the point",
-    // icon: Zap,
     color: "text-green-500",
   },
   {
     id: "versatile" as const,
     label: "Versatile",
     description: "Balanced & detailed",
-    // icon: Users,
     color: "text-purple-500",
   },
   {
     id: "creative" as const,
     label: "Creative",
     description: "Fun & imaginative",
-    // icon: Sparkles,
     color: "text-orange-500",
   },
 ];
@@ -59,7 +48,6 @@ export default function StyleSelector({
   const selectedOption = STYLE_OPTIONS.find(
     (option) => option.id === selectedStyle
   );
-  // const Icon = selectedOption?.icon || MessageCircle;
 
   return (
     <div className="relative inline-block">
@@ -74,7 +62,6 @@ export default function StyleSelector({
         `}
         whileTap={{ scale: 0.95 }}
       >
-        {/* <Icon className={`h-4 w-4 ${selectedOption?.color}`} /> */}
         <span className="text-xs font-semibold">{selectedOption?.label}</span>
         <ChevronDown
           className={`h-3 w-3 transition-transform duration-200 ${isOpen ? "rotate-0" : "rotate-180"}`}
@@ -102,12 +89,9 @@ export default function StyleSelector({
               className="absolute bottom-full mb-2 right-0 z-50 w-48 bg-card/95 backdrop-blur-xl border border-border/20 rounded-lg shadow-xl overflow-hidden"
             >
               <div className="px-3 py-2 border-b border-border/10">
-                <p className="text-xs text-red-500 font-medium">
-                  Experimental
-                </p>
+                <p className="text-xs text-red-500 font-medium">Experimental</p>
               </div>
               {STYLE_OPTIONS.map((option) => {
-                // const OptionIcon = option.icon;
                 const isSelected = selectedStyle === option.id;
 
                 return (
@@ -123,7 +107,6 @@ export default function StyleSelector({
                       ${isSelected ? "bg-primary/8 text-primary" : "text-foreground"}
                     `}
                   >
-                    {/* <OptionIcon className={`h-4 w-4 ${option.color}`} /> */}
                     <span className="font-medium">{option.label}</span>
                     {isSelected && (
                       <div className="w-2 h-2 bg-primary rounded-full ml-auto" />

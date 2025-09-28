@@ -14,12 +14,10 @@ const groq = new Groq({
 const MODEL_CONFIGS = {
   polite: {
     model: 'openai/gpt-oss-20b',
-
     description: 'Fast and friendly responses'
   },
   concise: {
     model: 'llama-3.1-8b-instant',
-
     description: 'Direct and to-the-point answers'
   },
   versatile: {
@@ -200,8 +198,6 @@ async function createStreamingResponse(result: any): Promise<ReadableStream> {
             totalChunks++;
             totalText += chunkText;
             
-            console.log(`[CHAT-API] Chunk ${totalChunks}: "${chunkText.substring(0, 100)}${chunkText.length > 100 ? '...' : ''}"`);
-
             const chunkData = JSON.stringify({ 
               text: chunkText,
               chunk: totalChunks 
@@ -210,7 +206,6 @@ async function createStreamingResponse(result: any): Promise<ReadableStream> {
           }
         }
 
-        console.log(`[CHAT-API] Streaming complete. Total chunks: ${totalChunks}, Total text length: ${totalText.length}`);
         
         controller.enqueue(new TextEncoder().encode('data: [DONE]\n\n'));
         controller.close();
@@ -240,11 +235,8 @@ export async function POST(req: Request) {
     const cfConnecting = req.headers.get('cf-connecting-ip');
     const ip = cfConnecting || forwarded?.split(',')[0]?.trim() || realIP || 'unknown';
     
-    console.log(`[CHAT-API] Request from IP: ${ip}`);
-    
     // Check rate limiting
     if (isRateLimited(ip)) {
-      console.log(`[CHAT-API] Rate limited IP: ${ip}`);
       return new Response(
         JSON.stringify({ 
           error: 'Rate limit exceeded. Please try again later.',
@@ -321,9 +313,6 @@ export async function POST(req: Request) {
 
     const selectedModel = MODEL_CONFIGS[selectedStyle];
 
-    console.log(`[CHAT-API] Processing ${validatedMessages.length} messages with style: ${selectedStyle} (${selectedModel.description})`);
-    console.log(`[CHAT-API] Last message preview: "${validatedMessages[validatedMessages.length - 1].content.substring(0, 100)}..."`);
-
     // Initialize Groq model with error handling
     let model;
     try {
@@ -379,13 +368,12 @@ export async function POST(req: Request) {
           headers: { 'Content-Type': 'application/json' }
         }
       );
-    }    console.log('[CHAT-API] Creating streaming response...');
+    }
 
     // Create streaming response
     const stream = await createStreamingResponse(result);
 
     const processingTime = Date.now() - startTime;
-    console.log(`[CHAT-API] Request processed in ${processingTime}ms`);
 
     return new Response(stream, {
       headers: {
@@ -437,7 +425,6 @@ export async function OPTIONS(req: Request) {
 // Simplified GET handler (keeping for backward compatibility but not recommended for production)
 export async function GET(req: Request) {
   try {
-    console.log('[CHAT-API] GET request received (deprecated method)');
     
     const url = new URL(req.url);
     const messagesParam = url.searchParams.get('messages');

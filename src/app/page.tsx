@@ -13,7 +13,6 @@ import {
   Layers,
   Sparkles,
   UserRoundSearch,
-  ChevronUp,
   ArrowUp,
 } from "lucide-react";
 import Image from "next/image";

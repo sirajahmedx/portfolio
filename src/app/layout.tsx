@@ -1,20 +1,11 @@
 import { Analytics } from "@vercel/analytics/react";
 import type { Metadata } from "next";
-// import { Inter } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import Header from "@/components/Header";
 import "./globals.css";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-
-// Use system fonts instead of Google Fonts to avoid network issues
-// const inter = Inter({
-//   subsets: ["latin"],
-//   variable: "--font-inter",
-//   display: "swap",
-//   fallback: ["system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"],
-// });
 
 export const metadata: Metadata = {
   title: "Siraj Ahmed - Full-Stack Developer",
@@ -92,10 +83,7 @@ export default function RootLayout({
           enableSystem={true} // Enable system theme detection
         >
           <Header />
-          <main
-            className="flex flex-col overflow-auto"
-            // style={{ minHeight: "calc(100dvh / 0)" }} // Adjust for 5% scale reduction
-          >
+          <main className="flex flex-col overflow-auto">
             {children}
             <SpeedInsights />
           </main>

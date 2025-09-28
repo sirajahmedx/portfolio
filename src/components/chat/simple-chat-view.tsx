@@ -6,9 +6,7 @@ import {
 } from "@/components/ui/chat/chat-bubble";
 import { motion } from "framer-motion";
 import ChatMessageContent from "./chat-message-content";
-// import ToolRenderer from "./tool-renderer";
 
-// Custom Message interface to match our implementation
 interface Message {
   id: string;
   role: "user" | "assistant";
@@ -41,7 +39,6 @@ export function SimplifiedChatView({
 }: SimplifiedChatViewProps) {
   if (message.role !== "assistant") return null;
 
-  // Extract tool invocations that are in "result" state
   const toolInvocations =
     message.parts
       ?.filter(
@@ -54,29 +51,16 @@ export function SimplifiedChatView({
       )
       .filter(Boolean) || [];
 
-  // Only display the first tool (if any)
   const currentTool = toolInvocations.length > 0 ? [toolInvocations[0]] : [];
 
   const hasTextContent =
     message.content !== undefined && message.content !== null;
   const hasTools = currentTool.length > 0;
 
-  console.log("currentTool", currentTool);
-
   return (
     <motion.div {...MOTION_CONFIG} className="flex h-full w-full flex-col px-4">
       {/* Single scrollable container for both tool and text content */}
       <div className="custom-scrollbar flex h-full w-full flex-col overflow-y-auto">
-        {/* Tool invocation result - displayed at the top */}
-        {/* {hasTools && (
-          <div className="mb-4 w-full">
-            <ToolRenderer
-              toolInvocations={currentTool}
-              messageId={message.id || "current-msg"}
-            />
-          </div>
-        )} */}
-
         {/* Text content */}
         {hasTextContent && (
           <div className="w-full">
@@ -95,7 +79,6 @@ export function SimplifiedChatView({
           </div>
         )}
 
-        {/* Add some padding at the bottom for better scrolling experience */}
         <div className="pb-4"></div>
       </div>
     </motion.div>

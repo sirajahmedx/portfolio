@@ -1,6 +1,6 @@
 // @ts-nocheck
 const useFluidCursor = () => {
-  const canvas = document.getElementById('fluid');
+  const canvas = document.getElementById("fluid");
   resizeCanvas();
 
   //try to adjust settings
@@ -55,21 +55,21 @@ const useFluidCursor = () => {
       preserveDrawingBuffer: false,
     };
 
-    let gl = canvas.getContext('webgl2', params);
+    let gl = canvas.getContext("webgl2", params);
     const isWebGL2 = !!gl;
     if (!isWebGL2)
       gl =
-        canvas.getContext('webgl', params) ||
-        canvas.getContext('experimental-webgl', params);
+        canvas.getContext("webgl", params) ||
+        canvas.getContext("experimental-webgl", params);
 
     let halfFloat;
     let supportLinearFiltering;
     if (isWebGL2) {
-      gl.getExtension('EXT_color_buffer_float');
-      supportLinearFiltering = gl.getExtension('OES_texture_float_linear');
+      gl.getExtension("EXT_color_buffer_float");
+      supportLinearFiltering = gl.getExtension("OES_texture_float_linear");
     } else {
-      halfFloat = gl.getExtension('OES_texture_half_float');
-      supportLinearFiltering = gl.getExtension('OES_texture_half_float_linear');
+      halfFloat = gl.getExtension("OES_texture_half_float");
+      supportLinearFiltering = gl.getExtension("OES_texture_half_float_linear");
     }
 
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
@@ -213,7 +213,7 @@ const useFluidCursor = () => {
     gl.linkProgram(program);
 
     if (!gl.getProgramParameter(program, gl.LINK_STATUS))
-      console.trace(gl.getProgramInfoLog(program));
+      throw new Error("Failed to link program");
 
     return program;
   }
@@ -236,16 +236,16 @@ const useFluidCursor = () => {
     gl.compileShader(shader);
 
     if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS))
-      console.trace(gl.getShaderInfoLog(shader));
+      throw new Error("Failed to compile shader");
 
     return shader;
   }
 
   function addKeywords(source, keywords) {
     if (keywords == null) return source;
-    let keywordsString = '';
+    let keywordsString = "";
     keywords.forEach((keyword) => {
-      keywordsString += '#define ' + keyword + '\n';
+      keywordsString += "#define " + keyword + "\n";
     });
 
     return keywordsString + source;
@@ -465,7 +465,7 @@ const useFluidCursor = () => {
            float decay = 1.0 + dissipation * dt;
            gl_FragColor = result / decay;
        }`,
-    ext.supportLinearFiltering ? null : ['MANUAL_FILTERING']
+    ext.supportLinearFiltering ? null : ["MANUAL_FILTERING"]
   );
 
   const divergenceShader = compileShader(
@@ -893,7 +893,7 @@ const useFluidCursor = () => {
 
   function updateKeywords() {
     let displayKeywords = [];
-    if (config.SHADING) displayKeywords.push('SHADING');
+    if (config.SHADING) displayKeywords.push("SHADING");
     displayMaterial.setKeywords(displayKeywords);
   }
 
@@ -905,7 +905,6 @@ const useFluidCursor = () => {
 
   function update() {
     const dt = calcDeltaTime();
-    // console.log(dt)
     if (resizeCanvas()) initFramebuffers();
     updateColors(dt);
     applyInputs();
@@ -1126,7 +1125,7 @@ const useFluidCursor = () => {
     return radius;
   }
 
-  window.addEventListener('mousedown', (e) => {
+  window.addEventListener("mousedown", (e) => {
     let pointer = pointers[0];
     let posX = scaleByPixelRatio(e.clientX);
     let posY = scaleByPixelRatio(e.clientY);
@@ -1134,7 +1133,7 @@ const useFluidCursor = () => {
     clickSplat(pointer);
   });
 
-  document.body.addEventListener('mousemove', function handleFirstMouseMove(e) {
+  document.body.addEventListener("mousemove", function handleFirstMouseMove(e) {
     let pointer = pointers[0];
     let posX = scaleByPixelRatio(e.clientX);
     let posY = scaleByPixelRatio(e.clientY);
@@ -1144,10 +1143,10 @@ const useFluidCursor = () => {
     updatePointerMoveData(pointer, posX, posY, color);
 
     // Remove this event listener after the first mousemove event
-    document.body.removeEventListener('mousemove', handleFirstMouseMove);
+    document.body.removeEventListener("mousemove", handleFirstMouseMove);
   });
 
-  window.addEventListener('mousemove', (e) => {
+  window.addEventListener("mousemove", (e) => {
     let pointer = pointers[0];
     let posX = scaleByPixelRatio(e.clientX);
     let posY = scaleByPixelRatio(e.clientY);
@@ -1157,7 +1156,7 @@ const useFluidCursor = () => {
   });
 
   document.body.addEventListener(
-    'touchstart',
+    "touchstart",
     function handleFirstTouchStart(e) {
       const touches = e.targetTouches;
       let pointer = pointers[0];
@@ -1171,11 +1170,11 @@ const useFluidCursor = () => {
       }
 
       // Remove this event listener after the first touchstart event
-      document.body.removeEventListener('touchstart', handleFirstTouchStart);
+      document.body.removeEventListener("touchstart", handleFirstTouchStart);
     }
   );
 
-  window.addEventListener('touchstart', (e) => {
+  window.addEventListener("touchstart", (e) => {
     const touches = e.targetTouches;
     let pointer = pointers[0];
     for (let i = 0; i < touches.length; i++) {
@@ -1186,7 +1185,7 @@ const useFluidCursor = () => {
   });
 
   window.addEventListener(
-    'touchmove',
+    "touchmove",
     (e) => {
       const touches = e.targetTouches;
       let pointer = pointers[0];
@@ -1199,7 +1198,7 @@ const useFluidCursor = () => {
     false
   );
 
-  window.addEventListener('touchend', (e) => {
+  window.addEventListener("touchend", (e) => {
     const touches = e.changedTouches;
     let pointer = pointers[0];
 
@@ -1222,7 +1221,6 @@ const useFluidCursor = () => {
   }
 
   function updatePointerMoveData(pointer, posX, posY, color) {
-    // pointer.down = false;
     pointer.prevTexcoordX = pointer.texcoordX;
     pointer.prevTexcoordY = pointer.texcoordY;
     pointer.texcoordX = posX / canvas.width;
@@ -1268,22 +1266,22 @@ const useFluidCursor = () => {
 
     switch (i % 6) {
       case 0:
-        (r = v), (g = t), (b = p);
+        ((r = v), (g = t), (b = p));
         break;
       case 1:
-        (r = q), (g = v), (b = p);
+        ((r = q), (g = v), (b = p));
         break;
       case 2:
-        (r = p), (g = v), (b = t);
+        ((r = p), (g = v), (b = t));
         break;
       case 3:
-        (r = p), (g = q), (b = v);
+        ((r = p), (g = q), (b = v));
         break;
       case 4:
-        (r = t), (g = p), (b = v);
+        ((r = t), (g = p), (b = v));
         break;
       case 5:
-        (r = v), (g = p), (b = q);
+        ((r = v), (g = p), (b = q));
         break;
     }
 

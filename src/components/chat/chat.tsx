@@ -15,14 +15,7 @@ import ChatBottombar from "@/components/chat/chat-bottombar";
 import ChatLanding from "@/components/chat/chat-landing";
 import ChatMessageContent from "@/components/chat/chat-message-content";
 import StyleSelector from "@/components/chat/style-selector";
-import {
-  Copy,
-  Info,
-  Loader2,
-  ChevronUp,
-  Home,
-  ChevronLeft,
-} from "lucide-react";
+import { Copy, Info, Loader2, ChevronUp, ChevronLeft } from "lucide-react";
 
 interface Message {
   id: string;
@@ -35,7 +28,6 @@ interface ChatState {
   messages: Message[];
   input: string;
   loadingSubmit: boolean;
-  isTalking: boolean;
   hasReachedLimit: boolean;
   conversationLoaded: boolean;
   lastRequestTime: number;
@@ -69,12 +61,10 @@ type ChatAction =
       payload: "polite" | "concise" | "versatile" | "creative";
     };
 
-// Initial state
 const initialState: ChatState = {
   messages: [],
   input: "",
   loadingSubmit: false,
-  isTalking: false,
   hasReachedLimit: false,
   conversationLoaded: false,
   lastRequestTime: 0,
@@ -114,9 +104,6 @@ function chatReducer(state: ChatState, action: ChatAction): ChatState {
     case "SET_LOADING_SUBMIT":
       return { ...state, loadingSubmit: action.payload };
 
-    case "SET_TALKING":
-      return { ...state, isTalking: action.payload };
-
     case "SET_MESSAGES":
       return { ...state, messages: action.payload };
 
@@ -146,7 +133,6 @@ function chatReducer(state: ChatState, action: ChatAction): ChatState {
         currentAssistantId: null,
         chunkCount: 0,
         loadingSubmit: false,
-        isTalking: false,
       };
 
     case "SET_SELECTED_STYLE":
@@ -286,7 +272,6 @@ const MOTION_CONFIG = {
 };
 
 const Chat = () => {
-  const videoRef = useRef<HTMLVideoElement | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get("query");
@@ -307,7 +292,6 @@ const Chat = () => {
     messages,
     input,
     loadingSubmit,
-    isTalking,
     hasReachedLimit,
     conversationLoaded,
     lastRequestTime,
@@ -345,7 +329,6 @@ const Chat = () => {
     }
   }, []);
 
-  // Generate unique ID for messages
   const generateId = useCallback(
     () => Math.random().toString(36).substring(2, 15),
     []
@@ -355,17 +338,11 @@ const Chat = () => {
     if (conversationLoaded) return;
 
     try {
-      console.log("[CLIENT] Loading conversation from memory...");
       if (conversationStorageRef.current.length > 0) {
         dispatch({
           type: "SET_MESSAGES",
           payload: conversationStorageRef.current,
         });
-        console.log(
-          "[CLIENT] Loaded",
-          conversationStorageRef.current.length,
-          "messages"
-        );
       }
     } catch (error) {
       console.error("Failed to load conversation:", error);
@@ -377,13 +354,11 @@ const Chat = () => {
   const saveConversation = useCallback((messages: Message[]) => {
     try {
       conversationStorageRef.current = messages;
-      console.log("[CLIENT] Saved", messages.length, "messages to memory");
     } catch (error) {
       console.error("Failed to save conversation:", error);
     }
   }, []);
 
-  // Enhanced auto-scroll to bottom with ultra-smooth animation
   const scrollToBottom = useCallback(() => {
     if (messagesEndRef.current) {
       const container = messagesEndRef.current.closest(
@@ -395,8 +370,7 @@ const Chat = () => {
         const distance = targetScrollTop - currentScrollTop;
 
         if (Math.abs(distance) > 1) {
-          // Ultra-smooth scrolling with easing
-          const duration = 800; // Increased duration for slower, smoother scroll
+          const duration = 800;
           const startTime = Date.now();
           const startScrollTop = currentScrollTop;
 
@@ -428,7 +402,7 @@ const Chat = () => {
   }, []);
 
   useEffect(() => {
-    const timer = setTimeout(scrollToBottom, 300); // Increased delay for more deliberate scrolling
+    const timer = setTimeout(scrollToBottom, 300);
     return () => clearTimeout(timer);
   }, [messages, loadingSubmit, scrollToBottom]);
 
@@ -441,7 +415,6 @@ const Chat = () => {
     }
   }, []);
 
-  // Handle style change
   const handleStyleChange = useCallback(
     (style: "polite" | "concise" | "versatile" | "creative") => {
       dispatch({ type: "SET_SELECTED_STYLE", payload: style });
@@ -449,23 +422,20 @@ const Chat = () => {
     []
   );
 
-  // Handle input change
   const handleInputChange = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       dispatch({ type: "SET_INPUT", payload: e.target.value });
 
-      // Auto-resize textarea
       const textarea = e.target;
       textarea.style.height = "auto";
       const scrollHeight = textarea.scrollHeight;
-      const newHeight = Math.min(scrollHeight, 120); // Max height of 120px (about 4-5 lines)
+      const newHeight = Math.min(scrollHeight, 120);
       textarea.style.height = `${newHeight}px`;
       setTextareaHeight(`${newHeight}px`);
     },
     []
   );
 
-  // Effect to handle textarea resizing
   useEffect(() => {
     if (textareaRef) {
       textareaRef.style.height = "auto";
@@ -476,7 +446,6 @@ const Chat = () => {
     }
   }, [input, textareaRef]);
 
-  // Enhanced streaming response handler
   const handleStreamingResponse = useCallback(
     async (response: Response, assistantMessageId: string) => {
       if (!response.body) {
@@ -493,7 +462,6 @@ const Chat = () => {
           const { done, value } = await reader.read();
 
           if (done) {
-            // Process any remaining buffer
             if (buffer.trim()) {
               processBuffer(buffer, assistantMessageId);
             }
@@ -510,7 +478,6 @@ const Chat = () => {
     []
   );
 
-  // Process streaming buffer
   const processBuffer = useCallback(
     (buffer: string, assistantMessageId: string): string => {
       const lines = buffer.split("\n");
@@ -523,7 +490,6 @@ const Chat = () => {
           const data = line.slice(6).trim();
 
           if (data === "[DONE]") {
-            console.log("[CLIENT] Received [DONE] marker");
             return remainingBuffer;
           }
 
@@ -538,11 +504,6 @@ const Chat = () => {
               assistantContentRef.current += parsed.text;
               dispatch({ type: "INCREMENT_CHUNK_COUNT" });
 
-              console.log(
-                `[CLIENT] Chunk ${chunkCount + 1}: "${parsed.text.substring(0, 50)}..."`
-              );
-
-              // Update the assistant message content
               dispatch({
                 type: "UPDATE_ASSISTANT_MESSAGE",
                 payload: {
@@ -551,23 +512,13 @@ const Chat = () => {
                 },
               });
 
-              // Stop loading animation after first chunk
               if (chunkCount === 0) {
-                // Loading animation handled by loadingSubmit state
               }
 
-              // Auto-scroll to bottom
               setTimeout(scrollToBottom, 50);
             }
-          } catch (parseError) {
-            console.warn(
-              "[CLIENT] Failed to parse streaming data:",
-              data,
-              parseError
-            );
-          }
+          } catch (parseError) {}
         } else if (i === lines.length - 1 && line) {
-          // Keep incomplete line for next iteration
           remainingBuffer = line;
         }
       }
@@ -577,27 +528,21 @@ const Chat = () => {
     [chunkCount]
   );
 
-  // Submit query to API
   const submitQuery = useCallback(
     async (query: string) => {
       if (!query.trim() || loadingSubmit) {
-        console.log("[CLIENT] Submit blocked - invalid conditions");
         return;
       }
 
-      // Rate limiting: prevent requests more frequent than every 2 seconds
       const now = Date.now();
       const timeSinceLastRequest = now - lastRequestTime;
       if (timeSinceLastRequest < 2000) {
-        console.log("[CLIENT] Rate limited - too frequent requests");
         toast.error("Please wait a moment before sending another message.");
         return;
       }
 
       const trimmedQuery = query.trim();
-      console.log("[CLIENT] Starting submitQuery with:", trimmedQuery);
 
-      // Cancel any existing request
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
       }
@@ -605,7 +550,6 @@ const Chat = () => {
 
       dispatch({ type: "SET_LAST_REQUEST_TIME", payload: now });
 
-      // Add user message
       const userMessage: Message = {
         id: generateId(),
         role: "user",
@@ -616,16 +560,7 @@ const Chat = () => {
       dispatch({ type: "ADD_MESSAGE", payload: userMessage });
       dispatch({ type: "SET_INPUT", payload: "" });
       dispatch({ type: "SET_LOADING_SUBMIT", payload: true });
-      dispatch({ type: "SET_TALKING", payload: true });
 
-      // Play video
-      if (videoRef.current) {
-        videoRef.current.play().catch((error) => {
-          console.error("Failed to play video:", error);
-        });
-      }
-
-      // Create assistant message placeholder
       const assistantMessageId = generateId();
       const assistantMessage: Message = {
         id: assistantMessageId,
@@ -640,9 +575,6 @@ const Chat = () => {
       });
 
       try {
-        console.log("[CLIENT] Making API request...");
-
-        // Build messages array including the new user message
         const messagesToSend = [...messages, userMessage];
 
         const response = await fetch("/api/chat", {
@@ -661,8 +593,6 @@ const Chat = () => {
           }),
           signal: abortControllerRef.current.signal,
         });
-
-        console.log("[CLIENT] API response status:", response.status);
 
         if (!response.ok) {
           let errorMessage = `HTTP error! status: ${response.status}`;
@@ -684,13 +614,9 @@ const Chat = () => {
           throw new Error(errorMessage);
         }
 
-        // Handle streaming response
         await handleStreamingResponse(response, assistantMessageId);
-
-        console.log("[CLIENT] Request completed successfully");
       } catch (error) {
         if (error instanceof Error && error.name === "AbortError") {
-          console.log("[CLIENT] Request was aborted");
           return;
         }
 
@@ -710,7 +636,6 @@ const Chat = () => {
           ? "I've reached my daily conversation limit. Please try again tomorrow."
           : "Sorry, I encountered an error while processing your request. Please try again.";
 
-        // Update assistant message with error
         dispatch({
           type: "UPDATE_ASSISTANT_MESSAGE",
           payload: {
@@ -720,9 +645,6 @@ const Chat = () => {
         });
       } finally {
         dispatch({ type: "RESET_STREAMING_STATE" });
-        if (videoRef.current) {
-          videoRef.current.pause();
-        }
         abortControllerRef.current = null;
       }
     },
@@ -735,7 +657,6 @@ const Chat = () => {
     ]
   );
 
-  // Handle form submission
   const onSubmit = useCallback(
     (e: React.FormEvent) => {
       e.preventDefault();
@@ -750,35 +671,21 @@ const Chat = () => {
     [input, loadingSubmit, submitQuery]
   );
 
-  // Stop current request
   const handleStop = useCallback(() => {
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
     }
     dispatch({ type: "RESET_STREAMING_STATE" });
-    if (videoRef.current) {
-      videoRef.current.pause();
-    }
   }, []);
 
-  const isToolInProgress = false; // Simplified - no tool support
+  const isToolInProgress = false;
 
-  // Effects
   useEffect(() => {
-    if (videoRef.current) {
-      videoRef.current.loop = true;
-      videoRef.current.muted = true;
-      videoRef.current.playsInline = true;
-      videoRef.current.pause();
-    }
-
-    // Load conversation from memory storage on mount
     if (!conversationLoaded) {
       loadConversation();
     }
   }, [loadConversation, conversationLoaded]);
 
-  // Handle initial query submission
   useEffect(() => {
     if (initialQuery && !autoSubmitted && conversationLoaded) {
       setAutoSubmitted(true);
@@ -786,47 +693,28 @@ const Chat = () => {
     }
   }, [initialQuery, autoSubmitted, submitQuery, conversationLoaded]);
 
-  // Save conversation whenever messages change
   useEffect(() => {
     if (messages.length > 0 && conversationLoaded) {
       saveConversation(messages);
     }
   }, [messages, saveConversation, conversationLoaded]);
 
-  // Control video based on talking state
-  useEffect(() => {
-    if (videoRef.current) {
-      if (isTalking) {
-        videoRef.current.play().catch((error) => {
-          console.error("Failed to play video:", error);
-        });
-      } else {
-        videoRef.current.pause();
-      }
-    }
-  }, [isTalking]);
-
-  // Mobile keyboard handling and viewport adjustments
   useEffect(() => {
     const handleViewportChange = () => {
-      // Small delay to ensure keyboard has fully appeared/disappeared
       setTimeout(() => {
         scrollToBottom();
       }, 300);
     };
 
     const handleFocus = () => {
-      // When input is focused on mobile, ensure we're scrolled to bottom
       setTimeout(() => {
         scrollToBottom();
       }, 100);
     };
 
-    // Listen for viewport changes (keyboard show/hide)
     window.addEventListener("resize", handleViewportChange);
     window.addEventListener("orientationchange", handleViewportChange);
 
-    // Listen for input focus events
     const inputElements = document.querySelectorAll("input, textarea");
     inputElements.forEach((input) => {
       input.addEventListener("focus", handleFocus);
@@ -841,10 +729,8 @@ const Chat = () => {
     };
   }, []);
 
-  // Check if this is the initial empty state
   const isEmptyState = messages.length === 0 && !loadingSubmit;
 
-  // Check if user asked about projects
   const userAskedAboutProjects = messages.some(
     (msg) =>
       msg.role === "user" &&
@@ -859,7 +745,6 @@ const Chat = () => {
         msg.content.toLowerCase().includes("sensify"))
   );
 
-  //chat
   return (
     <div className="bg-gradient-to-br from-primary/5 via-background to-accent/5 relative flex flex-col h-[100dvh] max-h-[100dvh] min-h-0 overflow-hidden">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/5 via-background to-background" />
@@ -907,11 +792,8 @@ const Chat = () => {
               scrollbarColor: "rgb(107 114 128 / 0.3) transparent",
               scrollBehavior: "smooth",
               scrollPadding: "1rem",
-              // Enhanced smooth scrolling properties
               scrollSnapType: "y proximity",
-              // Custom scroll timing for ultra-smooth experience
               scrollMargin: "1rem",
-              // Reduce scroll friction for smoother feel
               overscrollBehavior: "contain",
             }}
           >
@@ -963,7 +845,9 @@ const Chat = () => {
                                       isLast={index === messages.length - 1}
                                       isLoading={false}
                                       reload={() => Promise.resolve(null)}
-                                      showProjectsButton={userAskedAboutProjects}
+                                      showProjectsButton={
+                                        userAskedAboutProjects
+                                      }
                                     />
                                   </div>
                                 </div>
@@ -979,7 +863,9 @@ const Chat = () => {
                                         message.content === ""
                                       }
                                       reload={() => Promise.resolve(null)}
-                                      showProjectsButton={userAskedAboutProjects}
+                                      showProjectsButton={
+                                        userAskedAboutProjects
+                                      }
                                     />
                                   </div>
                                   <div className="mt-3 flex h-4 justify-start">

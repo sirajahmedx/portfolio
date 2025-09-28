@@ -11,7 +11,6 @@ import { useEffect, useState } from "react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
-// Custom Message interface
 interface Message {
   id: string;
   role: "user" | "assistant";
@@ -33,13 +32,11 @@ export type ChatMessageContentProps = {
 const CodeBlock = ({ content }: { content: string }) => {
   const [isOpen, setIsOpen] = useState(true);
 
-  // Extract language if present in the first line
   const firstLineBreak = content.indexOf("\n");
   const firstLine = content.substring(0, firstLineBreak).trim();
   const language = firstLine || "text";
   const code = firstLine ? content.substring(firstLineBreak + 1) : content;
 
-  // Get first few lines for preview
   const previewLines = code.split("\n").slice(0, 1).join("\n");
   const hasMoreLines = code.split("\n").length > 1;
 

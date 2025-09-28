@@ -36,18 +36,8 @@ const questionConfig = [
   { key: "Contact", color: "#C19433", icon: UserRoundSearch },
 ];
 
-// Animated Chevron component - Simplified to prevent infinite loops
-// const AnimatedChevron = () => {
-//   return (
-//     <div className="text-primary mb-1.5">
-//       <ChevronUp size={16} />
-//     </div>
-//   );
-// };
-
 export default React.memo(function HelperBoost({
   submitQuery,
-  // setInput,
   hasReachedLimit = false,
 }: HelperBoostProps) {
   const [isVisible, setIsVisible] = useState(false);
@@ -73,23 +63,16 @@ export default React.memo(function HelperBoost({
         !disabledQuestions.has(questionKey)
       ) {
         const now = Date.now();
-        // Prevent rapid clicking of the same question
         if (lastClickedQuestion === questionKey && now - lastClickTime < 1000) {
-          console.log(
-            "[HelperBoost] Rapid click blocked for question:",
-            questionKey
-          );
           return;
         }
 
-        // Temporarily disable the button
         setDisabledQuestions((prev) => new Set(prev).add(questionKey));
 
         setLastClickedQuestion(questionKey);
         setLastClickTime(now);
         submitQuery(questions[questionKey as keyof typeof questions]);
 
-        // Re-enable the button after 1 second
         const timeoutId = setTimeout(() => {
           setDisabledQuestions((prev) => {
             const newSet = new Set(prev);

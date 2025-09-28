@@ -13,7 +13,6 @@ const ChatLanding: React.FC<ChatLandingProps> = ({
   submitQuery,
   hasReachedLimit = false,
 }) => {
-  // Suggested questions that the user can click on
   const suggestedQuestions = [
     {
       icon: <MessageSquare className="h-4 w-4" />,
@@ -33,7 +32,6 @@ const ChatLanding: React.FC<ChatLandingProps> = ({
     },
   ];
 
-  // Animation variants for staggered animation
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
