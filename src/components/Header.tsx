@@ -85,12 +85,12 @@ export default function Header() {
 
             <div className="hidden md:flex items-center gap-3">
               <a
-                href="https://github.com/sirajahmedx"
+                href="https://github.com/sirajahmedx/portfolio"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-1 px-2 py-1 rounded text-muted-foreground hover:text-foreground transition-colors"
-                aria-label="View GitHub profile"
-                title={`Total stars earned on my repos: ${stars !== null ? stars.toLocaleString() : "..."}`}
+                aria-label="View portfolio repository on GitHub"
+                title={`Stars on portfolio repo: ${stars !== null ? stars.toLocaleString() : "..."}`}
               >
                 <Github className="h-5 w-5" />
                 <span className="font-mono text-sm min-w-[32px] text-center">

@@ -107,7 +107,7 @@ export default function Home() {
     <div className="relative min-h-screen flex flex-col">
       <Header />
 
-      <motion.div
+      {/* <motion.div
         initial={{ opacity: 0, x: -50 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 0.2 }}
@@ -115,7 +115,7 @@ export default function Home() {
       >
         <Sparkles className="h-2.5 w-2.5" />
         Available for new opportunities
-      </motion.div>
+      </motion.div> */}
 
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-accent/5" />
@@ -137,7 +137,7 @@ export default function Home() {
           >
             {/* Left side - Text content */}
             <div className="flex-1 space-y-4 sm:space-y-5 md:space-y-6 lg:space-y-8 lg:pr-6 xl:pr-8">
-              <motion.div
+              {/* <motion.div
                 initial={{ opacity: 0, x: -50 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.2 }}
@@ -145,7 +145,7 @@ export default function Home() {
               >
                 <Sparkles className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4" />
                 Available for new opportunities
-              </motion.div>
+              </motion.div> */}
 
               <motion.h1
                 initial={{ opacity: 0, y: 30 }}

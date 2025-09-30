@@ -1,15 +1,14 @@
 export async function GET(req: Request) {
-  const res = await fetch('https://api.github.com/user/repos?per_page=100', {
+  const res = await fetch('https://api.github.com/repos/sirajahmedx/portfolio', {
     headers: {
       Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
     },
   });
 
   if (!res.ok) {
-    return new Response('Failed to fetch repos', { status: res.status });
+    return new Response('Failed to fetch repo', { status: res.status });
   }
 
-  const repos = await res.json();
-  const totalStars = repos.reduce((sum: number, repo: any) => sum + repo.stargazers_count, 0);
-  return Response.json({ stars: totalStars });
+  const repo = await res.json();
+  return Response.json({ stars: repo.stargazers_count });
 }
