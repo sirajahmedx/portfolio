@@ -1,24 +1,22 @@
 "use client";
 
+import StyleSelector from "@/components/chat/style-selector";
 import FluidCursor from "@/components/FluidCursor";
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import {
-  ArrowRight,
+  ArrowUp,
   BriefcaseBusiness,
   Code,
   Coffee,
   Laugh,
   Layers,
-  Sparkles,
   UserRoundSearch,
-  ArrowUp,
 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import StyleSelector from "@/components/chat/style-selector";
 
 const questions = {
   Me: "Who are you? I want to know more about you.",
@@ -104,7 +102,7 @@ export default function Home() {
   }, [input]);
 
   return (
-    <div className="relative min-h-screen flex flex-col">
+    <div className="relative min-h-[90vh] lg:min-h-screen flex flex-col">
       <Header />
 
       {/* <motion.div
@@ -242,7 +240,10 @@ export default function Home() {
 
             {/* Page.tsx */}
             <form onSubmit={handleSubmit} className="relative">
-              <div className="flex items-end rounded-2xl sm:rounded-3xl border-2 border-border/50 p-2 sm:p-2.5 shadow-lg backdrop-blur-xl transition-all duration-300 hover:border-border/80">
+              <div
+                className="flex items-end rounded-full border-2  
+               border-border/80 p-2 sm:p-2.5 shadow-lg backdrop-blur-xl transition-all duration-300 hover:border-border/80"
+              >
                 <textarea
                   ref={inputRef}
                   value={input}
@@ -256,7 +257,7 @@ export default function Home() {
                     }
                   }}
                   placeholder="Ask me anything..."
-                  className="flex-1 border-none bg-transparent px-3 py-2.5 sm:px-4 sm:py-3 text-sm sm:text-base text-foreground placeholder:text-muted-foreground focus:outline-none resize-none overflow-hidden"
+                  className="flex-1 border-none bg-transparent px-3 py-3 sm:px-4 sm:py-3 text-sm sm:text-base text-foreground placeholder:text-muted-foreground focus:outline-none resize-none overflow-hidden"
                   style={{
                     height: "auto",
                     minHeight: "48px",
@@ -273,7 +274,7 @@ export default function Home() {
                 <button
                   type="submit"
                   disabled={!input.trim()}
-                  className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center justify-center px-3 py-3 rounded-lg transition-all duration-200 disabled:opacity-50 hover:scale-105 active:scale-95 shadow-md hover:shadow-lg"
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center justify-center px-3 py-3 rounded-full mb-1 transition-all duration-200 disabled:opacity-50 hover:scale-105 active:scale-95 shadow-md hover:shadow-lg"
                 >
                   <ArrowUp className="h-4 w-4 md:h-4 md:w-4" />
                 </button>

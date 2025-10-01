@@ -114,7 +114,6 @@ export default function ProjectsPage() {
         </div>
       </div>
 
-      {/* Projects Section */}
       <section className="pb-16 md:pb-20 px-4">
         <AllProjects />
       </section>

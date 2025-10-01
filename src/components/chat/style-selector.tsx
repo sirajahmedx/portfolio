@@ -55,7 +55,7 @@ export default function StyleSelector({
         onClick={() => !disabled && setIsOpen(!isOpen)}
         disabled={disabled}
         className={`
-          flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium
+          flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium mb-1
           transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed
           bg-transparent hover:bg-card/30 border border-transparent hover:border-border/20
           ${isOpen ? "bg-card/30 border-border/20" : ""}
@@ -71,7 +71,6 @@ export default function StyleSelector({
       <AnimatePresence>
         {isOpen && (
           <>
-            {/* Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -80,7 +79,6 @@ export default function StyleSelector({
               onClick={() => setIsOpen(false)}
             />
 
-            {/* Dropdown */}
             <motion.div
               initial={{ opacity: 0, y: 8, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}

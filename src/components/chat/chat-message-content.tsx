@@ -96,28 +96,23 @@ export default function ChatMessageContent({
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  // Check if content is long and needs truncation (mobile only, line-based)
   const lines = message.content ? message.content.split("\n") : [];
   const shouldTruncate = isMobile && lines.length > 6;
   const truncatedContent = shouldTruncate
     ? lines.slice(0, visibleLines).join("\n")
     : message.content;
 
-  // Handle both parts-based and direct content messages
   const renderContent = () => {
-    // If message has parts, use the parts-based rendering
     if (message.parts && message.parts.length > 0) {
       const content = message.parts.map((part, partIndex) => {
         if (part.type !== "text" || !part.text) return null;
 
-        // Split content by code block markers
         const contentParts = part.text.split("```");
 
         return (
           <div key={partIndex} className="w-full space-y-4">
             {contentParts.map((content: string, i: number) =>
               i % 2 === 0 ? (
-                // Regular text content
                 <div
                   key={`text-${i}`}
                   className="prose dark:prose-invert w-full"
@@ -161,7 +156,6 @@ export default function ChatMessageContent({
                   </Markdown>
                 </div>
               ) : (
-                // Code block content
                 <CodeBlock key={`code-${i}`} content={content} />
               )
             )}
@@ -186,7 +180,7 @@ export default function ChatMessageContent({
           )}
         </div>
       );
-    } // If no parts but has direct content, render it directly
+    }
     if (message.content) {
       const contentToRender = shouldTruncate
         ? truncatedContent
@@ -197,7 +191,6 @@ export default function ChatMessageContent({
         <div className="w-full space-y-4">
           {contentParts.map((content: string, i: number) =>
             i % 2 === 0 ? (
-              // Regular text content
               <div key={`text-${i}`} className="prose dark:prose-invert w-full">
                 <Markdown
                   remarkPlugins={[remarkGfm]}
@@ -238,7 +231,6 @@ export default function ChatMessageContent({
                 </Markdown>
               </div>
             ) : (
-              // Code block content
               <CodeBlock key={`code-${i}`} content={content} />
             )
           )}

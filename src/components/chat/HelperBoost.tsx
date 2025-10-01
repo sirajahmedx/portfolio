@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 import {
   BriefcaseBusiness,
   ChevronDown,
@@ -8,18 +7,11 @@ import {
   Layers,
   UserRoundSearch,
 } from "lucide-react";
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 
 interface HelperBoostProps {
   submitQuery?: (query: string) => void;
   setInput?: (value: string) => void;
-  hasReachedLimit?: boolean;
 }
 
 const questions = {
@@ -38,10 +30,8 @@ const questionConfig = [
 
 export default React.memo(function HelperBoost({
   submitQuery,
-  hasReachedLimit = false,
 }: HelperBoostProps) {
   const [isVisible, setIsVisible] = useState(false);
-  const [open, setOpen] = useState(false);
   const [lastClickedQuestion, setLastClickedQuestion] = useState<string>("");
   const [lastClickTime, setLastClickTime] = useState<number>(0);
   const [disabledQuestions, setDisabledQuestions] = useState<Set<string>>(
@@ -57,11 +47,7 @@ export default React.memo(function HelperBoost({
 
   const handleQuestionClick = useCallback(
     (questionKey: string) => {
-      if (
-        submitQuery &&
-        !hasReachedLimit &&
-        !disabledQuestions.has(questionKey)
-      ) {
+      if (submitQuery && !disabledQuestions.has(questionKey)) {
         const now = Date.now();
         if (lastClickedQuestion === questionKey && now - lastClickTime < 1000) {
           return;
@@ -84,13 +70,7 @@ export default React.memo(function HelperBoost({
         timeoutIds.current.add(timeoutId);
       }
     },
-    [
-      submitQuery,
-      hasReachedLimit,
-      lastClickedQuestion,
-      lastClickTime,
-      disabledQuestions,
-    ]
+    [submitQuery, lastClickedQuestion, lastClickTime, disabledQuestions]
   );
 
   const toggleVisibility = useCallback(() => {
@@ -143,11 +123,11 @@ export default React.memo(function HelperBoost({
                 onClick={() => handleQuestionClick(key)}
                 variant="outline"
                 className={`group h-auto min-w-[90px] md:min-w-[110px] flex-shrink-0 rounded-xl border-2 px-3 md:px-4 py-2.5 md:py-3 shadow-md backdrop-blur-xl transition-all duration-300 hover:shadow-xl ${
-                  hasReachedLimit || disabledQuestions.has(key)
+                  disabledQuestions.has(key)
                     ? "border-border/20 bg-muted/5 cursor-not-allowed opacity-50"
                     : "border-border/30 hover:border-border bg-card/5 hover:bg-card/15 cursor-pointer hover:scale-105 active:scale-95"
                 }`}
-                disabled={hasReachedLimit || disabledQuestions.has(key)}
+                disabled={disabledQuestions.has(key)}
               >
                 <div className="text-foreground flex items-center gap-1.5 md:gap-2">
                   <div

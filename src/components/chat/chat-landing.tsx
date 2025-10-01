@@ -60,17 +60,15 @@ const ChatLanding: React.FC<ChatLandingProps> = ({
       animate="visible"
       variants={containerVariants}
     >
-      {/* Welcome message */}
       <motion.div className="mb-4 md:mb-8 text-center" variants={itemVariants}>
-        <h2 className="mb-2 md:mb-3 text-lg md:text-2xl font-semibold leading-relaxed">
+        <h2 className="mb-2 md:mb-3 text-xl md:text-2xl font-semibold leading-relaxed">
           I'm Siraj's digital twin
         </h2>
-        <p className="text-muted-foreground mx-auto max-w-md text-sm md:text-base leading-relaxed">
+        {/* <p className="text-muted-foreground mx-auto max-w-md text-sm md:text-base leading-relaxed">
           A passionate 16-year-old developer from Pakistan.
-        </p>
+        </p> */}
       </motion.div>
 
-      {/* Suggested questions */}
       <motion.div
         className="w-full max-w-md space-y-2 md:space-y-3"
         variants={containerVariants}
@@ -78,7 +76,7 @@ const ChatLanding: React.FC<ChatLandingProps> = ({
         {suggestedQuestions.map((question, index) => (
           <motion.button
             key={index}
-            className={`flex w-full items-center rounded-lg px-2 md:px-4 py-2 md:py-3 transition-colors ${
+            className={`flex w-full items-center rounded-lg px-2 md:px-4 py-3 md:py-3 transition-colors ${
               hasReachedLimit
                 ? "bg-gray-100 cursor-not-allowed opacity-50"
                 : "bg-accent hover:bg-accent/80"
@@ -89,7 +87,7 @@ const ChatLanding: React.FC<ChatLandingProps> = ({
             whileTap={!hasReachedLimit ? { scale: 0.98 } : {}}
             disabled={hasReachedLimit}
           >
-            <span className="bg-background mr-2 md:mr-3 rounded-full p-1 md:p-2">
+            <span className="bg-background mr-2 md:mr-3 rounded-full p-2 md:p-2">
               {question.icon}
             </span>
             <span className="text-left text-sm md:text-base leading-relaxed">

@@ -25,7 +25,7 @@ const PROJECT_CONTENT = [
     links: [
       {
         name: "Live Demo",
-        url: "https://sirajahmedx.vercel.app",
+        url: "https://portfolio-dusky-three-40.vercel.app/",
       },
       {
         name: "GitHub",

@@ -2,9 +2,8 @@
 
 import { ChatRequestOptions } from "ai";
 import { motion } from "framer-motion";
-import { ArrowRight, ArrowUp, Loader2 } from "lucide-react";
-import React, { useCallback, useEffect, useState } from "react";
-import { FastfolioTracking } from "@/lib/fastfolio-tracking";
+import { ArrowUp, Loader2 } from "lucide-react";
+import React, { useEffect } from "react";
 import StyleSelector from "./style-selector";
 
 interface ChatBottombarProps {
@@ -36,11 +35,6 @@ export default function ChatBottombar({
   onStyleChange,
 }: ChatBottombarProps) {
   const inputRef = React.useRef<HTMLTextAreaElement>(null);
-  const [remainingMessages, setRemainingMessages] = useState(0);
-
-  useEffect(() => {
-    setRemainingMessages(FastfolioTracking.getRemainingMessages());
-  }, [input]);
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (
@@ -97,7 +91,6 @@ export default function ChatBottombar({
               style={{ minHeight: "2rem", maxHeight: "5rem" }}
             />
 
-            {/* Style Selector */}
             <div className="flex items-center mr-2">
               <StyleSelector
                 selectedStyle={selectedStyle}

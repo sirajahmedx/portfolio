@@ -28,7 +28,6 @@ interface ChatState {
   messages: Message[];
   input: string;
   loadingSubmit: boolean;
-  hasReachedLimit: boolean;
   conversationLoaded: boolean;
   lastRequestTime: number;
   currentAssistantId: string | null;
@@ -51,7 +50,6 @@ type ChatAction =
   | { type: "SET_TALKING"; payload: boolean }
   | { type: "SET_MESSAGES"; payload: Message[] }
   | { type: "CLEAR_CONVERSATION" }
-  | { type: "SET_REACHED_LIMIT"; payload: boolean }
   | { type: "SET_CONVERSATION_LOADED"; payload: boolean }
   | { type: "SET_LAST_REQUEST_TIME"; payload: number }
   | { type: "INCREMENT_CHUNK_COUNT" }
@@ -65,7 +63,6 @@ const initialState: ChatState = {
   messages: [],
   input: "",
   loadingSubmit: false,
-  hasReachedLimit: false,
   conversationLoaded: false,
   lastRequestTime: 0,
   currentAssistantId: null,
@@ -114,9 +111,6 @@ function chatReducer(state: ChatState, action: ChatAction): ChatState {
         currentAssistantId: null,
         chunkCount: 0,
       };
-
-    case "SET_REACHED_LIMIT":
-      return { ...state, hasReachedLimit: action.payload };
 
     case "SET_CONVERSATION_LOADED":
       return { ...state, conversationLoaded: action.payload };
@@ -292,10 +286,8 @@ const Chat = () => {
     messages,
     input,
     loadingSubmit,
-    hasReachedLimit,
     conversationLoaded,
     lastRequestTime,
-    currentAssistantId,
     chunkCount,
     selectedStyle,
   } = state;
@@ -601,12 +593,7 @@ const Chat = () => {
             const errorData = await response.json();
             errorMessage = errorData.error || errorMessage;
 
-            if (response.status === 429) {
-              dispatch({ type: "SET_REACHED_LIMIT", payload: true });
-              toast.error("API quota exceeded. Please try again tomorrow.");
-            } else {
-              toast.error(errorMessage);
-            }
+            toast.error(errorMessage);
           } catch {
             toast.error(errorMessage);
           }
@@ -620,17 +607,11 @@ const Chat = () => {
           return;
         }
 
-        console.error("[CLIENT] Chat error:", error);
-
         const isQuotaError =
           error instanceof Error &&
           (error.message.includes("QUOTA_EXCEEDED") ||
             error.message.includes("quota exceeded") ||
             error.message.includes("429"));
-
-        if (isQuotaError) {
-          dispatch({ type: "SET_REACHED_LIMIT", payload: true });
-        }
 
         const errorMessage = isQuotaError
           ? "I've reached my daily conversation limit. Please try again tomorrow."
@@ -750,9 +731,7 @@ const Chat = () => {
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/5 via-background to-background" />
       <div className="absolute inset-0 bg-grid-pattern opacity-[0.02]" />
 
-      {/* Main Content Area - Full height container with proper scrolling isolation */}
       <div className="relative z-10 flex flex-col h-full overflow-hidden isolate">
-        {/* Header - Fixed at top */}
         <div className="flex justify-between items-center px-6 py-2 border-b border-border/30 bg-card/30 backdrop-blur-sm flex-shrink-0">
           <Link
             href="/"
@@ -782,7 +761,6 @@ const Chat = () => {
           </div>
         </div>
 
-        {/* Messages Area - Independent scrollable container */}
         <div className="flex-1 overflow-hidden min-h-0 flex flex-col relative will-change-scroll">
           <div
             className="h-full overflow-y-auto px-4 pt-8 pb-48 md:pb-44 scroll-smooth"
@@ -805,10 +783,7 @@ const Chat = () => {
                     className="flex h-full items-center justify-center py-8 px-4"
                     {...MOTION_CONFIG}
                   >
-                    <ChatLanding
-                      submitQuery={submitQuery}
-                      hasReachedLimit={hasReachedLimit}
-                    />
+                    <ChatLanding submitQuery={submitQuery} />
                   </motion.div>
                 ) : (
                   <motion.div
@@ -947,11 +922,13 @@ const Chat = () => {
           </div>
         </div>
 
-        {/* Bottom bar positioned absolutely - stays fixed at bottom */}
         <div className="absolute bottom-0 left-0 right-0 z-[100] bg-background/80 border-t border-border/30 min-h-[120px] md:min-h-[100px] flex-shrink-0 shadow-2xl backdrop-blur-md px-4 py-3">
           <div className="mx-auto max-w-3xl">
             <form onSubmit={onSubmit} className="relative">
-              <div className="flex items-end rounded-2xl sm:rounded-3xl border-2 border-border/50 p-2 sm:p-2.5 shadow-lg backdrop-blur-xl transition-all duration-300 hover:border-border/80">
+              <div
+                className="flex items-end rounded-full border-2  
+               border-border/80 p-2 sm:p-2.5 shadow-lg backdrop-blur-xl transition-all duration-300 hover:border-border/80"
+              >
                 <textarea
                   ref={setTextareaRef}
                   value={input}
@@ -959,48 +936,31 @@ const Chat = () => {
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && !e.shiftKey) {
                       e.preventDefault();
-                      if (
-                        !loadingSubmit &&
-                        input.trim() &&
-                        !isToolInProgress &&
-                        !hasReachedLimit
-                      ) {
+                      if (!loadingSubmit && input.trim() && !isToolInProgress) {
                         onSubmit(e as any);
                       }
                     }
                   }}
-                  placeholder={
-                    hasReachedLimit
-                      ? "Chat limit reached"
-                      : "Ask me anything..."
-                  }
-                  className="flex-1 border-none bg-transparent px-3 py-2.5 sm:px-4 sm:py-3 text-sm sm:text-base text-foreground placeholder:text-muted-foreground focus:outline-none resize-none overflow-hidden"
+                  placeholder="Ask me anything..."
+                  className="flex-1 border-none bg-transparent px-3 py-3 sm:px-4 sm:py-3 text-sm sm:text-base text-foreground placeholder:text-muted-foreground focus:outline-none resize-none overflow-hidden"
                   style={{
-                    height: textareaHeight,
+                    height: "auto",
                     minHeight: "48px",
                     maxHeight: "140px",
                   }}
-                  disabled={
-                    isToolInProgress || loadingSubmit || hasReachedLimit
-                  }
                   rows={1}
+                  disabled={isToolInProgress || loadingSubmit}
                 />
                 <div className="flex items-center mr-2">
                   <StyleSelector
                     selectedStyle={selectedStyle}
                     onStyleChange={handleStyleChange}
-                    disabled={hasReachedLimit}
                   />
                 </div>
                 <button
                   type="submit"
-                  disabled={
-                    loadingSubmit ||
-                    !input.trim() ||
-                    isToolInProgress ||
-                    hasReachedLimit
-                  }
-                  className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center justify-center rounded-lg p-2 transition-all duration-200 disabled:opacity-50 hover:scale-105 active:scale-95 shadow-md hover:shadow-lg"
+                  disabled={loadingSubmit || !input.trim() || isToolInProgress}
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center justify-center px-3 py-3 rounded-full mb-1 transition-all duration-200 disabled:opacity-50 hover:scale-105 active:scale-95 shadow-md hover:shadow-lg"
                   onClick={(e) => {
                     if (loadingSubmit) {
                       e.preventDefault();
@@ -1020,7 +980,6 @@ const Chat = () => {
         </div>
       </div>
 
-      {/* Message Info Dialog */}
       {selectedMessage && (
         <MessageInfoDialog
           message={selectedMessage}
