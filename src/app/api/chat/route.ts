@@ -291,16 +291,24 @@ function formatStructuredResponse(fullText: string, responseType: 'skills' | 're
     chunks.push('- Platform connecting service providers with clients');
     chunks.push('- Tech: Next.js, Node.js, GraphQL, MongoDB, Socket.io');
     chunks.push('- Focus: Backend development, real-time features, dashboard design');
+    chunks.push('https://jobifyy.com');
     chunks.push('');
     chunks.push('**Servifi** (Completed Project)');
     chunks.push('- Service platform linking providers with customers');
     chunks.push('- Tech: React, Node.js, MongoDB, Socket.io');
     chunks.push('- Built complete backend APIs, admin dashboards, real-time systems');
+    chunks.push('https://nsevensecurity.com');
     chunks.push('');
     chunks.push('**Talent-Tube** (Professional Project)');
     chunks.push('- Real-time chat system for talent platform');
     chunks.push('- Tech: React, Socket.io, Node.js');
     chunks.push('- Led the complete chat system implementation');
+    chunks.push('https://tt.mlxsoft.com/');
+    chunks.push('');
+    chunks.push('**GitHub Bot** (Personal Project)');
+    chunks.push('- GitHub automation toolkit with AI assistance');
+    chunks.push('- Tech: Node.js, GitHub API');
+    chunks.push('https://github.com/sirajahmedx/bots');
 
   } else if (responseType === 'experience') {
     // Format experience as structured chunks
