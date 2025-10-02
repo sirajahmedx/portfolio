@@ -492,8 +492,14 @@ const Chat = () => {
               throw new Error(parsed.error);
             }
 
-            if (parsed.text && parsed.text.trim()) {
-              assistantContentRef.current += parsed.text;
+            // Handle structured responses (skills, resume, projects, etc.)
+            if (
+              parsed.responseType &&
+              typeof parsed.chunk === "number" &&
+              parsed.text !== undefined
+            ) {
+              assistantContentRef.current +=
+                parsed.text + (parsed.isComplete ? "" : "\n");
               dispatch({ type: "INCREMENT_CHUNK_COUNT" });
 
               dispatch({
@@ -504,12 +510,37 @@ const Chat = () => {
                 },
               });
 
-              if (chunkCount === 0) {
+              if (parsed.isComplete) {
+                console.log(
+                  `[CHAT-UI] Completed structured response: ${parsed.responseType}`
+                );
               }
-
-              setTimeout(scrollToBottom, 50);
             }
-          } catch (parseError) {}
+            // Handle regular streaming responses
+            else if (parsed.text && parsed.text.trim()) {
+              assistantContentRef.current += parsed.text;
+              dispatch({ type: "INCREMENT_CHUNK_COUNT" });
+
+              dispatch({
+                type: "UPDATE_ASSISTANT_MESSAGE",
+                payload: {
+                  id: assistantMessageId,
+                  content: assistantContentRef.current,
+                },
+              });
+            }
+
+            if (chunkCount === 0) {
+            }
+
+            setTimeout(scrollToBottom, 50);
+          } catch (parseError) {
+            console.warn(
+              "[CHAT-UI] Failed to parse streaming data:",
+              data,
+              parseError
+            );
+          }
         } else if (i === lines.length - 1 && line) {
           remainingBuffer = line;
         }
