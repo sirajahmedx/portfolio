@@ -11,7 +11,6 @@ import React, {
 } from "react";
 import { toast } from "sonner";
 
-import ChatBottombar from "@/components/chat/chat-bottombar";
 import ChatLanding from "@/components/chat/chat-landing";
 import ChatMessageContent from "@/components/chat/chat-message-content";
 import StyleSelector from "@/components/chat/style-selector";
@@ -295,7 +294,6 @@ const Chat = () => {
   const [autoSubmitted, setAutoSubmitted] = useState(false);
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
   const [showMessageInfo, setShowMessageInfo] = useState(false);
-  const [textareaHeight, setTextareaHeight] = useState("auto");
   const [textareaRef, setTextareaRef] = useState<HTMLTextAreaElement | null>(
     null
   );
@@ -306,7 +304,7 @@ const Chat = () => {
     try {
       await navigator.clipboard.writeText(text);
       toast.success("Copied to clipboard!");
-    } catch (err) {
+    } catch {
       const textArea = document.createElement("textarea");
       textArea.value = text;
       document.body.appendChild(textArea);
@@ -314,7 +312,7 @@ const Chat = () => {
       try {
         document.execCommand("copy");
         toast.success("Copied to clipboard!");
-      } catch (fallbackErr) {
+      } catch {
         toast.error("Failed to copy text");
       }
       document.body.removeChild(textArea);
@@ -423,7 +421,6 @@ const Chat = () => {
       const scrollHeight = textarea.scrollHeight;
       const newHeight = Math.min(scrollHeight, 120);
       textarea.style.height = `${newHeight}px`;
-      setTextareaHeight(`${newHeight}px`);
     },
     []
   );
@@ -434,7 +431,6 @@ const Chat = () => {
       const scrollHeight = textareaRef.scrollHeight;
       const newHeight = Math.min(scrollHeight, 120);
       textareaRef.style.height = `${newHeight}px`;
-      setTextareaHeight(`${newHeight}px`);
     }
   }, [input, textareaRef]);
 

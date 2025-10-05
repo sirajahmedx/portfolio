@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Award, Code, GraduationCap, Mail, MessageSquare } from "lucide-react";
+import { Brain, Code, MessageSquare, User, Award, Mail } from "lucide-react";
 import React from "react";
 
 interface ChatLandingProps {

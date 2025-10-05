@@ -1,19 +1,13 @@
-import Groq from 'groq-sdk';
-import { SYSTEM_PROMPT } from './prompt';
 import {
-  createSuccessResponse,
   createErrorResponse,
   createStreamingChunk,
   createStreamingError,
   ERROR_TYPES,
-  formatTimestamp,
   formatErrorMessage,
-  validateMessageContent,
-  type ApiResponse,
-  type ErrorResponse,
-  type StreamingChunk,
-  type StreamingError
+  formatTimestamp
 } from '@/lib/api-response-utils';
+import Groq from 'groq-sdk';
+import { SYSTEM_PROMPT } from './prompt';
 
 export const maxDuration = 30;
 
@@ -204,37 +198,49 @@ function validateResponse(response: string, userQuery: string): boolean {
   return hasRelevantContent || response.length > 20; // Allow longer responses even if not directly relevant
 }
 
-function isStructuredResponseQuery(userQuery: string): 'skills' | 'resume' | 'projects' | 'experience' | null {
+function isStructuredResponseQuery(userQuery: string): 'skills' | 'resume' | 'projects' | 'experience' | 'contact' | 'setup' | null {
   const queryLower = userQuery.toLowerCase();
 
   // Check for skills-related queries
-  const skillsKeywords = ['skills', 'hard skills', 'soft skills', 'technical skills', 'what are your skills', 'tell me about your skills', 'what skills do you have'];
+  const skillsKeywords = ['skills', 'hard skills', 'soft skills', 'technical skills', 'what are your skills', 'tell me about your skills', 'what skills do you have', 'abilities', 'competencies'];
   if (skillsKeywords.some(keyword => queryLower.includes(keyword))) {
     return 'skills';
   }
 
   // Check for resume/CV related queries
-  const resumeKeywords = ['resume', 'cv', 'curriculum vitae', 'background', 'qualification', 'summary', 'about me', 'bio'];
+  const resumeKeywords = ['resume', 'cv', 'curriculum vitae', 'background', 'qualification', 'summary', 'about me', 'bio', 'profile'];
   if (resumeKeywords.some(keyword => queryLower.includes(keyword))) {
     return 'resume';
   }
 
   // Check for projects-related queries
-  const projectsKeywords = ['projects', 'work', 'portfolio', 'what have you built', 'what are your projects', 'show me your projects'];
+  const projectsKeywords = ['projects', 'work', 'portfolio', 'what have you built', 'what are your projects', 'show me your projects', 'showcase', 'demos'];
   if (projectsKeywords.some(keyword => queryLower.includes(keyword))) {
     return 'projects';
   }
 
   // Check for experience-related queries
-  const experienceKeywords = ['experience', 'job', 'work experience', 'professional experience', 'career'];
+  const experienceKeywords = ['experience', 'job', 'work experience', 'professional experience', 'career', 'employment', 'work history'];
   if (experienceKeywords.some(keyword => queryLower.includes(keyword))) {
     return 'experience';
+  }
+
+  // Check for contact-related queries
+  const contactKeywords = ['contact', 'reach out', 'get in touch', 'email', 'social media', 'github', 'instagram', 'discord', 'linkedin'];
+  if (contactKeywords.some(keyword => queryLower.includes(keyword))) {
+    return 'contact';
+  }
+
+  // Check for setup-related queries
+  const setupKeywords = ['setup', 'computer', 'laptop', 'specs', 'hardware', 'development environment', 'machine'];
+  if (setupKeywords.some(keyword => queryLower.includes(keyword))) {
+    return 'setup';
   }
 
   return null;
 }
 
-function formatStructuredResponse(fullText: string, responseType: 'skills' | 'resume' | 'projects' | 'experience'): string[] {
+function formatStructuredResponse(fullText: string, responseType: 'skills' | 'resume' | 'projects' | 'experience' | 'contact' | 'setup'): string[] {
   const chunks: string[] = [];
 
   if (responseType === 'skills') {
@@ -265,69 +271,179 @@ function formatStructuredResponse(fullText: string, responseType: 'skills' | 're
     chunks.push('- Developing Jobify platform connecting service providers with clients');
     chunks.push('- Complete backend development including APIs, databases, and real-time features');
     chunks.push('- Working on client projects and internal systems');
+    chunks.push('- Remote work with flexible schedule and task-based delivery');
     chunks.push('');
     chunks.push('**Education:**');
-    chunks.push('- High School Student');
-    chunks.push('- Self-taught developer through online learning and practical projects');
+    chunks.push('- **High School** - Currently enrolled (Expected graduation 2025)');
+    chunks.push('- **Self-taught Developer** - Online learning through practical projects');
+    chunks.push('- **Primary Learning Resource** - Hitesh Choudhary YouTube channel');
     chunks.push('');
-    chunks.push('**Technical Skills:**');
+    chunks.push('**Technical Proficiency:**');
     chunks.push('- **Frontend:** React, Next.js, React Native');
     chunks.push('- **Backend:** Node.js, GraphQL, REST APIs');
     chunks.push('- **Database:** MongoDB');
     chunks.push('- **Real-time:** Socket.io');
     chunks.push('- **Tools:** VS Code, Git, Linux (Ubuntu)');
+    chunks.push('');
+    chunks.push('**Personal Attributes:**');
+    chunks.push('- **Work Philosophy:** "Learn by doing, build by solving"');
+    chunks.push('- **Coding Style:** Move fast and break things');
+    chunks.push('- **Work Ethic:** Don\'t sleep until the task is done');
+    chunks.push('- **Learning Approach:** Practical application through building projects');
 
   } else if (responseType === 'projects') {
-    // Format projects as structured chunks
+    // Format projects as structured chunks with GitHub links
     chunks.push('**Featured Projects:**');
     chunks.push('');
     chunks.push('**Tuneit** (Personal Project - In Development)');
     chunks.push('- Full-stack service platform connecting users with local services');
-    chunks.push('- Tech: Next.js, React Native, Node.js, GraphQL, MongoDB');
-    chunks.push('- Features: Service browsing, provider profiles, booking system, real-time notifications');
-    chunks.push('- Status: Actively developing solo');
+    chunks.push('- **Vision:** Make service work more digital, trustworthy, and foundational');
+    chunks.push('- **Tech Stack:** Next.js, React Native, Node.js, GraphQL, MongoDB');
+    chunks.push('- **Features:** Service browsing, provider profiles, booking system, real-time notifications');
+    chunks.push('- **Status:** Actively developing solo - this is the dream project');
+    chunks.push('- **GitHub Repos:**');
+    chunks.push('  - Web: https://github.com/sirajahmedx/tuneit-web');
+    chunks.push('  - API: https://github.com/sirajahmedx/tuneit-api');
+    chunks.push('  - Mobile: https://github.com/sirajahmedx/tuneit-app');
     chunks.push('');
     chunks.push('**Jobify** (Professional Project - Current)');
     chunks.push('- Platform connecting service providers with clients');
-    chunks.push('- Tech: Next.js, Node.js, GraphQL, MongoDB, Socket.io');
-    chunks.push('- Focus: Backend development, real-time features, dashboard design');
+    chunks.push('- **Role:** Complete backend development, dashboards, database design');
+    chunks.push('- **Tech Stack:** Next.js, Node.js, GraphQL, MongoDB, Socket.io');
+    chunks.push('- **Duration:** Working on it for about 2 months');
+    chunks.push('- **Focus:** Real-time features, API development, system architecture');
     chunks.push('https://jobifyy.com');
     chunks.push('');
     chunks.push('**Servifi** (Completed Project)');
     chunks.push('- Service platform linking providers with customers');
-    chunks.push('- Tech: React, Node.js, MongoDB, Socket.io');
-    chunks.push('- Built complete backend APIs, admin dashboards, real-time systems');
+    chunks.push('- **Achievement:** Favorite finished project');
+    chunks.push('- **Tech Stack:** React, Node.js, MongoDB, Socket.io');
+    chunks.push('- **Responsibilities:** Complete backend APIs, admin dashboards, database architecture, real-time systems');
     chunks.push('https://nsevensecurity.com');
     chunks.push('');
     chunks.push('**Talent-Tube** (Professional Project)');
     chunks.push('- Real-time chat system for talent platform');
-    chunks.push('- Tech: React, Socket.io, Node.js');
-    chunks.push('- Led the complete chat system implementation');
+    chunks.push('- **Team Size:** 8-10 person team');
+    chunks.push('- **Role:** Led the complete chat system implementation');
+    chunks.push('- **Tech Stack:** React, Socket.io, Node.js');
     chunks.push('https://tt.mlxsoft.com/');
+    chunks.push('');
+    chunks.push('**Global Parcel Services GPS** (Mobile Project)');
+    chunks.push('- Mobile app for GPS-based parcel tracking');
+    chunks.push('- **Milestone:** First mobile project - learned while building');
+    chunks.push('- **Platform:** Available on Google Play Store');
+    chunks.push('- **Tech Stack:** React Native');
+    chunks.push('');
+    chunks.push('**Sensify** (School Project)');
+    chunks.push('- React Native sensor app suite');
+    chunks.push('- **Context:** School project with late-night dedication');
+    chunks.push('- **Work Ethic:** Don\'t sleep till the task is done');
+    chunks.push('https://github.com/sirajahmedx/sensify');
     chunks.push('');
     chunks.push('**GitHub Bot** (Personal Project)');
     chunks.push('- GitHub automation toolkit with AI assistance');
-    chunks.push('- Tech: Node.js, GitHub API');
+    chunks.push('- **Tech Stack:** Node.js, GitHub API');
+    chunks.push('- **Approach:** Built with AI assistance for automation');
     chunks.push('https://github.com/sirajahmedx/bots');
+    chunks.push('');
+    chunks.push('**This Portfolio** (Personal Project)');
+    chunks.push('- Interactive portfolio website with AI chat');
+    chunks.push('- **Development:** Coded till late night - when I start something, I finish it');
+    chunks.push('- **Tech Stack:** Next.js, TypeScript, Tailwind CSS');
+    chunks.push('- **Features:** Real-time chat, project showcase, responsive design');
 
   } else if (responseType === 'experience') {
     // Format experience as structured chunks
-    chunks.push('**Work Experience:**');
+    chunks.push('**Professional Experience:**');
     chunks.push('');
     chunks.push('**Junior Developer** - Marvellex Softwares');
-    chunks.push('- *Duration:* Current position');
-    chunks.push('- *Responsibilities:* Full-stack development, client project delivery');
-    chunks.push('- *Key Achievements:* Successfully delivered multiple client projects, implemented real-time features');
+    chunks.push('- **Duration:** Current position');
+    chunks.push('- **How I got in:** Through a reference, did the interview, never let them down since');
+    chunks.push('- **Work Style:** Remote from home, flexible schedule');
+    chunks.push('- **Task Range:** 30 minutes to 5-6 hours per task');
+    chunks.push('- **Environment:** Relaxed with no pressure, task-based delivery');
+    chunks.push('- **Responsibilities:** Full-stack development, client project delivery');
+    chunks.push('- **Current Focus:** Jobify platform and other client projects');
+    chunks.push('- **Key Achievements:** Successfully delivered multiple client projects, implemented real-time features');
     chunks.push('');
-    chunks.push('**Freelance Developer**');
-    chunks.push('- *Duration:* Ongoing');
-    chunks.push('- *Focus:* Personal projects and learning new technologies');
-    chunks.push('- *Notable Work:* Tuneit platform development, various client projects');
+    chunks.push('**Freelance & Personal Development**');
+    chunks.push('- **Duration:** Ongoing alongside professional work');
+    chunks.push('- **Focus:** Personal projects and learning new technologies');
+    chunks.push('- **Schedule:** Code whenever I get free time and am in the mood');
+    chunks.push('- **Notable Work:** Tuneit platform development, various experimental projects');
+    chunks.push('- **Learning Philosophy:** Learn by doing, build by solving');
     chunks.push('');
-    chunks.push('**Self-Learning Journey**');
-    chunks.push('- Started coding in school, continued with self-study');
-    chunks.push('- Primary learning resource: Hitesh Choudhary YouTube channel');
-    chunks.push('- Focus: Practical application through building projects');
+    chunks.push('**Educational Journey**');
+    chunks.push('- **Formal Education:** High School (Currently enrolled)');
+    chunks.push('- **Self-Learning Path:** Started coding in school, continued with self-study');
+    chunks.push('- **Primary Resource:** Hitesh Choudhary YouTube channel - he\'s an OG dev');
+    chunks.push('- **Approach:** Practical application through building real projects');
+    chunks.push('- **Motto:** "Learn by doing, build by solving"');
+    chunks.push('');
+    chunks.push('**Development Environment & Workflow**');
+    chunks.push('- **Work Environment:** Code in complete silence with random thoughts running');
+    chunks.push('- **Schedule:** No fixed schedule - code when free and in the mood');
+    chunks.push('- **Work Ethic:** Don\'t sleep till the task is done');
+    chunks.push('- **Problem Solving:** When stuck, scroll Instagram to clear head');
+    chunks.push('- **Learning Resource:** Ask ChatGPT when don\'t know something');
+
+  } else if (responseType === 'contact') {
+    // Format contact information as structured chunks
+    chunks.push('**Contact Information:**');
+    chunks.push('');
+    chunks.push('**Primary Contact:**');
+    chunks.push('- **Email:** sirajahmedxdev@gmail.com');
+    chunks.push('- **Best for:** Professional inquiries, project discussions, collaboration opportunities');
+    chunks.push('');
+    chunks.push('**Social Media & Professional:**');
+    chunks.push('- **GitHub:** @sirajahmedx');
+    chunks.push('- **Instagram:** @sirajahmedxdev (not very active)');
+    chunks.push('- **Discord:** sirajahmedx');
+    chunks.push('- **LinkedIn:** Currently working on it');
+    chunks.push('');
+    chunks.push('**Availability & Work Inquiries:**');
+    chunks.push('- **Current Status:** Working at Marvellex Softwares');
+    chunks.push('- **Freelance:** Focused on current job and personal projects');
+    chunks.push('- **For Discussions:** Feel free to email for specific opportunities');
+    chunks.push('- **Code Help:** Not available for debugging others\' code, but can discuss via email');
+    chunks.push('');
+    chunks.push('**Response Expectations:**');
+    chunks.push('- **Professional emails:** Will respond within 1-2 business days');
+    chunks.push('- **Social media:** Less active, email is preferred');
+    chunks.push('- **Best approach:** Be specific about what you\'re looking for');
+
+  } else if (responseType === 'setup') {
+    // Format setup information as structured chunks
+    chunks.push('**Development Setup:**');
+    chunks.push('');
+    chunks.push('**Hardware Specifications:**');
+    chunks.push('- **Laptop:** Dell Latitude 7480');
+    chunks.push('- **Processor:** Intel i7 6th generation');
+    chunks.push('- **RAM:** 24GB');
+    chunks.push('- **Storage:** 256GB SSD');
+    chunks.push('');
+    chunks.push('**Operating System & Environment:**');
+    chunks.push('- **OS:** Ubuntu (Linux)');
+    chunks.push('- **Why Linux:** Enjoy the control and development-friendly environment');
+    chunks.push('- **Editor:** VS Code');
+    chunks.push('- **Terminal:** Default Ubuntu terminal');
+    chunks.push('');
+    chunks.push('**Development Workflow:**');
+    chunks.push('- **Work Environment:** Complete silence with random thoughts running');
+    chunks.push('- **Schedule:** No fixed schedule - code when free and in the mood');
+    chunks.push('- **Version Control:** Git with GitHub');
+    chunks.push('- **Problem Solving:** Systematic debugging + ChatGPT when stuck');
+    chunks.push('');
+    chunks.push('**Learning & Resources:**');
+    chunks.push('- **Primary Learning:** Hitesh Choudhary YouTube channel');
+    chunks.push('- **When Stuck:** Ask ChatGPT');
+    chunks.push('- **Stress Relief:** Scroll Instagram to clear head');
+    chunks.push('- **Philosophy:** Move fast and break things');
+    chunks.push('');
+    chunks.push('**Future Considerations:**');
+    chunks.push('- **Pets:** No pets yet but thinking of getting a cat');
+    chunks.push('- **Setup Upgrades:** Currently satisfied with the current setup');
+    chunks.push('- **Work Style:** Comfortable with remote work and flexible hours');
   }
 
   return chunks;
@@ -391,12 +507,12 @@ async function createStreamingResponse(result: any, userQuery: string, requestId
           }
         }
 
-        // Handle structured responses (skills/resume)
+        // Handle structured responses (skills/resume/projects/experience/contact/setup)
         if (responseType) {
           console.log(`[CHAT-API] ${requestId} - Detected ${responseType} query, formatting as structured response`);
 
-          // Parse the complete response and format as structured chunks
-          const structuredChunks = formatStructuredResponse(totalText, responseType);
+          // Use predefined structured response instead of AI-generated content for consistency
+          const structuredChunks = formatStructuredResponse('', responseType);
 
           for (let i = 0; i < structuredChunks.length; i++) {
             const chunk = structuredChunks[i];
@@ -415,24 +531,40 @@ async function createStreamingResponse(result: any, userQuery: string, requestId
           // Handle normal streaming responses
           console.log(`[CHAT-API] ${requestId} - Normal response, streaming text chunks`);
 
-          // For normal responses, simulate streaming by chunking the complete text
-          const sentences = totalText.split(/[.!?]+/).filter(s => s.trim());
-          let chunkIndex = 0;
+          // Improved chunking strategy for better readability
+          if (totalText.trim()) {
+            // Split by sentences but also respect paragraph breaks
+            const paragraphs = totalText.split(/\n\s*\n/).filter(p => p.trim());
+            let chunkIndex = 0;
 
-          for (let i = 0; i < sentences.length; i++) {
-            const sentence = sentences[i].trim();
-            if (sentence) {
-              chunkIndex++;
-              const chunkData = createStreamingChunk(sentence + (i < sentences.length - 1 ? '.' : ''), chunkIndex, i === sentences.length - 1);
-              console.log(`[CHAT-API] ${requestId} - Sending chunk ${chunkIndex}: "${sentence.substring(0, 50)}${sentence.length > 50 ? '...' : ''}"`);
+            for (let i = 0; i < paragraphs.length; i++) {
+              const paragraph = paragraphs[i].trim();
+              if (paragraph) {
+                // Further split long paragraphs by sentences
+                const sentences = paragraph.split(/[.!?]+/).filter(s => s.trim());
+                
+                for (let j = 0; j < sentences.length; j++) {
+                  const sentence = sentences[j].trim();
+                  if (sentence) {
+                    chunkIndex++;
+                    const punctuation = j === sentences.length - 1 && i === paragraphs.length - 1 ? '' : '.';
+                    const chunkData = createStreamingChunk(
+                      sentence + punctuation, 
+                      chunkIndex, 
+                      i === paragraphs.length - 1 && j === sentences.length - 1
+                    );
+                    console.log(`[CHAT-API] ${requestId} - Sending chunk ${chunkIndex}: "${sentence.substring(0, 50)}${sentence.length > 50 ? '...' : ''}"`);
+                    controller.enqueue(new TextEncoder().encode(`data: ${JSON.stringify(chunkData)}\n\n`));
+                  }
+                }
+              }
+            }
+
+            // Fallback if no proper chunks were created
+            if (chunkIndex === 0) {
+              const chunkData = createStreamingChunk(totalText.trim(), 1, true);
               controller.enqueue(new TextEncoder().encode(`data: ${JSON.stringify(chunkData)}\n\n`));
             }
-          }
-
-          // If no sentences were found, send the whole text as one chunk
-          if (chunkIndex === 0 && totalText.trim()) {
-            const chunkData = createStreamingChunk(totalText.trim(), 1, true);
-            controller.enqueue(new TextEncoder().encode(`data: ${JSON.stringify(chunkData)}\n\n`));
           }
         }
 
@@ -460,7 +592,9 @@ async function createStreamingResponse(result: any, userQuery: string, requestId
       }
     }
   });
-}export async function POST(req: Request) {
+}
+
+export async function POST(req: Request) {
   const startTime = Date.now();
   const requestId = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
