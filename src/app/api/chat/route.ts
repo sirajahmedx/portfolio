@@ -198,40 +198,29 @@ function validateResponse(response: string, userQuery: string): boolean {
   return hasRelevantContent || response.length > 20; // Allow longer responses even if not directly relevant
 }
 
-function isStructuredResponseQuery(userQuery: string): 'skills' | 'resume' | 'projects' | 'experience' | 'contact' | 'setup' | null {
+function isStructuredResponseQuery(userQuery: string): 'skills' | 'projects' | 'experience' | 'contact' | 'setup' | null {
   const queryLower = userQuery.toLowerCase();
 
-  // Check for skills-related queries
   const skillsKeywords = ['skills', 'hard skills', 'soft skills', 'technical skills', 'what are your skills', 'tell me about your skills', 'what skills do you have', 'abilities', 'competencies'];
   if (skillsKeywords.some(keyword => queryLower.includes(keyword))) {
     return 'skills';
   }
 
-  // Check for resume/CV related queries
-  const resumeKeywords = ['resume', 'cv', 'curriculum vitae', 'background', 'qualification', 'summary', 'about me', 'bio', 'profile'];
-  if (resumeKeywords.some(keyword => queryLower.includes(keyword))) {
-    return 'resume';
-  }
-
-  // Check for projects-related queries
   const projectsKeywords = ['projects', 'work', 'portfolio', 'what have you built', 'what are your projects', 'show me your projects', 'showcase', 'demos'];
   if (projectsKeywords.some(keyword => queryLower.includes(keyword))) {
     return 'projects';
   }
 
-  // Check for experience-related queries
   const experienceKeywords = ['experience', 'job', 'work experience', 'professional experience', 'career', 'employment', 'work history'];
   if (experienceKeywords.some(keyword => queryLower.includes(keyword))) {
     return 'experience';
   }
 
-  // Check for contact-related queries
   const contactKeywords = ['contact', 'reach out', 'get in touch', 'email', 'social media', 'github', 'instagram', 'discord', 'linkedin'];
   if (contactKeywords.some(keyword => queryLower.includes(keyword))) {
     return 'contact';
   }
 
-  // Check for setup-related queries
   const setupKeywords = ['setup', 'computer', 'laptop', 'specs', 'hardware', 'development environment', 'machine'];
   if (setupKeywords.some(keyword => queryLower.includes(keyword))) {
     return 'setup';
@@ -240,7 +229,7 @@ function isStructuredResponseQuery(userQuery: string): 'skills' | 'resume' | 'pr
   return null;
 }
 
-function formatStructuredResponse(fullText: string, responseType: 'skills' | 'resume' | 'projects' | 'experience' | 'contact' | 'setup'): string[] {
+function formatStructuredResponse(fullText: string, responseType: 'skills' | 'projects' | 'experience' | 'contact' | 'setup'): string[] {
   const chunks: string[] = [];
 
   if (responseType === 'skills') {
@@ -261,194 +250,118 @@ function formatStructuredResponse(fullText: string, responseType: 'skills' | 're
     chunks.push('- Strong focus - Maintain concentration during long coding sessions');
     chunks.push('- Clean code principles - Write maintainable, readable code');
 
-  } else if (responseType === 'resume') {
-    // Format resume as structured chunks
-    chunks.push('**Professional Summary:**');
-    chunks.push('16-year-old full-stack developer from Pakistan, currently working as a junior developer at Marvellex Softwares while completing high school.');
-    chunks.push('');
-    chunks.push('**Professional Experience:**');
-    chunks.push('**Junior Developer** - Marvellex Softwares (Current)');
-    chunks.push('- Developing Jobify platform connecting service providers with clients');
-    chunks.push('- Complete backend development including APIs, databases, and real-time features');
-    chunks.push('- Working on client projects and internal systems');
-    chunks.push('- Remote work with flexible schedule and task-based delivery');
-    chunks.push('');
-    chunks.push('**Education:**');
-    chunks.push('- **High School** - Currently enrolled (Expected graduation 2025)');
-    chunks.push('- **Self-taught Developer** - Online learning through practical projects');
-    chunks.push('- **Primary Learning Resource** - Hitesh Choudhary YouTube channel');
-    chunks.push('');
-    chunks.push('**Technical Proficiency:**');
-    chunks.push('- **Frontend:** React, Next.js, React Native');
-    chunks.push('- **Backend:** Node.js, GraphQL, REST APIs');
-    chunks.push('- **Database:** MongoDB');
-    chunks.push('- **Real-time:** Socket.io');
-    chunks.push('- **Tools:** VS Code, Git, Linux (Ubuntu)');
-    chunks.push('');
-    chunks.push('**Personal Attributes:**');
-    chunks.push('- **Work Philosophy:** "Learn by doing, build by solving"');
-    chunks.push('- **Coding Style:** Move fast and break things');
-    chunks.push('- **Work Ethic:** Don\'t sleep until the task is done');
-    chunks.push('- **Learning Approach:** Practical application through building projects');
-
   } else if (responseType === 'projects') {
-    // Format projects as structured chunks with GitHub links
+    // Format projects as structured chunks with accurate roles
     chunks.push('**Featured Projects:**');
     chunks.push('');
-    chunks.push('**Tuneit** (Personal Project - In Development)');
-    chunks.push('- Full-stack service platform connecting users with local services');
-    chunks.push('- **Vision:** Make service work more digital, trustworthy, and foundational');
+    chunks.push('**Tuneit** (Personal Project – In Development)');
+    chunks.push('- Platform to connect users with **local auto mechanics** for car repairs and maintenance');
+    chunks.push('- **Vision:** Make finding a trustworthy mechanic digital, fast, and stress-free');
     chunks.push('- **Tech Stack:** Next.js, React Native, Node.js, GraphQL, MongoDB');
-    chunks.push('- **Features:** Service browsing, provider profiles, booking system, real-time notifications');
-    chunks.push('- **Status:** Actively developing solo - this is the dream project');
+    chunks.push('- **My Role:** Building everything solo — backend, frontend, mobile, real-time notifications');
+    chunks.push('- **Status:** Actively developing — this is my dream project');
     chunks.push('- **GitHub Repos:**');
     chunks.push('  - Web: https://github.com/sirajahmedx/tuneit-web');
     chunks.push('  - API: https://github.com/sirajahmedx/tuneit-api');
     chunks.push('  - Mobile: https://github.com/sirajahmedx/tuneit-app');
     chunks.push('');
-    chunks.push('**Jobify** (Professional Project - Current)');
-    chunks.push('- Platform connecting service providers with clients');
-    chunks.push('- **Role:** Complete backend development, dashboards, database design');
-    chunks.push('- **Tech Stack:** Next.js, Node.js, GraphQL, MongoDB, Socket.io');
-    chunks.push('- **Duration:** Working on it for about 2 months');
-    chunks.push('- **Focus:** Real-time features, API development, system architecture');
-    chunks.push('https://jobifyy.com');
+    chunks.push('**Jobify** (Professional Project – Current)');
+    chunks.push('- Platform connecting clients with skilled professionals (online or in-person)');
+    chunks.push('- **Live:** https://jobifyy.com (10k+ users, 120+ services, 14 added today)');
+    chunks.push('- **My Role:** Built all backend logic — user auth, service categories, calendar-based booking, real-time job alerts, and dashboard functionality for both clients and pros');
+    chunks.push('- **Note:** Frontend/UI built by another team; I focused on data flow, APIs, and system behavior');
     chunks.push('');
-    chunks.push('**Servifi** (Completed Project)');
-    chunks.push('- Service platform linking providers with customers');
-    chunks.push('- **Achievement:** Favorite finished project');
-    chunks.push('- **Tech Stack:** React, Node.js, MongoDB, Socket.io');
-    chunks.push('- **Responsibilities:** Complete backend APIs, admin dashboards, database architecture, real-time systems');
-    chunks.push('https://nsevensecurity.com');
+    chunks.push('**Servifi** (Completed Client Project)');
+    chunks.push('- Handyman service platform: “Handyman Services Are All Under One Roof”');
+    chunks.push('- **Live:** https://nsevensecurity.com (24/7 emergency handyman service, 10+ years experience)');
+    chunks.push('- **Workflow:** “Describe Your Task” → “Choose When & Where” → “Select Payment” → “All Done”');
+    chunks.push('- **My Role:** Developed the full booking flow logic, admin & user dashboard APIs, MongoDB schema, and real-time updates');
+    chunks.push('- **Note:** Did not work on visual design — handled backend functionality only');
     chunks.push('');
     chunks.push('**Talent-Tube** (Professional Project)');
-    chunks.push('- Real-time chat system for talent platform');
-    chunks.push('- **Team Size:** 8-10 person team');
-    chunks.push('- **Role:** Led the complete chat system implementation');
-    chunks.push('- **Tech Stack:** React, Socket.io, Node.js');
-    chunks.push('https://tt.mlxsoft.com/');
+    chunks.push('- Real-time talent platform with video reels and escrow-protected bookings');
+    chunks.push('- **Live:** https://tt.mlxsoft.com/');
+    chunks.push('- **Features:** AI-powered feed, story-based jobs, Stripe escrow, verified talent, 24/7 support');
+    chunks.push('- **My Role:** Built the entire real-time chat system for an 8–10 person team');
     chunks.push('');
     chunks.push('**Global Parcel Services GPS** (Mobile Project)');
-    chunks.push('- Mobile app for GPS-based parcel tracking');
-    chunks.push('- **Milestone:** First mobile project - learned while building');
-    chunks.push('- **Platform:** Available on Google Play Store');
-    chunks.push('- **Tech Stack:** React Native');
+    chunks.push('- GPS-based parcel tracking mobile app');
+    chunks.push('- **My Role:** Built solo as my first mobile project using React Native');
+    chunks.push('- **Note:** Used AI assistance to understand geolocation APIs while learning');
+    chunks.push('- **Available on:** Google Play Store (search “Global Parcel Services”)');
     chunks.push('');
     chunks.push('**Sensify** (School Project)');
     chunks.push('- React Native sensor app suite');
-    chunks.push('- **Context:** School project with late-night dedication');
-    chunks.push('- **Work Ethic:** Don\'t sleep till the task is done');
+    chunks.push('- **Built for:** School assignment');
+    chunks.push('- **Work Ethic:** Pulled a late night — I don’t sleep till the task is done');
     chunks.push('https://github.com/sirajahmedx/sensify');
     chunks.push('');
     chunks.push('**GitHub Bot** (Personal Project)');
-    chunks.push('- GitHub automation toolkit with AI assistance');
-    chunks.push('- **Tech Stack:** Node.js, GitHub API');
-    chunks.push('- **Approach:** Built with AI assistance for automation');
-    chunks.push('https://github.com/sirajahmedx/bots');
+    chunks.push('- GitHub automation toolkit');
+    chunks.push('- **Built with:** AI assistance for learning, but fully understood and implemented by me');
     chunks.push('');
     chunks.push('**This Portfolio** (Personal Project)');
-    chunks.push('- Interactive portfolio website with AI chat');
-    chunks.push('- **Development:** Coded till late night - when I start something, I finish it');
-    chunks.push('- **Tech Stack:** Next.js, TypeScript, Tailwind CSS');
-    chunks.push('- **Features:** Real-time chat, project showcase, responsive design');
+    chunks.push('- Interactive portfolio with AI chat');
+    chunks.push('- **Built with:** Next.js, TypeScript, Tailwind CSS');
+    chunks.push('- **Note:** Coded till late night — when I start something, I finish it');
 
   } else if (responseType === 'experience') {
     // Format experience as structured chunks
     chunks.push('**Professional Experience:**');
     chunks.push('');
     chunks.push('**Junior Developer** - Marvellex Softwares');
-    chunks.push('- **Duration:** Current position');
     chunks.push('- **How I got in:** Through a reference, did the interview, never let them down since');
-    chunks.push('- **Work Style:** Remote from home, flexible schedule');
-    chunks.push('- **Task Range:** 30 minutes to 5-6 hours per task');
-    chunks.push('- **Environment:** Relaxed with no pressure, task-based delivery');
-    chunks.push('- **Responsibilities:** Full-stack development, client project delivery');
-    chunks.push('- **Current Focus:** Jobify platform and other client projects');
-    chunks.push('- **Key Achievements:** Successfully delivered multiple client projects, implemented real-time features');
+    chunks.push('- **Work Style:** Remote from home, flexible schedule, task-based delivery');
+    chunks.push('- **Task Range:** 30 minutes to 5–6 hours per task');
+    chunks.push('- **Environment:** Relaxed, no pressure, collaborative');
+    chunks.push('- **My Focus:** Backend development, API design, real-time systems, dashboard logic');
+    chunks.push('- **Team Dynamic:** Frontend handled by dedicated UI team; I own the functionality');
+    chunks.push('- **Current Projects:** Jobify (booking platform), client systems like Servifi');
     chunks.push('');
-    chunks.push('**Freelance & Personal Development**');
-    chunks.push('- **Duration:** Ongoing alongside professional work');
-    chunks.push('- **Focus:** Personal projects and learning new technologies');
-    chunks.push('- **Schedule:** Code whenever I get free time and am in the mood');
-    chunks.push('- **Notable Work:** Tuneit platform development, various experimental projects');
-    chunks.push('- **Learning Philosophy:** Learn by doing, build by solving');
-    chunks.push('');
-    chunks.push('**Educational Journey**');
-    chunks.push('- **Formal Education:** High School (Currently enrolled)');
-    chunks.push('- **Self-Learning Path:** Started coding in school, continued with self-study');
-    chunks.push('- **Primary Resource:** Hitesh Choudhary YouTube channel - he\'s an OG dev');
-    chunks.push('- **Approach:** Practical application through building real projects');
+    chunks.push('**Personal Development Philosophy:**');
+    chunks.push('- **Learning:** Started in school, continued at home. Follow Hitesh Choudhary — he’s an OG dev');
+    chunks.push('- **AI Use:** When stuck, I ask ChatGPT — but only to learn or debug, never to copy blindly');
+    chunks.push('- **Debugging:** Add logs everywhere, trace step by step. Time-consuming but works');
+    chunks.push('- **When Frustrated:** Scroll Instagram to clear my head');
     chunks.push('- **Motto:** "Learn by doing, build by solving"');
-    chunks.push('');
-    chunks.push('**Development Environment & Workflow**');
-    chunks.push('- **Work Environment:** Code in complete silence with random thoughts running');
-    chunks.push('- **Schedule:** No fixed schedule - code when free and in the mood');
-    chunks.push('- **Work Ethic:** Don\'t sleep till the task is done');
-    chunks.push('- **Problem Solving:** When stuck, scroll Instagram to clear head');
-    chunks.push('- **Learning Resource:** Ask ChatGPT when don\'t know something');
 
   } else if (responseType === 'contact') {
     // Format contact information as structured chunks
     chunks.push('**Contact Information:**');
     chunks.push('');
-    chunks.push('**Primary Contact:**');
-    chunks.push('- **Email:** sirajahmedxdev@gmail.com');
-    chunks.push('- **Best for:** Professional inquiries, project discussions, collaboration opportunities');
+    chunks.push('**Email:** sirajahmedxdev@gmail.com *(preferred for professional inquiries)*');
+    chunks.push('**GitHub:** @sirajahmedx');
+    chunks.push('**Discord:** sirajahmedx');
+    chunks.push('**Instagram:** @sirajahmedxdev *(not very active)*');
+    chunks.push('**LinkedIn:** Working on it');
     chunks.push('');
-    chunks.push('**Social Media & Professional:**');
-    chunks.push('- **GitHub:** @sirajahmedx');
-    chunks.push('- **Instagram:** @sirajahmedxdev (not very active)');
-    chunks.push('- **Discord:** sirajahmedx');
-    chunks.push('- **LinkedIn:** Currently working on it');
-    chunks.push('');
-    chunks.push('**Availability & Work Inquiries:**');
-    chunks.push('- **Current Status:** Working at Marvellex Softwares');
-    chunks.push('- **Freelance:** Focused on current job and personal projects');
-    chunks.push('- **For Discussions:** Feel free to email for specific opportunities');
-    chunks.push('- **Code Help:** Not available for debugging others\' code, but can discuss via email');
-    chunks.push('');
-    chunks.push('**Response Expectations:**');
-    chunks.push('- **Professional emails:** Will respond within 1-2 business days');
-    chunks.push('- **Social media:** Less active, email is preferred');
-    chunks.push('- **Best approach:** Be specific about what you\'re looking for');
+    chunks.push('**Availability:**');
+    chunks.push('- Currently employed at Marvellex Softwares');
+    chunks.push('- Focused on Jobify, Tuneit, and client projects');
+    chunks.push('- Open to collaboration — email me to discuss');
 
   } else if (responseType === 'setup') {
     // Format setup information as structured chunks
     chunks.push('**Development Setup:**');
     chunks.push('');
-    chunks.push('**Hardware Specifications:**');
-    chunks.push('- **Laptop:** Dell Latitude 7480');
-    chunks.push('- **Processor:** Intel i7 6th generation');
-    chunks.push('- **RAM:** 24GB');
-    chunks.push('- **Storage:** 256GB SSD');
+    chunks.push('**Hardware:**');
+    chunks.push('- Dell Latitude 7480');
+    chunks.push('- Intel i7 (6th gen), 24GB RAM, 256GB SSD');
     chunks.push('');
-    chunks.push('**Operating System & Environment:**');
-    chunks.push('- **OS:** Ubuntu (Linux)');
-    chunks.push('- **Why Linux:** Enjoy the control and development-friendly environment');
-    chunks.push('- **Editor:** VS Code');
-    chunks.push('- **Terminal:** Default Ubuntu terminal');
+    chunks.push('**Software:**');
+    chunks.push('- OS: Ubuntu (Linux)');
+    chunks.push('- Editor: VS Code');
+    chunks.push('- Terminal: Default Ubuntu terminal');
     chunks.push('');
-    chunks.push('**Development Workflow:**');
-    chunks.push('- **Work Environment:** Complete silence with random thoughts running');
-    chunks.push('- **Schedule:** No fixed schedule - code when free and in the mood');
-    chunks.push('- **Version Control:** Git with GitHub');
-    chunks.push('- **Problem Solving:** Systematic debugging + ChatGPT when stuck');
-    chunks.push('');
-    chunks.push('**Learning & Resources:**');
-    chunks.push('- **Primary Learning:** Hitesh Choudhary YouTube channel');
-    chunks.push('- **When Stuck:** Ask ChatGPT');
-    chunks.push('- **Stress Relief:** Scroll Instagram to clear head');
-    chunks.push('- **Philosophy:** Move fast and break things');
-    chunks.push('');
-    chunks.push('**Future Considerations:**');
-    chunks.push('- **Pets:** No pets yet but thinking of getting a cat');
-    chunks.push('- **Setup Upgrades:** Currently satisfied with the current setup');
-    chunks.push('- **Work Style:** Comfortable with remote work and flexible hours');
+    chunks.push('**Workflow:**');
+    chunks.push('- Code in complete silence with random thoughts running');
+    chunks.push('- No fixed schedule — code when free and in the mood');
+    chunks.push('- Don’t sleep till the task is done');
+    chunks.push('- Use Git + GitHub for version control');
   }
 
   return chunks;
 }
-
 function validateMessages(messages: any[]): Message[] {
   if (!Array.isArray(messages)) {
     throw new Error('Messages must be an array');
