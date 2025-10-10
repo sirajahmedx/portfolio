@@ -358,7 +358,7 @@ const Chat = () => {
   const scrollToBottom = useCallback((force: boolean = false) => {
     const container = scrollContainerRef.current;
     if (!container) {
-      console.log('[SCROLL] Container not found, using fallback');
+      console.log("[SCROLL] Container not found, using fallback");
       // Fallback to messagesEndRef
       if (messagesEndRef.current) {
         messagesEndRef.current.scrollIntoView({
@@ -369,11 +369,14 @@ const Chat = () => {
       return;
     }
 
-    console.log('[SCROLL] Attempting to scroll', { force, isUserScrolling: isUserScrolling.current });
+    console.log("[SCROLL] Attempting to scroll", {
+      force,
+      isUserScrolling: isUserScrolling.current,
+    });
 
     // Simple scroll to bottom
     if (force) {
-      console.log('[SCROLL] Force scrolling to bottom');
+      console.log("[SCROLL] Force scrolling to bottom");
       container.scrollTo({
         top: container.scrollHeight,
         behavior: "smooth",
@@ -384,7 +387,7 @@ const Chat = () => {
     // Prevent excessive scrolling
     const now = Date.now();
     if (now - lastScrollTime.current < 100) {
-      console.log('[SCROLL] Throttled - too recent');
+      console.log("[SCROLL] Throttled - too recent");
       return;
     }
     lastScrollTime.current = now;
@@ -394,24 +397,26 @@ const Chat = () => {
     const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
     const isNearBottom = distanceFromBottom < 150;
 
-    console.log('[SCROLL] Scroll state:', { 
-      scrollTop, 
-      scrollHeight, 
-      clientHeight, 
-      distanceFromBottom, 
+    console.log("[SCROLL] Scroll state:", {
+      scrollTop,
+      scrollHeight,
+      clientHeight,
+      distanceFromBottom,
       isNearBottom,
-      isUserScrolling: isUserScrolling.current 
+      isUserScrolling: isUserScrolling.current,
     });
 
     // Auto-scroll if near bottom or not manually scrolling
     if (isNearBottom || !isUserScrolling.current) {
-      console.log('[SCROLL] Scrolling to bottom');
+      console.log("[SCROLL] Scrolling to bottom");
       container.scrollTo({
         top: scrollHeight,
         behavior: "smooth",
       });
     } else {
-      console.log('[SCROLL] Skipping scroll - user not near bottom or is scrolling');
+      console.log(
+        "[SCROLL] Skipping scroll - user not near bottom or is scrolling"
+      );
     }
   }, []);
 
@@ -421,18 +426,18 @@ const Chat = () => {
     if (!container) return;
 
     isUserScrolling.current = true;
-    
+
     // Check if user is near bottom
     const { scrollTop, scrollHeight, clientHeight } = container;
     const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
     const nearBottom = distanceFromBottom < 150;
     isNearBottom.current = nearBottom;
     setShowScrollButton(!nearBottom && scrollTop > 200);
-    
+
     if (scrollTimeoutRef.current) {
       clearTimeout(scrollTimeoutRef.current);
     }
-    
+
     scrollTimeoutRef.current = setTimeout(() => {
       isUserScrolling.current = false;
     }, 1500); // Longer timeout to prevent aggressive auto-scrolling
@@ -669,7 +674,7 @@ const Chat = () => {
       dispatch({ type: "ADD_MESSAGE", payload: userMessage });
       dispatch({ type: "SET_INPUT", payload: "" });
       dispatch({ type: "SET_LOADING_SUBMIT", payload: true });
-      
+
       // Force scroll to bottom after adding user message
       setTimeout(() => scrollToBottom(true), 100);
 
