@@ -266,6 +266,12 @@ const MOTION_CONFIG = {
 
 const Chat = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const lastScrollTime = useRef<number>(0);
+  const isUserScrolling = useRef<boolean>(false);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const isNearBottom = useRef<boolean>(true);
+  const [showScrollButton, setShowScrollButton] = useState(false);
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get("query");
   const initialStyle = searchParams.get("style") as
@@ -349,50 +355,130 @@ const Chat = () => {
     }
   }, []);
 
-  const scrollToBottom = useCallback(() => {
-    if (messagesEndRef.current) {
-      const container = messagesEndRef.current.closest(
-        ".overflow-y-auto"
-      ) as HTMLElement;
-      if (container) {
-        const targetScrollTop = container.scrollHeight - container.clientHeight;
-        const currentScrollTop = container.scrollTop;
-        const distance = targetScrollTop - currentScrollTop;
-
-        if (Math.abs(distance) > 1) {
-          const duration = 800;
-          const startTime = Date.now();
-          const startScrollTop = currentScrollTop;
-
-          const easeInOutCubic = (t: number): number => {
-            return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-          };
-
-          const animateScroll = () => {
-            const elapsed = Date.now() - startTime;
-            const progress = Math.min(elapsed / duration, 1);
-            const easedProgress = easeInOutCubic(progress);
-
-            container.scrollTop = startScrollTop + distance * easedProgress;
-
-            if (progress < 1) {
-              requestAnimationFrame(animateScroll);
-            }
-          };
-
-          requestAnimationFrame(animateScroll);
-        }
-      } else {
+  const scrollToBottom = useCallback((force: boolean = false) => {
+    const container = scrollContainerRef.current;
+    if (!container) {
+      console.log('[SCROLL] Container not found, using fallback');
+      // Fallback to messagesEndRef
+      if (messagesEndRef.current) {
         messagesEndRef.current.scrollIntoView({
           behavior: "smooth",
           block: "end",
         });
       }
+      return;
+    }
+
+    console.log('[SCROLL] Attempting to scroll', { force, isUserScrolling: isUserScrolling.current });
+
+    // Simple scroll to bottom
+    if (force) {
+      console.log('[SCROLL] Force scrolling to bottom');
+      container.scrollTo({
+        top: container.scrollHeight,
+        behavior: "smooth",
+      });
+      return;
+    }
+
+    // Prevent excessive scrolling
+    const now = Date.now();
+    if (now - lastScrollTime.current < 100) {
+      console.log('[SCROLL] Throttled - too recent');
+      return;
+    }
+    lastScrollTime.current = now;
+
+    // Check if user is near bottom
+    const { scrollTop, scrollHeight, clientHeight } = container;
+    const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
+    const isNearBottom = distanceFromBottom < 150;
+
+    console.log('[SCROLL] Scroll state:', { 
+      scrollTop, 
+      scrollHeight, 
+      clientHeight, 
+      distanceFromBottom, 
+      isNearBottom,
+      isUserScrolling: isUserScrolling.current 
+    });
+
+    // Auto-scroll if near bottom or not manually scrolling
+    if (isNearBottom || !isUserScrolling.current) {
+      console.log('[SCROLL] Scrolling to bottom');
+      container.scrollTo({
+        top: scrollHeight,
+        behavior: "smooth",
+      });
+    } else {
+      console.log('[SCROLL] Skipping scroll - user not near bottom or is scrolling');
     }
   }, []);
 
+  // Handle user scroll detection
+  const handleScroll = useCallback(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    isUserScrolling.current = true;
+    
+    // Check if user is near bottom
+    const { scrollTop, scrollHeight, clientHeight } = container;
+    const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
+    const nearBottom = distanceFromBottom < 150;
+    isNearBottom.current = nearBottom;
+    setShowScrollButton(!nearBottom && scrollTop > 200);
+    
+    if (scrollTimeoutRef.current) {
+      clearTimeout(scrollTimeoutRef.current);
+    }
+    
+    scrollTimeoutRef.current = setTimeout(() => {
+      isUserScrolling.current = false;
+    }, 1500); // Longer timeout to prevent aggressive auto-scrolling
+  }, []);
+
   useEffect(() => {
-    const timer = setTimeout(scrollToBottom, 300);
+    const container = scrollContainerRef.current;
+    if (container) {
+      container.addEventListener("scroll", handleScroll, { passive: true });
+      return () => {
+        container.removeEventListener("scroll", handleScroll);
+        if (scrollTimeoutRef.current) {
+          clearTimeout(scrollTimeoutRef.current);
+        }
+      };
+    }
+  }, [handleScroll]);
+
+  // Intersection observer for better scroll behavior
+  useEffect(() => {
+    const endElement = messagesEndRef.current;
+    if (!endElement) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        isNearBottom.current = entry.isIntersecting;
+      },
+      {
+        root: scrollContainerRef.current,
+        threshold: 0.1,
+        rootMargin: "0px 0px 100px 0px", // Trigger when element is 100px from bottom
+      }
+    );
+
+    observer.observe(endElement);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
+  // Smooth scroll to bottom when messages change
+  useEffect(() => {
+    // Immediate scroll for new messages, debounced for updates
+    const timer = setTimeout(() => scrollToBottom(), 50);
     return () => clearTimeout(timer);
   }, [messages, loadingSubmit, scrollToBottom]);
 
@@ -529,7 +615,11 @@ const Chat = () => {
             if (chunkCount === 0) {
             }
 
-            setTimeout(scrollToBottom, 50);
+            // Gentle scroll during streaming
+            if (chunkCount % 3 === 0) {
+              // Only scroll every 3rd chunk
+              setTimeout(() => scrollToBottom(), 100);
+            }
           } catch (parseError) {
             console.warn(
               "[CHAT-UI] Failed to parse streaming data:",
@@ -579,6 +669,9 @@ const Chat = () => {
       dispatch({ type: "ADD_MESSAGE", payload: userMessage });
       dispatch({ type: "SET_INPUT", payload: "" });
       dispatch({ type: "SET_LOADING_SUBMIT", payload: true });
+      
+      // Force scroll to bottom after adding user message
+      setTimeout(() => scrollToBottom(true), 100);
 
       const assistantMessageId = generateId();
       const assistantMessage: Message = {
@@ -662,6 +755,7 @@ const Chat = () => {
       messages,
       generateId,
       handleStreamingResponse,
+      scrollToBottom,
     ]
   );
 
@@ -710,13 +804,13 @@ const Chat = () => {
   useEffect(() => {
     const handleViewportChange = () => {
       setTimeout(() => {
-        scrollToBottom();
+        scrollToBottom(true); // Force scroll on viewport change
       }, 300);
     };
 
     const handleFocus = () => {
       setTimeout(() => {
-        scrollToBottom();
+        scrollToBottom(true); // Force scroll on focus
       }, 100);
     };
 
@@ -790,6 +884,7 @@ const Chat = () => {
 
         <div className="flex-1 overflow-hidden min-h-0 flex flex-col relative will-change-scroll">
           <div
+            ref={scrollContainerRef}
             className="h-full overflow-y-auto px-4 pt-8 pb-48 md:pb-44 scroll-smooth"
             style={{
               WebkitOverflowScrolling: "touch",
@@ -1006,6 +1101,23 @@ const Chat = () => {
           </div>
         </div>
       </div>
+
+      {/* Scroll to bottom button */}
+      <AnimatePresence>
+        {showScrollButton && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0.8, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.8, y: 20 }}
+            transition={{ duration: 0.2 }}
+            onClick={() => scrollToBottom(true)}
+            className="fixed bottom-28 md:bottom-24 right-6 z-50 bg-primary text-primary-foreground hover:bg-primary/90 rounded-full p-3 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 active:scale-95"
+            title="Scroll to bottom"
+          >
+            <ChevronUp className="h-5 w-5 rotate-180" />
+          </motion.button>
+        )}
+      </AnimatePresence>
 
       {selectedMessage && (
         <MessageInfoDialog

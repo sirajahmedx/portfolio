@@ -1,5 +1,6 @@
 "use client";
 import AllProjects from "@/components/projects/AllProjects";
+import InspiredByFooter from "@/components/footer";
 import { motion } from "framer-motion";
 
 export default function ProjectsPage() {
@@ -119,6 +120,8 @@ export default function ProjectsPage() {
       <section className="pb-12 sm:pb-16 md:pb-20 px-4 sm:px-6 lg:px-8">
         <AllProjects />
       </section>
+
+      <InspiredByFooter variant="center" />
     </div>
   );
 }

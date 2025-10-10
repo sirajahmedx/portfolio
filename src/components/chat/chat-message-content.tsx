@@ -6,6 +6,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import ExpandableText from "@/components/ui/expandable-text";
 import { ChevronDown, ChevronUp, ExternalLink } from "lucide-react";
 import { useEffect, useState } from "react";
 import Markdown from "react-markdown";
@@ -87,7 +88,6 @@ export default function ChatMessageContent({
   showProjectsButton = false,
 }: ChatMessageContentProps) {
   const [isMobile, setIsMobile] = useState(false);
-  const [visibleLines, setVisibleLines] = useState(6);
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -95,12 +95,6 @@ export default function ChatMessageContent({
     window.addEventListener("resize", checkMobile);
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
-
-  const lines = message.content ? message.content.split("\n") : [];
-  const shouldTruncate = isMobile && lines.length > 6;
-  const truncatedContent = shouldTruncate
-    ? lines.slice(0, visibleLines).join("\n")
-    : message.content;
 
   const renderContent = () => {
     if (message.parts && message.parts.length > 0) {
@@ -182,53 +176,61 @@ export default function ChatMessageContent({
       );
     }
     if (message.content) {
-      const contentToRender = shouldTruncate
-        ? truncatedContent
-        : message.content;
-      const contentParts = contentToRender.split("```");
+      const contentParts = message.content.split("```");
 
       const content = (
         <div className="w-full space-y-4">
           {contentParts.map((content: string, i: number) =>
             i % 2 === 0 ? (
               <div key={`text-${i}`} className="prose dark:prose-invert w-full">
-                <Markdown
-                  remarkPlugins={[remarkGfm]}
-                  components={{
-                    p: ({ children }) => (
-                      <p className="break-words whitespace-pre-wrap text-sm md:text-base leading-relaxed">
-                        {children}
-                      </p>
-                    ),
-                    ul: ({ children }) => (
-                      <ul className="my-3 md:my-4 list-disc pl-4 md:pl-6 text-sm md:text-base leading-relaxed">
-                        {children}
-                      </ul>
-                    ),
-                    ol: ({ children }) => (
-                      <ol className="my-3 md:my-4 list-decimal pl-4 md:pl-6 text-sm md:text-base leading-relaxed">
-                        {children}
-                      </ol>
-                    ),
-                    li: ({ children }) => (
-                      <li className="my-2 text-sm md:text-base leading-relaxed">
-                        {children}
-                      </li>
-                    ),
-                    a: ({ href, children }) => (
-                      <a
-                        href={href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-500 hover:underline"
-                      >
-                        {children}
-                      </a>
-                    ),
-                  }}
-                >
-                  {content}
-                </Markdown>
+                {isMobile ? (
+                  <div className="prose dark:prose-invert w-full">
+                    <ExpandableText
+                      text={content}
+                      maxLines={8}
+                      mobileMaxLines={10}
+                      className="break-words whitespace-pre-wrap text-sm md:text-base leading-relaxed"
+                    />
+                  </div>
+                ) : (
+                  <Markdown
+                    remarkPlugins={[remarkGfm]}
+                    components={{
+                      p: ({ children }) => (
+                        <p className="break-words whitespace-pre-wrap text-sm md:text-base leading-relaxed">
+                          {children}
+                        </p>
+                      ),
+                      ul: ({ children }) => (
+                        <ul className="my-3 md:my-4 list-disc pl-4 md:pl-6 text-sm md:text-base leading-relaxed">
+                          {children}
+                        </ul>
+                      ),
+                      ol: ({ children }) => (
+                        <ol className="my-3 md:my-4 list-decimal pl-4 md:pl-6 text-sm md:text-base leading-relaxed">
+                          {children}
+                        </ol>
+                      ),
+                      li: ({ children }) => (
+                        <li className="my-2 text-sm md:text-base leading-relaxed">
+                          {children}
+                        </li>
+                      ),
+                      a: ({ href, children }) => (
+                        <a
+                          href={href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-500 hover:underline"
+                        >
+                          {children}
+                        </a>
+                      ),
+                    }}
+                  >
+                    {content}
+                  </Markdown>
+                )}
               </div>
             ) : (
               <CodeBlock key={`code-${i}`} content={content} />
@@ -268,33 +270,6 @@ export default function ChatMessageContent({
       } max-w-none`}
     >
       {content}
-      {shouldTruncate && visibleLines < lines.length && isMobile && (
-        <div className="mt-4 text-center">
-          <Button
-            onClick={() => {
-              const newVisibleLines = Math.min(visibleLines + 6, lines.length);
-              setVisibleLines(newVisibleLines);
-            }}
-            variant="outline"
-            size="sm"
-            className="text-xs"
-          >
-            View More
-          </Button>
-        </div>
-      )}
-      {visibleLines >= lines.length && visibleLines > 6 && isMobile && (
-        <div className="mt-4 text-center">
-          <Button
-            onClick={() => setVisibleLines(6)}
-            variant="outline"
-            size="sm"
-            className="text-xs"
-          >
-            View Less
-          </Button>
-        </div>
-      )}
     </div>
   );
 }

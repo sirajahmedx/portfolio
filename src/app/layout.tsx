@@ -85,17 +85,7 @@ export default function RootLayout({
           <Header />
           <main className="flex flex-col overflow-auto">
             {children}
-            <div className="hidden sm:block absolute bottom-2 right-2 sm:bottom-4 sm:right-4 text-xs sm:text-sm text-muted-foreground">
-              Inspired by{" "}
-              <a
-                href="https://www.toukoum.fr"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline hover:text-foreground transition-colors"
-              >
-                Toukoum
-              </a>
-            </div>
+
             <SpeedInsights />
           </main>
           <Toaster />

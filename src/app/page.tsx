@@ -2,6 +2,7 @@
 
 import StyleSelector from "@/components/chat/style-selector";
 import FluidCursor from "@/components/FluidCursor";
+import Footer from "@/components/footer";
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
@@ -39,7 +40,6 @@ export default function Home() {
   >("polite");
   const router = useRouter();
   const inputRef = useRef<HTMLTextAreaElement>(null);
-  const [textareaHeight, setTextareaHeight] = useState("auto");
 
   const goToChat = (query: string) =>
     router.push(
@@ -97,7 +97,6 @@ export default function Home() {
     if (inputRef.current) {
       inputRef.current.style.height = "auto";
       inputRef.current.style.height = `${Math.min(inputRef.current.scrollHeight, 140)}px`;
-      setTextareaHeight(`${Math.min(inputRef.current.scrollHeight, 140)}px`);
     }
   }, [input]);
 
@@ -284,6 +283,7 @@ export default function Home() {
         </section>
       </div>
 
+      <Footer variant="bottom" />
       <FluidCursor />
     </div>
   );
