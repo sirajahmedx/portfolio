@@ -52,6 +52,7 @@ export default function StyleSelector({
   return (
     <div className="relative inline-block">
       <motion.button
+        type="button"
         onClick={() => !disabled && setIsOpen(!isOpen)}
         disabled={disabled}
         className={`
@@ -95,6 +96,7 @@ export default function StyleSelector({
                 return (
                   <button
                     key={option.id}
+                    type="button"
                     onClick={() => {
                       onStyleChange(option.id);
                       setIsOpen(false);

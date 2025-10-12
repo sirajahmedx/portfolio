@@ -241,7 +241,7 @@ export default function Home() {
             <form onSubmit={handleSubmit} className="relative">
               <div
                 className="flex items-end rounded-full border-2  
-               border-border/80 p-2 sm:p-2.5 shadow-lg backdrop-blur-xl transition-all duration-300 hover:border-border/80"
+               border-border/80 p-2 sm:p-2.5 shadow-lg backdrop-blur-xl transition-all duration-300 hover:border-border/90 focus-within:!border-primary/50 focus-within:!shadow-lg focus-within:!shadow-primary/10"
               >
                 <textarea
                   ref={inputRef}
