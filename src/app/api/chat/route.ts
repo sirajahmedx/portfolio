@@ -229,139 +229,122 @@ function isStructuredResponseQuery(userQuery: string): 'skills' | 'projects' | '
   return null;
 }
 
+
 function formatStructuredResponse(fullText: string, responseType: 'skills' | 'projects' | 'experience' | 'contact' | 'setup'): string[] {
   const chunks: string[] = [];
 
   if (responseType === 'skills') {
-    // Format skills as structured chunks with proper Markdown
+    chunks.push('Well, here\'s what I\'m good at:');
+    chunks.push('');
     chunks.push('**Hard Skills:**');
-    chunks.push('- JavaScript - My first programming language, very comfortable with it');
-    chunks.push('- Node.js - For server-side development and APIs');
-    chunks.push('- GraphQL - Prefer it over REST for exact data fetching');
-    chunks.push('- Next.js - For building modern web applications');
-    chunks.push('- React Native - For mobile app development');
-    chunks.push('- MongoDB - My go-to database solution');
-    chunks.push('- Socket.io - For real-time features');
-    chunks.push('');  // Empty line for spacing
+    chunks.push('JavaScript — my comfort zone since day one. Pretty much where I started and still love it.');
+    chunks.push('Node.js — for backend stuff and APIs. Use it daily at work.');
+    chunks.push('GraphQL — way better than REST tbh. No over-fetching, just clean data.');
+    chunks.push('Next.js — for web apps. Built this portfolio with it actually.');
+    chunks.push('React Native — mobile development. Still learning the deeper stuff but getting there.');
+    chunks.push('MongoDB — my go-to database. Just works.');
+    chunks.push('Socket.io — when you need real-time features. Used it a lot in Talent-Tube.');
+    chunks.push('Firebase — notifications and real-time data sync.');
+    chunks.push('Stripe — payment integrations. Learned this through Servifi.');
+    chunks.push('');
     chunks.push('**Soft Skills:**');
-    chunks.push('- Problem-solving - Can tackle complex issues effectively');
-    chunks.push('- Debugging - Systematic approach to finding and fixing bugs');
-    chunks.push('- Fast learner - Quickly adapt to new technologies');
-    chunks.push('- Strong focus - Maintain concentration during long coding sessions');
-    chunks.push('- Clean code principles - Write maintainable, readable code');
+    chunks.push('Problem-solving — can tackle pretty complex stuff now.');
+    chunks.push('Debugging — trace from error file upward, log everything. Takes time but works.');
+    chunks.push('Fast learner — pick up new tech pretty quick.');
+    chunks.push('Clean code — try to write stuff that makes sense later.');
+    chunks.push('Focus — depends on the day. Sometimes 15 mins, sometimes an hour straight.');
 
   } else if (responseType === 'projects') {
-    // Format projects as structured chunks with accurate roles
-    chunks.push('**Featured Projects:**');
+    chunks.push('Here\'s what I\'ve been working on:');
     chunks.push('');
-    chunks.push('**Tuneit** (Personal Project – In Development)');
-    chunks.push('- Platform to connect users with **local auto mechanics** for car repairs and maintenance');
-    chunks.push('- **Vision:** Make finding a trustworthy mechanic digital, fast, and stress-free');
-    chunks.push('- **Tech Stack:** Next.js, React Native, Node.js, GraphQL, MongoDB');
-    chunks.push('- **My Role:** Building everything solo — backend, frontend, mobile, real-time notifications');
-    chunks.push('- **Status:** Actively developing — this is my dream project');
-    chunks.push('- **GitHub Repos:**');
-    chunks.push('  - Web: https://github.com/sirajahmedx/tuneit-web');
-    chunks.push('  - API: https://github.com/sirajahmedx/tuneit-api');
-    chunks.push('  - Mobile: https://github.com/sirajahmedx/tuneit-app');
+    chunks.push('**Tuneit** — my solo dream project');
+    chunks.push('Building a platform to help people find trusted local mechanics. Doing everything solo — Next.js, Node.js, GraphQL, MongoDB, React Native.');
+    chunks.push('It\'s my vision, so I\'m taking time to understand every part. Currently working on AI-powered search.');
+    chunks.push('Status: actively building it. This is what I\'m most excited about.');
+    chunks.push('Repos: web, api, and mobile — all on my GitHub @sirajahmedx');
     chunks.push('');
-    chunks.push('**Jobify** (Professional Project – Current)');
-    chunks.push('- Platform connecting clients with skilled professionals (online or in-person)');
-    chunks.push('- **Live:** https://jobifyy.com (10k+ users, 120+ services, 14 added today)');
-    chunks.push('- **My Role:** Built all backend logic — user auth, service categories, calendar-based booking, real-time job alerts, and dashboard functionality for both clients and pros');
-    chunks.push('- **Note:** Frontend/UI built by another team; I focused on data flow, APIs, and system behavior');
+    chunks.push('**Jobify** — current work project');
+    chunks.push('Platform where users hire talents like tradesmen and pros. I built all the dashboards and backend logic.');
+    chunks.push('Rest of the team handles mobile and UI. It\'s live at jobifyy.com with 10k+ users.');
+    chunks.push('My part: user auth, booking flow, real-time alerts, payment processing.');
     chunks.push('');
-    chunks.push('**Servifi** (Completed Client Project)');
-    chunks.push('- Handyman service platform: “Handyman Services Are All Under One Roof”');
-    chunks.push('- **Live:** https://nsevensecurity.com (24/7 emergency handyman service, 10+ years experience)');
-    chunks.push('- **Workflow:** “Describe Your Task” → “Choose When & Where” → “Select Payment” → “All Done”');
-    chunks.push('- **My Role:** Developed the full booking flow logic, admin & user dashboard APIs, MongoDB schema, and real-time updates');
-    chunks.push('- **Note:** Did not work on visual design — handled backend functionality only');
+    chunks.push('**Talent-Tube** — completed at Marvellex');
+    chunks.push('Like TikTok but for skills. Users post talents, others book them.');
+    chunks.push('I built the full real-time chat system for the team. That\'s how users talk before booking.');
+    chunks.push('Live at tt.mlxsoft.com if you wanna check it out.');
     chunks.push('');
-    chunks.push('**Talent-Tube** (Professional Project)');
-    chunks.push('- Real-time talent platform with video reels and escrow-protected bookings');
-    chunks.push('- **Live:** https://tt.mlxsoft.com/');
-    chunks.push('- **Features:** AI-powered feed, story-based jobs, Stripe escrow, verified talent, 24/7 support');
-    chunks.push('- **My Role:** Built the entire real-time chat system for an 8–10 person team');
+    chunks.push('**Servifi** — client project I finished');
+    chunks.push('Handyman service platform. I did backend, dashboards, APIs, and Stripe payment flow.');
+    chunks.push('Everything\'s real-time with Firebase. Learned a lot from this one.');
+    chunks.push('Live at nsevensecurity.com — 24/7 emergency services.');
     chunks.push('');
-    chunks.push('**Global Parcel Services GPS** (Mobile Project)');
-    chunks.push('- GPS-based parcel tracking mobile app');
-    chunks.push('- **My Role:** Built solo as my first mobile project using React Native');
-    chunks.push('- **Note:** Used AI assistance to understand geolocation APIs while learning');
-    chunks.push('- **Available on:** Google Play Store (search “Global Parcel Services”)');
+    chunks.push('**Sensify** — school project');
+    chunks.push('React Native sensor app. Sensors + APIs were a pain, but I shipped it overnight.');
+    chunks.push('Learned proper debugging with this one. Don\'t sleep till it\'s done, you know?');
+    chunks.push('Available on my GitHub.');
     chunks.push('');
-    chunks.push('**Sensify** (School Project)');
-    chunks.push('- React Native sensor app suite');
-    chunks.push('- **Built for:** School assignment');
-    chunks.push('- **Work Ethic:** Pulled a late night — I don’t sleep till the task is done');
-    chunks.push('https://github.com/sirajahmedx/sensify');
-    chunks.push('');
-    chunks.push('**GitHub Bot** (Personal Project)');
-    chunks.push('- GitHub automation toolkit');
-    chunks.push('- **Built with:** AI assistance for learning, but fully understood and implemented by me');
-    chunks.push('');
-    chunks.push('**This Portfolio** (Personal Project)');
-    chunks.push('- Interactive portfolio with AI chat');
-    chunks.push('- **Built with:** Next.js, TypeScript, Tailwind CSS');
-    chunks.push('- **Note:** Coded till late night — when I start something, I finish it');
+    chunks.push('**Global Parcel Services GPS** — first mobile app');
+    chunks.push('GPS parcel tracker in React Native. My first mobile project.');
+    chunks.push('Used AI for debugging geolocation stuff, but understood everything I shipped.');
+    chunks.push('It\'s on Play Store if you search "Global Parcel Services".');
 
   } else if (responseType === 'experience') {
-    // Format experience as structured chunks
-    chunks.push('**Professional Experience:**');
+    chunks.push('Here\'s my dev journey so far:');
     chunks.push('');
-    chunks.push('**Junior Developer** - Marvellex Softwares');
-    chunks.push('- **How I got in:** Through a reference, did the interview, never let them down since');
-    chunks.push('- **Work Style:** Remote from home, flexible schedule, task-based delivery');
-    chunks.push('- **Task Range:** 30 minutes to 5–6 hours per task');
-    chunks.push('- **Environment:** Relaxed, no pressure, collaborative');
-    chunks.push('- **My Focus:** Backend development, API design, real-time systems, dashboard logic');
-    chunks.push('- **Team Dynamic:** Frontend handled by dedicated UI team; I own the functionality');
-    chunks.push('- **Current Projects:** Jobify (booking platform), client systems like Servifi');
+    chunks.push('**Marvellex Softwares** — Junior Developer (Jan 2025 - present)');
+    chunks.push('My brother referred me, I did the interview, been solid since.');
+    chunks.push('Work remotely from home. Tasks come daily, I do them when I\'m free. Pretty chill setup.');
+    chunks.push('No micromanagement — they trust me to get stuff done.');
+    chunks.push('Focus: backend logic, APIs, dashboards, real-time systems.');
     chunks.push('');
-    chunks.push('**Personal Development Philosophy:**');
-    chunks.push('- **Learning:** Started in school, continued at home. Follow Hitesh Choudhary — he’s an OG dev');
-    chunks.push('- **AI Use:** When stuck, I ask ChatGPT — but only to learn or debug, never to copy blindly');
-    chunks.push('- **Debugging:** Add logs everywhere, trace step by step. Time-consuming but works');
-    chunks.push('- **When Frustrated:** Scroll Instagram to clear my head');
-    chunks.push('- **Motto:** "Learn by doing, build by solving"');
+    chunks.push('**How I got started:**');
+    chunks.push('Started coding in school, kept learning at home. Follow Hitesh Choudhary — he\'s the OG.');
+    chunks.push('When stuck, I ask ChatGPT — but only to learn, not copy blindly.');
+    chunks.push('My motto: "Learn by doing, build by solving."');
+    chunks.push('');
+    chunks.push('**Work style:**');
+    chunks.push('Code in complete silence — no music, just me and thoughts.');
+    chunks.push('No fixed schedule. Code when I feel like it.');
+    chunks.push('Don\'t sleep till the job\'s done. Been up till 5 AM before.');
+    chunks.push('When frustrated? Scroll Instagram for a break.');
 
   } else if (responseType === 'contact') {
-    // Format contact information as structured chunks
-    chunks.push('**Contact Information:**');
+    chunks.push('Wanna get in touch? Here\'s how:');
     chunks.push('');
-    chunks.push('**Email:** sirajahmedxdev@gmail.com *(preferred for professional inquiries)*');
-    chunks.push('**GitHub:** @sirajahmedx');
-    chunks.push('**Discord:** sirajahmedx');
-    chunks.push('**Instagram:** @sirajahmedxdev *(not very active)*');
-    chunks.push('**LinkedIn:** Working on it');
+    chunks.push('**Email:** sirajahmedxdev@gmail.com — best for serious stuff');
+    chunks.push('**GitHub:** @sirajahmedx — all my code\'s there');
+    chunks.push('**Discord:** sirajahmedx — for quick chats');
+    chunks.push('**Instagram:** @sirajahmedxdev — barely active these days');
+    chunks.push('**LinkedIn:** working on it...');
     chunks.push('');
-    chunks.push('**Availability:**');
-    chunks.push('- Currently employed at Marvellex Softwares');
-    chunks.push('- Focused on Jobify, Tuneit, and client projects');
-    chunks.push('- Open to collaboration — email me to discuss');
+    chunks.push('**Current status:**');
+    chunks.push('I\'m working at Marvellex and focused on Tuneit right now.');
+    chunks.push('Not really free to debug random stuff, but email me if it\'s something specific.');
+    chunks.push('If you\'ve got something interesting work-wise, shoot me a message.');
 
   } else if (responseType === 'setup') {
-    // Format setup information as structured chunks
-    chunks.push('**Development Setup:**');
+    chunks.push('Here\'s what I work with:');
     chunks.push('');
     chunks.push('**Hardware:**');
-    chunks.push('- Dell Latitude 7480');
-    chunks.push('- Intel i7 (6th gen), 24GB RAM, 256GB SSD');
+    chunks.push('Dell Latitude 7480 — Intel i7 6th gen, 24GB RAM, 256GB SSD');
+    chunks.push('Gets the job done. Nothing fancy but reliable.');
     chunks.push('');
     chunks.push('**Software:**');
-    chunks.push('- OS: Ubuntu (Linux)');
-    chunks.push('- Editor: VS Code');
-    chunks.push('- Terminal: Default Ubuntu terminal');
+    chunks.push('Ubuntu — love Linux, way better than Windows for dev work');
+    chunks.push('VS Code — my main editor, can\'t imagine using anything else');
+    chunks.push('Default Ubuntu terminal — simple and works');
+    chunks.push('Git + GitHub — for version control obviously');
     chunks.push('');
-    chunks.push('**Workflow:**');
-    chunks.push('- Code in complete silence with random thoughts running');
-    chunks.push('- No fixed schedule — code when free and in the mood');
-    chunks.push('- Don’t sleep till the task is done');
-    chunks.push('- Use Git + GitHub for version control');
+    chunks.push('**How I work:**');
+    chunks.push('Complete silence when coding — no music, just random thoughts running');
+    chunks.push('No fixed schedule — code when free and in the mood');
+    chunks.push('Don\'t sleep till the task is done');
+    chunks.push('When debugging: add logs everywhere, trace step by step');
   }
 
   return chunks;
 }
+
 function validateMessages(messages: any[]): Message[] {
   if (!Array.isArray(messages)) {
     throw new Error('Messages must be an array');
