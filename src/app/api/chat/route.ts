@@ -4,15 +4,15 @@ import {
   createStreamingError,
   ERROR_TYPES,
   formatErrorMessage,
-  formatTimestamp
-} from '@/lib/api-response-utils';
-import Groq from 'groq-sdk';
-import { SYSTEM_PROMPT } from './prompt';
+  formatTimestamp,
+} from "@/lib/api-response-utils";
+import Groq from "groq-sdk";
+import { SYSTEM_PROMPT } from "./prompt";
 
 export const maxDuration = 30;
 
 if (!process.env.GROQ_API_KEY) {
-  throw new Error('GROQ_API_KEY environment variable is required');
+  throw new Error("GROQ_API_KEY environment variable is required");
 }
 
 const groq = new Groq({
@@ -21,85 +21,101 @@ const groq = new Groq({
 
 const MODEL_CONFIGS = {
   polite: {
-    model: 'openai/gpt-oss-20b',
-    description: 'Fast and friendly responses'
+    model: "openai/gpt-oss-20b",
+    description: "Fast and friendly responses",
   },
   concise: {
-    model: 'llama-3.1-8b-instant',
-    description: 'Direct and to-the-point answers'
+    model: "llama-3.1-8b-instant",
+    description: "Direct and to-the-point answers",
   },
   versatile: {
-    model: 'llama-3.3-70b-versatile',
-    description: 'Balanced responses with good detail'
+    model: "llama-3.3-70b-versatile",
+    description: "Balanced responses with good detail",
   },
   creative: {
-    model: 'openai/gpt-oss-120b',
-    description: 'Creative and engaging conversations'
-  }
+    model: "openai/gpt-oss-120b",
+    description: "Creative and engaging conversations",
+  },
 } as const;
 
 type StyleOption = keyof typeof MODEL_CONFIGS;
 
-function errorHandler(error: unknown): { message: string; type: string; status: number } {
+function errorHandler(error: unknown): {
+  message: string;
+  type: string;
+  status: number;
+} {
   if (error == null) {
     return {
-      message: formatErrorMessage('An unknown error occurred'),
+      message: formatErrorMessage("An unknown error occurred"),
       type: ERROR_TYPES.UNKNOWN_ERROR,
-      status: 500
+      status: 500,
     };
   }
 
-  if (typeof error === 'string') {
+  if (typeof error === "string") {
     return {
       message: formatErrorMessage(error),
       type: ERROR_TYPES.UNKNOWN_ERROR,
-      status: 500
+      status: 500,
     };
   }
 
   if (error instanceof Error) {
-    if (error.message.includes('429') ||
-        error.message.includes('Too Many Requests') ||
-        error.message.includes('quota') ||
-        error.message.toLowerCase().includes('resource has been exhausted')) {
+    if (
+      error.message.includes("429") ||
+      error.message.includes("Too Many Requests") ||
+      error.message.includes("quota") ||
+      error.message.toLowerCase().includes("resource has been exhausted")
+    ) {
       return {
-        message: formatErrorMessage('API quota exceeded. Please try again tomorrow or upgrade your plan.'),
+        message: formatErrorMessage(
+          "API quota exceeded. Please try again tomorrow or upgrade your plan."
+        ),
         type: ERROR_TYPES.QUOTA_EXCEEDED,
-        status: 429
+        status: 429,
       };
     }
 
-    if (error.message.includes('401') ||
-        error.message.includes('unauthorized') ||
-        error.message.includes('API key')) {
+    if (
+      error.message.includes("401") ||
+      error.message.includes("unauthorized") ||
+      error.message.includes("API key")
+    ) {
       return {
-        message: formatErrorMessage('Authentication failed. Please check your API key configuration.'),
+        message: formatErrorMessage(
+          "Authentication failed. Please check your API key configuration."
+        ),
         type: ERROR_TYPES.AUTH_ERROR,
-        status: 401
+        status: 401,
       };
     }
 
-    if (error.message.includes('fetch') ||
-        error.message.includes('network') ||
-        error.message.includes('connection')) {
+    if (
+      error.message.includes("fetch") ||
+      error.message.includes("network") ||
+      error.message.includes("connection")
+    ) {
       return {
-        message: formatErrorMessage('Network error. Please check your connection and try again.'),
+        message: formatErrorMessage(
+          "Network error. Please check your connection and try again."
+        ),
         type: ERROR_TYPES.NETWORK_ERROR,
-        status: 503
+        status: 503,
       };
     }
 
     return {
       message: formatErrorMessage(error.message),
       type: ERROR_TYPES.API_ERROR,
-      status: 500
+      status: 500,
     };
   }
 
   return {
-    message: formatErrorMessage('An unexpected error occurred'),
+    message: formatErrorMessage("An unexpected error occurred"),
     type: ERROR_TYPES.UNKNOWN_ERROR,
-    status: 500
+    status: 500,
   };
 }
 
@@ -142,333 +158,311 @@ function isRateLimited(ip: string): boolean {
 
 // Message validation
 interface Message {
-  role: 'user' | 'assistant';
+  role: "user" | "assistant";
   content: string;
   timestamp?: string;
   id?: string;
 }
 
 function summarizeConversation(messages: Message[]): string {
-  if (messages.length <= 2) return '';
+  if (messages.length <= 2) return "";
 
   const recentMessages = messages.slice(-6); // Last 6 messages for context
   const topics = [];
-  
+
   // Extract key topics from recent conversation
-  const content = recentMessages.map(m => m.content).join(' ').toLowerCase();
-  
-  if (content.includes('tuneit') || content.includes('solo project')) topics.push('Tuneit project');
-  if (content.includes('jobify') || content.includes('marvellex')) topics.push('Jobify/Marvellex work');
-  if (content.includes('servifi')) topics.push('Servifi project');
-  if (content.includes('talent-tube') || content.includes('talent tube')) topics.push('Talent-Tube project');
-  if (content.includes('debug') || content.includes('bug')) topics.push('debugging experience');
-  if (content.includes('learn') || content.includes('started')) topics.push('learning journey');
-  if (content.includes('javascript') || content.includes('js')) topics.push('JavaScript');
-  if (content.includes('react') || content.includes('next')) topics.push('React/Next.js');
-  
-  if (topics.length === 0) return '';
-  
-  return `Recent conversation topics: ${topics.join(', ')}. `;
+  const content = recentMessages
+    .map((m) => m.content)
+    .join(" ")
+    .toLowerCase();
+
+  if (content.includes("tuneit") || content.includes("solo project"))
+    topics.push("Tuneit project");
+  if (content.includes("jobify") || content.includes("marvellex"))
+    topics.push("Jobify/Marvellex work");
+  if (content.includes("servifi")) topics.push("Servifi project");
+  if (content.includes("talent-tube") || content.includes("talent tube"))
+    topics.push("Talent-Tube project");
+  if (content.includes("debug") || content.includes("bug"))
+    topics.push("debugging experience");
+  if (content.includes("learn") || content.includes("started"))
+    topics.push("learning journey");
+  if (content.includes("javascript") || content.includes("js"))
+    topics.push("JavaScript");
+  if (content.includes("react") || content.includes("next"))
+    topics.push("React/Next.js");
+
+  if (topics.length === 0) return "";
+
+  return `Recent conversation topics: ${topics.join(", ")}. `;
 }
 
 function validateResponse(response: string, userQuery: string): boolean {
   const responseLower = response.toLowerCase();
   const queryLower = userQuery.toLowerCase();
-  
+
   // Check if response is too generic or redirecting
-  if (responseLower.includes('here to talk about my dev work') && 
-      responseLower.includes('what would you like to know')) {
+  if (
+    responseLower.includes("here to talk about my dev work") &&
+    responseLower.includes("what would you like to know")
+  ) {
     return false; // Too generic redirect
   }
-  
+
   // Check if response mentions key topics that should be covered
-  const hasRelevantContent = 
-    responseLower.includes('tuneit') ||
-    responseLower.includes('jobify') ||
-    responseLower.includes('servifi') ||
-    responseLower.includes('javascript') ||
-    responseLower.includes('react') ||
-    responseLower.includes('next') ||
-    responseLower.includes('debug') ||
-    responseLower.includes('learn') ||
-    responseLower.includes('work') ||
-    responseLower.includes('project') ||
-    responseLower.includes('code');
-  
-  return hasRelevantContent || response.length > 20; // Allow longer responses even if not directly relevant
+  const hasRelevantContent =
+    responseLower.includes("tuneit") ||
+    responseLower.includes("jobify") ||
+    responseLower.includes("servifi") ||
+    responseLower.includes("javascript") ||
+    responseLower.includes("react") ||
+    responseLower.includes("next") ||
+    responseLower.includes("debug") ||
+    responseLower.includes("learn") ||
+    responseLower.includes("work") ||
+    responseLower.includes("project") ||
+    responseLower.includes("code");
+
+  return hasRelevantContent || response.length > 20;
 }
 
-function isStructuredResponseQuery(userQuery: string): 'skills' | 'resume' | 'projects' | 'experience' | 'contact' | 'setup' | null {
+function isCasualGreeting(userQuery: string): boolean {
+  const queryLower = userQuery.toLowerCase().trim();
+
+  const greetingKeywords = [
+    "hello",
+    "hi",
+    "hey",
+    "good morning",
+    "good afternoon",
+    "good evening",
+    "howdy",
+    "greetings",
+    "sup",
+    "what's up",
+    "whats up",
+    "yo",
+    "hiya",
+  ];
+
+  return (
+    greetingKeywords.some(
+      (keyword) =>
+        queryLower === keyword ||
+        queryLower.startsWith(keyword + " ") ||
+        queryLower.startsWith(keyword + ",") ||
+        queryLower.startsWith(keyword + "!")
+    ) && queryLower.length < 50
+  );
+}
+
+function generateGreetingResponse(): string {
+  const greetings = [
+    "Hey, what's up?",
+    "Hi there, what's on your mind today?",
+    "Hey! What would you like to know?",
+    "Hello! How can I help you today?",
+    "Hi! What's on your mind?",
+  ];
+
+  return greetings[Math.floor(Math.random() * greetings.length)];
+}
+
+function detectQueryType(userQuery: string): string | null {
   const queryLower = userQuery.toLowerCase();
 
-  // Check for skills-related queries
-  const skillsKeywords = ['skills', 'hard skills', 'soft skills', 'technical skills', 'what are your skills', 'tell me about your skills', 'what skills do you have', 'abilities', 'competencies'];
-  if (skillsKeywords.some(keyword => queryLower.includes(keyword))) {
-    return 'skills';
+  const skillsKeywords = [
+    "skills",
+    "hard skills",
+    "soft skills",
+    "technical skills",
+    "what are your skills",
+    "tell me about your skills",
+    "what skills do you have",
+    "abilities",
+    "competencies",
+  ];
+  if (skillsKeywords.some((keyword) => queryLower.includes(keyword))) {
+    return "skills";
   }
 
-  // Check for resume/CV related queries
-  const resumeKeywords = ['resume', 'cv', 'curriculum vitae', 'background', 'qualification', 'summary', 'about me', 'bio', 'profile'];
-  if (resumeKeywords.some(keyword => queryLower.includes(keyword))) {
-    return 'resume';
+  const resumeKeywords = [
+    "resume",
+    "cv",
+    "curriculum vitae",
+    "background",
+    "qualification",
+    "summary",
+    "about me",
+    "bio",
+    "profile",
+  ];
+  if (resumeKeywords.some((keyword) => queryLower.includes(keyword))) {
+    return "resume";
   }
 
-  // Check for projects-related queries
-  const projectsKeywords = ['projects', 'work', 'portfolio', 'what have you built', 'what are your projects', 'show me your projects', 'showcase', 'demos'];
-  if (projectsKeywords.some(keyword => queryLower.includes(keyword))) {
-    return 'projects';
+  const projectsKeywords = [
+    "projects",
+    "work",
+    "portfolio",
+    "what have you built",
+    "what are your projects",
+    "show me your projects",
+    "showcase",
+    "demos",
+  ];
+  if (projectsKeywords.some((keyword) => queryLower.includes(keyword))) {
+    return "projects";
   }
 
-  // Check for experience-related queries
-  const experienceKeywords = ['experience', 'job', 'work experience', 'professional experience', 'career', 'employment', 'work history'];
-  if (experienceKeywords.some(keyword => queryLower.includes(keyword))) {
-    return 'experience';
+  const experienceKeywords = [
+    "experience",
+    "job",
+    "work experience",
+    "professional experience",
+    "career",
+    "employment",
+    "work history",
+  ];
+  if (experienceKeywords.some((keyword) => queryLower.includes(keyword))) {
+    return "experience";
   }
 
-  // Check for contact-related queries
-  const contactKeywords = ['contact', 'reach out', 'get in touch', 'email', 'social media', 'github', 'instagram', 'discord', 'linkedin'];
-  if (contactKeywords.some(keyword => queryLower.includes(keyword))) {
-    return 'contact';
+  const contactKeywords = [
+    "contact",
+    "reach out",
+    "get in touch",
+    "email",
+    "social media",
+    "github",
+    "instagram",
+    "discord",
+    "linkedin",
+  ];
+  if (contactKeywords.some((keyword) => queryLower.includes(keyword))) {
+    return "contact";
   }
 
-  // Check for setup-related queries
-  const setupKeywords = ['setup', 'computer', 'laptop', 'specs', 'hardware', 'development environment', 'machine'];
-  if (setupKeywords.some(keyword => queryLower.includes(keyword))) {
-    return 'setup';
+  const setupKeywords = [
+    "setup",
+    "computer",
+    "laptop",
+    "specs",
+    "hardware",
+    "development environment",
+    "machine",
+  ];
+  if (setupKeywords.some((keyword) => queryLower.includes(keyword))) {
+    return "setup";
   }
 
   return null;
 }
 
-function formatStructuredResponse(fullText: string, responseType: 'skills' | 'resume' | 'projects' | 'experience' | 'contact' | 'setup'): string[] {
-  const chunks: string[] = [];
+function getStructuredResponseInstructions(queryType: string): string {
+  const instructions = {
+    skills: `
+When discussing your skills, share them conversationally like you're explaining what you know and how you use it:
 
-  if (responseType === 'skills') {
-    // Format skills as structured chunks with proper Markdown
-    chunks.push('**Hard Skills:**');
-    chunks.push('- JavaScript - My first programming language, very comfortable with it');
-    chunks.push('- Node.js - For server-side development and APIs');
-    chunks.push('- GraphQL - Prefer it over REST for exact data fetching');
-    chunks.push('- Next.js - For building modern web applications');
-    chunks.push('- React Native - For mobile app development');
-    chunks.push('- MongoDB - My go-to database solution');
-    chunks.push('- Socket.io - For real-time features');
-    chunks.push('');  // Empty line for spacing
-    chunks.push('**Soft Skills:**');
-    chunks.push('- Problem-solving - Can tackle complex issues effectively');
-    chunks.push('- Debugging - Systematic approach to finding and fixing bugs');
-    chunks.push('- Fast learner - Quickly adapt to new technologies');
-    chunks.push('- Strong focus - Maintain concentration during long coding sessions');
-    chunks.push('- Clean code principles - Write maintainable, readable code');
+- Start with your overall tech journey and what drives your learning
+- Talk about your key technologies naturally - explain why you like each one and how you apply it
+- Group them loosely (like frontend tools, backend systems, databases, etc.) but don't force rigid categories
+- For each skill, mention specific projects or experiences that highlight your experience
+- Share your learning approach and how you stay current
+- Keep the tone personal and reflective of your actual experience
 
-  } else if (responseType === 'resume') {
-    // Format resume as structured chunks
-    chunks.push('**Professional Summary:**');
-    chunks.push('16-year-old full-stack developer from Pakistan, currently working as a junior developer at Marvellex Softwares while completing high school.');
-    chunks.push('');
-    chunks.push('**Professional Experience:**');
-    chunks.push('**Junior Developer** - Marvellex Softwares (Current)');
-    chunks.push('- Developing Jobify platform connecting service providers with clients');
-    chunks.push('- Complete backend development including APIs, databases, and real-time features');
-    chunks.push('- Working on client projects and internal systems');
-    chunks.push('- Remote work with flexible schedule and task-based delivery');
-    chunks.push('');
-    chunks.push('**Education:**');
-    chunks.push('- **High School** - Currently enrolled (Expected graduation 2025)');
-    chunks.push('- **Self-taught Developer** - Online learning through practical projects');
-    chunks.push('- **Primary Learning Resource** - Hitesh Choudhary YouTube channel');
-    chunks.push('');
-    chunks.push('**Technical Proficiency:**');
-    chunks.push('- **Frontend:** React, Next.js, React Native');
-    chunks.push('- **Backend:** Node.js, GraphQL, REST APIs');
-    chunks.push('- **Database:** MongoDB');
-    chunks.push('- **Real-time:** Socket.io');
-    chunks.push('- **Tools:** VS Code, Git, Linux (Ubuntu)');
-    chunks.push('');
-    chunks.push('**Personal Attributes:**');
-    chunks.push('- **Work Philosophy:** "Learn by doing, build by solving"');
-    chunks.push('- **Coding Style:** Move fast and break things');
-    chunks.push('- **Work Ethic:** Don\'t sleep until the task is done');
-    chunks.push('- **Learning Approach:** Practical application through building projects');
+Remember to maintain natural flow - use phrases like "I'm really comfortable with", "I've been using", "What I love about", "That's helped me with" to make it feel like real conversation.`,
 
-  } else if (responseType === 'projects') {
-    // Format projects as structured chunks with GitHub links
-    chunks.push('**Featured Projects:**');
-    chunks.push('');
-    chunks.push('**Tuneit** (Personal Project - In Development)');
-    chunks.push('- Full-stack service platform connecting users with local services');
-    chunks.push('- **Vision:** Make service work more digital, trustworthy, and foundational');
-    chunks.push('- **Tech Stack:** Next.js, React Native, Node.js, GraphQL, MongoDB');
-    chunks.push('- **Features:** Service browsing, provider profiles, booking system, real-time notifications');
-    chunks.push('- **Status:** Actively developing solo - this is the dream project');
-    chunks.push('- **GitHub Repos:**');
-    chunks.push('  - Web: https://github.com/sirajahmedx/tuneit-web');
-    chunks.push('  - API: https://github.com/sirajahmedx/tuneit-api');
-    chunks.push('  - Mobile: https://github.com/sirajahmedx/tuneit-app');
-    chunks.push('');
-    chunks.push('**Jobify** (Professional Project - Current)');
-    chunks.push('- Platform connecting service providers with clients');
-    chunks.push('- **Role:** Complete backend development, dashboards, database design');
-    chunks.push('- **Tech Stack:** Next.js, Node.js, GraphQL, MongoDB, Socket.io');
-    chunks.push('- **Duration:** Working on it for about 2 months');
-    chunks.push('- **Focus:** Real-time features, API development, system architecture');
-    chunks.push('https://jobifyy.com');
-    chunks.push('');
-    chunks.push('**Servifi** (Completed Project)');
-    chunks.push('- Service platform linking providers with customers');
-    chunks.push('- **Achievement:** Favorite finished project');
-    chunks.push('- **Tech Stack:** React, Node.js, MongoDB, Socket.io');
-    chunks.push('- **Responsibilities:** Complete backend APIs, admin dashboards, database architecture, real-time systems');
-    chunks.push('https://nsevensecurity.com');
-    chunks.push('');
-    chunks.push('**Talent-Tube** (Professional Project)');
-    chunks.push('- Real-time chat system for talent platform');
-    chunks.push('- **Team Size:** 8-10 person team');
-    chunks.push('- **Role:** Led the complete chat system implementation');
-    chunks.push('- **Tech Stack:** React, Socket.io, Node.js');
-    chunks.push('https://tt.mlxsoft.com/');
-    chunks.push('');
-    chunks.push('**Global Parcel Services GPS** (Mobile Project)');
-    chunks.push('- Mobile app for GPS-based parcel tracking');
-    chunks.push('- **Milestone:** First mobile project - learned while building');
-    chunks.push('- **Platform:** Available on Google Play Store');
-    chunks.push('- **Tech Stack:** React Native');
-    chunks.push('');
-    chunks.push('**Sensify** (School Project)');
-    chunks.push('- React Native sensor app suite');
-    chunks.push('- **Context:** School project with late-night dedication');
-    chunks.push('- **Work Ethic:** Don\'t sleep till the task is done');
-    chunks.push('https://github.com/sirajahmedx/sensify');
-    chunks.push('');
-    chunks.push('**GitHub Bot** (Personal Project)');
-    chunks.push('- GitHub automation toolkit with AI assistance');
-    chunks.push('- **Tech Stack:** Node.js, GitHub API');
-    chunks.push('- **Approach:** Built with AI assistance for automation');
-    chunks.push('https://github.com/sirajahmedx/bots');
-    chunks.push('');
-    chunks.push('**This Portfolio** (Personal Project)');
-    chunks.push('- Interactive portfolio website with AI chat');
-    chunks.push('- **Development:** Coded till late night - when I start something, I finish it');
-    chunks.push('- **Tech Stack:** Next.js, TypeScript, Tailwind CSS');
-    chunks.push('- **Features:** Real-time chat, project showcase, responsive design');
+    projects: `
+When talking about your projects, share them like you're telling someone about your work and what you've built:
 
-  } else if (responseType === 'experience') {
-    // Format experience as structured chunks
-    chunks.push('**Professional Experience:**');
-    chunks.push('');
-    chunks.push('**Junior Developer** - Marvellex Softwares');
-    chunks.push('- **Duration:** Current position');
-    chunks.push('- **How I got in:** Through a reference, did the interview, never let them down since');
-    chunks.push('- **Work Style:** Remote from home, flexible schedule');
-    chunks.push('- **Task Range:** 30 minutes to 5-6 hours per task');
-    chunks.push('- **Environment:** Relaxed with no pressure, task-based delivery');
-    chunks.push('- **Responsibilities:** Full-stack development, client project delivery');
-    chunks.push('- **Current Focus:** Jobify platform and other client projects');
-    chunks.push('- **Key Achievements:** Successfully delivered multiple client projects, implemented real-time features');
-    chunks.push('');
-    chunks.push('**Freelance & Personal Development**');
-    chunks.push('- **Duration:** Ongoing alongside professional work');
-    chunks.push('- **Focus:** Personal projects and learning new technologies');
-    chunks.push('- **Schedule:** Code whenever I get free time and am in the mood');
-    chunks.push('- **Notable Work:** Tuneit platform development, various experimental projects');
-    chunks.push('- **Learning Philosophy:** Learn by doing, build by solving');
-    chunks.push('');
-    chunks.push('**Educational Journey**');
-    chunks.push('- **Formal Education:** High School (Currently enrolled)');
-    chunks.push('- **Self-Learning Path:** Started coding in school, continued with self-study');
-    chunks.push('- **Primary Resource:** Hitesh Choudhary YouTube channel - he\'s an OG dev');
-    chunks.push('- **Approach:** Practical application through building real projects');
-    chunks.push('- **Motto:** "Learn by doing, build by solving"');
-    chunks.push('');
-    chunks.push('**Development Environment & Workflow**');
-    chunks.push('- **Work Environment:** Code in complete silence with random thoughts running');
-    chunks.push('- **Schedule:** No fixed schedule - code when free and in the mood');
-    chunks.push('- **Work Ethic:** Don\'t sleep till the task is done');
-    chunks.push('- **Problem Solving:** When stuck, scroll Instagram to clear head');
-    chunks.push('- **Learning Resource:** Ask ChatGPT when don\'t know something');
+- Start with a brief overview of your project journey and what motivates you
+- Describe each major project in a connected way - what problem it solves, your role, the tech involved, and the outcome
+- Connect projects to show your growth or learning progression
+- Include links naturally as part of the conversation (like "you can check it out at...")
+- Highlight what made each project interesting or challenging to you personally
+- Don't list them mechanically - weave them into a narrative about your development path
 
-  } else if (responseType === 'contact') {
-    // Format contact information as structured chunks
-    chunks.push('**Contact Information:**');
-    chunks.push('');
-    chunks.push('**Primary Contact:**');
-    chunks.push('- **Email:** sirajahmedxdev@gmail.com');
-    chunks.push('- **Best for:** Professional inquiries, project discussions, collaboration opportunities');
-    chunks.push('');
-    chunks.push('**Social Media & Professional:**');
-    chunks.push('- **GitHub:** @sirajahmedx');
-    chunks.push('- **Instagram:** @sirajahmedxdev (not very active)');
-    chunks.push('- **Discord:** sirajahmedx');
-    chunks.push('- **LinkedIn:** Currently working on it');
-    chunks.push('');
-    chunks.push('**Availability & Work Inquiries:**');
-    chunks.push('- **Current Status:** Working at Marvellex Softwares');
-    chunks.push('- **Freelance:** Focused on current job and personal projects');
-    chunks.push('- **For Discussions:** Feel free to email for specific opportunities');
-    chunks.push('- **Code Help:** Not available for debugging others\' code, but can discuss via email');
-    chunks.push('');
-    chunks.push('**Response Expectations:**');
-    chunks.push('- **Professional emails:** Will respond within 1-2 business days');
-    chunks.push('- **Social media:** Less active, email is preferred');
-    chunks.push('- **Best approach:** Be specific about what you\'re looking for');
+Use smooth transitions and keep it conversational, like you're sharing your portfolio with a friend.`,
 
-  } else if (responseType === 'setup') {
-    // Format setup information as structured chunks
-    chunks.push('**Development Setup:**');
-    chunks.push('');
-    chunks.push('**Hardware Specifications:**');
-    chunks.push('- **Laptop:** Dell Latitude 7480');
-    chunks.push('- **Processor:** Intel i7 6th generation');
-    chunks.push('- **RAM:** 24GB');
-    chunks.push('- **Storage:** 256GB SSD');
-    chunks.push('');
-    chunks.push('**Operating System & Environment:**');
-    chunks.push('- **OS:** Ubuntu (Linux)');
-    chunks.push('- **Why Linux:** Enjoy the control and development-friendly environment');
-    chunks.push('- **Editor:** VS Code');
-    chunks.push('- **Terminal:** Default Ubuntu terminal');
-    chunks.push('');
-    chunks.push('**Development Workflow:**');
-    chunks.push('- **Work Environment:** Complete silence with random thoughts running');
-    chunks.push('- **Schedule:** No fixed schedule - code when free and in the mood');
-    chunks.push('- **Version Control:** Git with GitHub');
-    chunks.push('- **Problem Solving:** Systematic debugging + ChatGPT when stuck');
-    chunks.push('');
-    chunks.push('**Learning & Resources:**');
-    chunks.push('- **Primary Learning:** Hitesh Choudhary YouTube channel');
-    chunks.push('- **When Stuck:** Ask ChatGPT');
-    chunks.push('- **Stress Relief:** Scroll Instagram to clear head');
-    chunks.push('- **Philosophy:** Move fast and break things');
-    chunks.push('');
-    chunks.push('**Future Considerations:**');
-    chunks.push('- **Pets:** No pets yet but thinking of getting a cat');
-    chunks.push('- **Setup Upgrades:** Currently satisfied with the current setup');
-    chunks.push('- **Work Style:** Comfortable with remote work and flexible hours');
-  }
+    contact: `
+When sharing contact information, be helpful and give context about how to reach you:
 
-  return chunks;
+- Start with your preferred way to be contacted and why
+- Explain your social media presence and how active you are on each platform
+- Share your availability and typical response times
+- Give guidance on what kinds of inquiries work best for email vs other channels
+- Be clear about your current work situation and freelance availability
+- Keep it approachable and personable
+
+Make it feel like you're giving someone your contact info in a natural conversation.`,
+
+    experience: `
+When discussing your professional experience, share your journey like you're telling your story:
+
+- Start with how you got into coding and your early experiences
+- Talk about your current work at Marvellex - how you got there, what you do, your daily rhythm
+- Share your work philosophy and habits that have shaped your approach
+- Connect your experience to personal growth and future goals
+- Mention key projects or achievements that highlight your development
+- Keep it chronological but conversational, not like a resume
+
+Use storytelling elements to make it engaging and authentic.`,
+
+    setup: `
+When describing your development setup, share it like you're showing someone your workspace:
+
+- Start with your hardware and why it works for you
+- Talk about your operating system choice and development environment
+- Explain your tools and workflow preferences
+- Share habits or quirks that make your setup unique
+- Mention any future considerations or what you value in your setup
+- Keep it personal and reflective of your actual preferences
+
+Make it feel like a natural discussion about your tech environment.`,
+
+    resume: `
+When providing background information, share it like you're introducing yourself professionally but conversationally:
+
+- Start with who you are, your current role, and your background
+- Cover your professional experience, education, and key skills
+- Highlight major projects and achievements
+- Share your technical proficiency and work approach
+- Keep it comprehensive but flowing naturally
+- Use confident but approachable language
+
+Structure it logically but maintain the personal touch throughout.`,
+  };
+
+  return instructions[queryType as keyof typeof instructions] || "";
 }
 
 function validateMessages(messages: any[]): Message[] {
   if (!Array.isArray(messages)) {
-    throw new Error('Messages must be an array');
+    throw new Error("Messages must be an array");
   }
 
   if (messages.length === 0) {
-    throw new Error('At least one message is required');
+    throw new Error("At least one message is required");
   }
 
   return messages.map((msg, index) => {
-    if (!msg || typeof msg !== 'object') {
-      throw new Error(`Invalid message format at index ${index}: must be an object`);
+    if (!msg || typeof msg !== "object") {
+      throw new Error(
+        `Invalid message format at index ${index}: must be an object`
+      );
     }
 
-    if (!msg.role || !['user', 'assistant'].includes(msg.role)) {
-      throw new Error(`Invalid role at index ${index}: must be 'user' or 'assistant'`);
+    if (!msg.role || !["user", "assistant"].includes(msg.role)) {
+      throw new Error(
+        `Invalid role at index ${index}: must be 'user' or 'assistant'`
+      );
     }
 
-    if (!msg.content || typeof msg.content !== 'string') {
-      throw new Error(`Invalid content at index ${index}: must be a non-empty string`);
+    if (!msg.content || typeof msg.content !== "string") {
+      throw new Error(
+        `Invalid content at index ${index}: must be a non-empty string`
+      );
     }
 
     if (msg.content.trim().length === 0) {
@@ -476,121 +470,130 @@ function validateMessages(messages: any[]): Message[] {
     }
 
     if (msg.content.length > 10000) {
-      throw new Error(`Message too long at index ${index}: maximum 10,000 characters`);
+      throw new Error(
+        `Message too long at index ${index}: maximum 10,000 characters`
+      );
     }
 
     return {
       role: msg.role,
       content: msg.content.trim(),
       timestamp: msg.timestamp,
-      id: msg.id
+      id: msg.id,
     };
   });
 }
 
-async function createStreamingResponse(result: any, userQuery: string, requestId: string): Promise<ReadableStream> {
-  console.log(`[CHAT-API] ${requestId} - Starting streaming response creation`);
-  const responseType = isStructuredResponseQuery(userQuery);
+async function createStreamingResponse(
+  result: any,
+  userQuery: string,
+  requestId: string
+): Promise<ReadableStream> {
+  // Check for casual greetings first
+  if (isCasualGreeting(userQuery)) {
+    return new ReadableStream({
+      start(controller) {
+        const greetingResponse = generateGreetingResponse();
+
+        const chunkData = {
+          text: greetingResponse,
+          isComplete: true,
+          chunk: 1,
+          totalChunks: 1,
+          showProjectsButton: false,
+        };
+
+        controller.enqueue(
+          new TextEncoder().encode(`data: ${JSON.stringify(chunkData)}\n\n`)
+        );
+        controller.close();
+      },
+    });
+  }
 
   return new ReadableStream({
     async start(controller) {
-      let totalChunks = 0;
-      let totalText = '';
+      let chunkIndex = 0;
+      let totalText = "";
+      let currentSentence = "";
 
       try {
-        // First, collect the complete response
         for await (const chunk of result) {
           const chunkText = chunk.choices[0]?.delta?.content;
-          if (chunkText && chunkText.trim()) {
-            totalChunks++;
+
+          if (chunkText) {
             totalText += chunkText;
-          }
-        }
+            currentSentence += chunkText;
 
-        // Handle structured responses (skills/resume/projects/experience/contact/setup)
-        if (responseType) {
-          console.log(`[CHAT-API] ${requestId} - Detected ${responseType} query, formatting as structured response`);
+            // Stream in smaller, more natural chunks (by sentence or line break)
+            const sentences = currentSentence.split(/([.!?\n]+)/);
 
-          // Use predefined structured response instead of AI-generated content for consistency
-          const structuredChunks = formatStructuredResponse('', responseType);
+            // Process complete sentences, keep incomplete one in buffer
+            for (let i = 0; i < sentences.length - 1; i += 2) {
+              const sentence = sentences[i];
+              const punctuation = sentences[i + 1] || "";
 
-          for (let i = 0; i < structuredChunks.length; i++) {
-            const chunk = structuredChunks[i];
-            const chunkData = {
-              responseType,
-              chunk: i,
-              timestamp: formatTimestamp(),
-              isComplete: i === structuredChunks.length - 1,
-              text: chunk
-            };
+              if (sentence.trim()) {
+                chunkIndex++;
+                const fullSentence = sentence + punctuation;
 
-            console.log(`[CHAT-API] ${requestId} - Sending structured chunk ${i}: "${chunk.substring(0, 50)}${chunk.length > 50 ? '...' : ''}"`);
-            controller.enqueue(new TextEncoder().encode(`data: ${JSON.stringify(chunkData)}\n\n`));
-          }
-        } else {
-          // Handle normal streaming responses
-          console.log(`[CHAT-API] ${requestId} - Normal response, streaming text chunks`);
+                const chunkData = createStreamingChunk(
+                  fullSentence,
+                  chunkIndex,
+                  false
+                );
 
-          // Improved chunking strategy for better readability
-          if (totalText.trim()) {
-            // Split by sentences but also respect paragraph breaks
-            const paragraphs = totalText.split(/\n\s*\n/).filter(p => p.trim());
-            let chunkIndex = 0;
-
-            for (let i = 0; i < paragraphs.length; i++) {
-              const paragraph = paragraphs[i].trim();
-              if (paragraph) {
-                // Further split long paragraphs by sentences
-                const sentences = paragraph.split(/[.!?]+/).filter(s => s.trim());
-                
-                for (let j = 0; j < sentences.length; j++) {
-                  const sentence = sentences[j].trim();
-                  if (sentence) {
-                    chunkIndex++;
-                    const punctuation = j === sentences.length - 1 && i === paragraphs.length - 1 ? '' : '.';
-                    const chunkData = createStreamingChunk(
-                      sentence + punctuation, 
-                      chunkIndex, 
-                      i === paragraphs.length - 1 && j === sentences.length - 1
-                    );
-                    console.log(`[CHAT-API] ${requestId} - Sending chunk ${chunkIndex}: "${sentence.substring(0, 50)}${sentence.length > 50 ? '...' : ''}"`);
-                    controller.enqueue(new TextEncoder().encode(`data: ${JSON.stringify(chunkData)}\n\n`));
-                  }
-                }
+                controller.enqueue(
+                  new TextEncoder().encode(
+                    `data: ${JSON.stringify(chunkData)}\n\n`
+                  )
+                );
               }
             }
 
-            // Fallback if no proper chunks were created
-            if (chunkIndex === 0) {
-              const chunkData = createStreamingChunk(totalText.trim(), 1, true);
-              controller.enqueue(new TextEncoder().encode(`data: ${JSON.stringify(chunkData)}\n\n`));
-            }
+            // Keep the last incomplete sentence in buffer
+            currentSentence = sentences[sentences.length - 1] || "";
           }
+        }
+
+        // Send any remaining text
+        if (currentSentence.trim()) {
+          chunkIndex++;
+          const chunkData = createStreamingChunk(
+            currentSentence.trim(),
+            chunkIndex,
+            true
+          );
+          controller.enqueue(
+            new TextEncoder().encode(`data: ${JSON.stringify(chunkData)}\n\n`)
+          );
+        } else if (chunkIndex > 0) {
+          // Mark the last sent chunk as complete
+          const finalChunk = createStreamingChunk("", chunkIndex, true);
+          controller.enqueue(
+            new TextEncoder().encode(`data: ${JSON.stringify(finalChunk)}\n\n`)
+          );
         }
 
         // Validate final response
         if (totalText && !validateResponse(totalText, userQuery)) {
-          console.warn(`[CHAT-API] ${requestId} - Response validation failed, response may be off-topic`);
-          // Could add fallback logic here in the future
         }
 
-        console.log(`[CHAT-API] ${requestId} - Streaming complete. Total chunks: ${totalChunks}, total text length: ${totalText.length}`);
         controller.close();
-
       } catch (streamError) {
-        console.error(`[CHAT-API] ${requestId} - Streaming error:`, streamError);
         const errorInfo = errorHandler(streamError);
 
         const errorData = createStreamingError(
           errorInfo.message,
           errorInfo.type as keyof typeof ERROR_TYPES,
-          totalChunks
+          chunkIndex
         );
-        console.log(`[CHAT-API] ${requestId} - Sending streaming error:`, JSON.stringify(errorData, null, 2));
-        controller.enqueue(new TextEncoder().encode(`data: ${JSON.stringify(errorData)}\n\n`));
+        controller.enqueue(
+          new TextEncoder().encode(`data: ${JSON.stringify(errorData)}\n\n`)
+        );
         controller.close();
       }
-    }
+    },
   });
 }
 
@@ -598,154 +601,115 @@ export async function POST(req: Request) {
   const startTime = Date.now();
   const requestId = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
-  console.log(`[CHAT-API] ${requestId} - Starting POST request processing`);
-
   try {
-    // Get client IP for rate limiting (with better IP detection)
-    const forwarded = req.headers.get('x-forwarded-for');
-    const realIP = req.headers.get('x-real-ip');
-    const cfConnecting = req.headers.get('cf-connecting-ip');
-    const ip = cfConnecting || forwarded?.split(',')[0]?.trim() || realIP || 'unknown';
-
-    console.log(`[CHAT-API] ${requestId} - Client IP: ${ip}`);
+    // Get client IP for rate limiting
+    const forwarded = req.headers.get("x-forwarded-for");
+    const realIP = req.headers.get("x-real-ip");
+    const cfConnecting = req.headers.get("cf-connecting-ip");
+    const ip =
+      cfConnecting || forwarded?.split(",")[0]?.trim() || realIP || "unknown";
 
     // Check rate limiting
     if (isRateLimited(ip)) {
-      console.log(`[CHAT-API] ${requestId} - Rate limit exceeded for IP: ${ip}`);
       const errorResponse = createErrorResponse(
         ERROR_TYPES.RATE_LIMIT_ERROR,
-        'Rate limit exceeded. Please try again later.',
+        "Rate limit exceeded. Please try again later.",
         { retryAfter: Math.ceil(RATE_LIMIT_WINDOW_MS / 1000) }
       );
-      console.log(`[CHAT-API] ${requestId} - Sending rate limit error response:`, JSON.stringify(errorResponse, null, 2));
-      return new Response(
-        JSON.stringify(errorResponse),
-        {
-          status: 429,
-          headers: {
-            'Content-Type': 'application/json',
-            'Retry-After': Math.ceil(RATE_LIMIT_WINDOW_MS / 1000).toString()
-          }
-        }
-      );
+      return new Response(JSON.stringify(errorResponse), {
+        status: 429,
+        headers: {
+          "Content-Type": "application/json",
+          "Retry-After": Math.ceil(RATE_LIMIT_WINDOW_MS / 1000).toString(),
+        },
+      });
     }
 
     // Parse and validate request body
     let body;
     try {
       const text = await req.text();
-      console.log(`[CHAT-API] ${requestId} - Raw request body length: ${text.length}`);
       if (!text.trim()) {
-        throw new Error('Empty request body');
+        throw new Error("Empty request body");
       }
       body = JSON.parse(text);
-      console.log(`[CHAT-API] ${requestId} - Parsed request body:`, {
-        messagesCount: body.messages?.length || 0,
-        style: body.style || 'default',
-        hasMessages: !!body.messages
-      });
     } catch (parseError) {
-      console.error(`[CHAT-API] ${requestId} - Failed to parse request body:`, parseError);
       const errorResponse = createErrorResponse(
         ERROR_TYPES.PARSE_ERROR,
-        'Invalid JSON in request body'
+        "Invalid JSON in request body"
       );
-      console.log(`[CHAT-API] ${requestId} - Sending parse error response:`, JSON.stringify(errorResponse, null, 2));
-      return new Response(
-        JSON.stringify(errorResponse),
-        {
-          status: 400,
-          headers: { 'Content-Type': 'application/json' }
-        }
-      );
+      return new Response(JSON.stringify(errorResponse), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     // Validate messages
     let validatedMessages: Message[];
     try {
       validatedMessages = validateMessages(body.messages);
-      console.log(`[CHAT-API] ${requestId} - Validated ${validatedMessages.length} messages successfully`);
-      validatedMessages.forEach((msg, i) => {
-        console.log(`[CHAT-API] ${requestId} - Message ${i + 1}: role=${msg.role}, contentLength=${msg.content.length}`);
-      });
     } catch (validationError) {
-      console.error(`[CHAT-API] ${requestId} - Message validation failed:`, validationError);
       const errorResponse = createErrorResponse(
         ERROR_TYPES.VALIDATION_ERROR,
-        validationError instanceof Error ? validationError.message : 'Invalid message format'
+        validationError instanceof Error
+          ? validationError.message
+          : "Invalid message format"
       );
-      console.log(`[CHAT-API] ${requestId} - Sending validation error response:`, JSON.stringify(errorResponse, null, 2));
-      return new Response(
-        JSON.stringify(errorResponse),
-        {
-          status: 400,
-          headers: { 'Content-Type': 'application/json' }
-        }
-      );
+      return new Response(JSON.stringify(errorResponse), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     // Validate and set style option
-    let selectedStyle: StyleOption = 'versatile'; // default
+    let selectedStyle: StyleOption = "versatile";
     if (body.style) {
-      if (typeof body.style !== 'string' || !MODEL_CONFIGS[body.style as StyleOption]) {
-        console.log(`[CHAT-API] ${requestId} - Invalid style option provided: ${body.style}`);
+      if (
+        typeof body.style !== "string" ||
+        !MODEL_CONFIGS[body.style as StyleOption]
+      ) {
         const errorResponse = createErrorResponse(
           ERROR_TYPES.VALIDATION_ERROR,
-          'Invalid style option. Available options: polite, concise, versatile, creative'
+          "Invalid style option. Available options: polite, concise, versatile, creative"
         );
-        console.log(`[CHAT-API] ${requestId} - Sending style validation error response:`, JSON.stringify(errorResponse, null, 2));
-        return new Response(
-          JSON.stringify(errorResponse),
-          {
-            status: 400,
-            headers: { 'Content-Type': 'application/json' }
-          }
-        );
+        return new Response(JSON.stringify(errorResponse), {
+          status: 400,
+          headers: { "Content-Type": "application/json" },
+        });
       }
       selectedStyle = body.style as StyleOption;
     }
 
     const selectedModel = MODEL_CONFIGS[selectedStyle];
-    console.log(`[CHAT-API] ${requestId} - Selected style: ${selectedStyle}, model: ${selectedModel.model}`);
 
-    // Initialize Groq model with error handling
-    let model;
-    try {
-      model = groq; // Groq client is ready - model will be selected based on style
-    } catch (modelError) {
-      console.error('[CHAT-API] Failed to initialize Groq client:', modelError);
-      const errorInfo = errorHandler(modelError);
-      const errorResponse = createErrorResponse(
-        errorInfo.type as keyof typeof ERROR_TYPES,
-        errorInfo.message
-      );
-      return new Response(
-        JSON.stringify(errorResponse),
-        {
-          status: errorInfo.status,
-          headers: { 'Content-Type': 'application/json' }
-        }
-      );
-    }
+    // Detect query type and add structured response instructions if needed
+    const lastUserMessage = validatedMessages[validatedMessages.length - 1];
+    const userQuery = lastUserMessage ? lastUserMessage.content : "";
+    const queryType = detectQueryType(userQuery);
 
-    // Convert messages to Groq format (include system prompt and all messages)
+    // Build conversation context
     const conversationSummary = summarizeConversation(validatedMessages);
-    const systemPromptWithContext = conversationSummary
-      ? SYSTEM_PROMPT.content + '\n\n' + conversationSummary
+    let systemPromptWithContext = conversationSummary
+      ? SYSTEM_PROMPT.content + "\n\n" + conversationSummary
       : SYSTEM_PROMPT.content;
 
-    const messages: Array<{role: 'system' | 'user' | 'assistant', content: string}> = [
-      { role: 'system' as const, content: systemPromptWithContext },
+    // Add structured response instructions for specific query types
+    if (queryType) {
+      const structuredInstructions =
+        getStructuredResponseInstructions(queryType);
+      systemPromptWithContext += "\n\n" + structuredInstructions;
+    }
+
+    const messages: Array<{
+      role: "system" | "user" | "assistant";
+      content: string;
+    }> = [
+      { role: "system" as const, content: systemPromptWithContext },
       ...validatedMessages.map((msg) => ({
         role: msg.role,
         content: msg.content,
       })),
     ];
-
-    console.log(`[CHAT-API] ${requestId} - Total messages for Groq: ${messages.length}`);
-    console.log(`[CHAT-API] ${requestId} - Conversation summary: ${conversationSummary || 'none'}`);
-
-    console.log(`[CHAT-API] ${requestId} - Sending request to Groq API with model: ${selectedModel.model}`);
 
     // Send message and get streaming response
     let result;
@@ -757,49 +721,37 @@ export async function POST(req: Request) {
         temperature: 0.7,
         stream: true,
       });
-      console.log(`[CHAT-API] ${requestId} - Groq API request successful, starting streaming response`);
     } catch (apiError) {
-      console.error(`[CHAT-API] ${requestId} - Groq API error:`, apiError);
       const errorInfo = errorHandler(apiError);
       const errorResponse = createErrorResponse(
         errorInfo.type as keyof typeof ERROR_TYPES,
         errorInfo.message
       );
-      console.log(`[CHAT-API] ${requestId} - Sending API error response:`, JSON.stringify(errorResponse, null, 2));
-      return new Response(
-        JSON.stringify(errorResponse),
-        {
-          status: errorInfo.status,
-          headers: { 'Content-Type': 'application/json' }
-        }
-      );
+      return new Response(JSON.stringify(errorResponse), {
+        status: errorInfo.status,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     // Create streaming response
-    const lastUserMessage = validatedMessages[validatedMessages.length - 1];
-    const userQuery = lastUserMessage ? lastUserMessage.content : '';
-    console.log(`[CHAT-API] ${requestId} - Creating streaming response for user query: "${userQuery.substring(0, 100)}${userQuery.length > 100 ? '...' : ''}"`);
     const stream = await createStreamingResponse(result, userQuery, requestId);
 
     const processingTime = Date.now() - startTime;
-    console.log(`[CHAT-API] ${requestId} - Request completed successfully in ${processingTime}ms`);
 
     return new Response(stream, {
       headers: {
-        'Content-Type': 'text/event-stream',
-        'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-        'X-Processing-Time': processingTime.toString(),
-        'X-Request-ID': requestId
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache",
+        Connection: "keep-alive",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization",
+        "X-Processing-Time": processingTime.toString(),
+        "X-Request-ID": requestId,
       },
     });
-
   } catch (globalError) {
     const processingTime = Date.now() - startTime;
-    console.error(`[CHAT-API] ${requestId || 'unknown'} - Global error:`, globalError);
     const errorInfo = errorHandler(globalError);
 
     const errorResponse = createErrorResponse(
@@ -808,126 +760,50 @@ export async function POST(req: Request) {
       { processingTime }
     );
 
-    console.log(`[CHAT-API] ${requestId || 'unknown'} - Sending global error response:`, JSON.stringify(errorResponse, null, 2));
-
-    return new Response(
-      JSON.stringify(errorResponse),
-      {
-        status: errorInfo.status,
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Processing-Time': processingTime.toString(),
-          'X-Request-ID': requestId || 'unknown'
-        }
-      }
-    );
+    return new Response(JSON.stringify(errorResponse), {
+      status: errorInfo.status,
+      headers: {
+        "Content-Type": "application/json",
+        "X-Processing-Time": processingTime.toString(),
+        "X-Request-ID": requestId || "unknown",
+      },
+    });
   }
 }
 
 // OPTIONS handler for CORS preflight
 export async function OPTIONS(req: Request) {
   const requestId = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-  console.log(`[CHAT-API] ${requestId} - Handling OPTIONS preflight request`);
   return new Response(null, {
     status: 200,
     headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-      'Access-Control-Max-Age': '86400', // 24 hours
-      'X-Request-ID': requestId
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization",
+      "Access-Control-Max-Age": "86400",
+      "X-Request-ID": requestId,
     },
   });
 }
 
-// Simplified GET handler (keeping for backward compatibility but not recommended for production)
+// GET handler (deprecated)
 export async function GET(req: Request) {
   const requestId = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-  console.log(`[CHAT-API] ${requestId} - Handling deprecated GET request`);
-  
-  try {
-    
-    const url = new URL(req.url);
-    const messagesParam = url.searchParams.get('messages');
-    
-    if (!messagesParam) {
-      console.log(`[CHAT-API] ${requestId} - Missing messages parameter in GET request`);
-      const errorResponse = createErrorResponse(
-        ERROR_TYPES.VALIDATION_ERROR,
-        'Messages parameter is required'
-      );
-      console.log(`[CHAT-API] ${requestId} - Sending missing parameter error:`, JSON.stringify(errorResponse, null, 2));
-      return new Response(
-        JSON.stringify(errorResponse),
-        {
-          status: 400,
-          headers: { 'Content-Type': 'application/json', 'X-Request-ID': requestId }
-        }
-      );
+
+  const errorResponse = createErrorResponse(
+    ERROR_TYPES.METHOD_DEPRECATED,
+    "GET method is deprecated. Please use POST method instead.",
+    {
+      recommendation: "Use POST /api/chat with messages in the request body",
     }
+  );
 
-    let messages;
-    try {
-      messages = JSON.parse(decodeURIComponent(messagesParam));
-      console.log(`[CHAT-API] ${requestId} - Parsed ${messages?.length || 0} messages from GET parameter`);
-    } catch (parseError) {
-      console.error(`[CHAT-API] ${requestId} - Failed to parse messages parameter:`, parseError);
-      const errorResponse = createErrorResponse(
-        ERROR_TYPES.PARSE_ERROR,
-        'Invalid messages format in query parameter'
-      );
-      console.log(`[CHAT-API] ${requestId} - Sending parse error response:`, JSON.stringify(errorResponse, null, 2));
-      return new Response(
-        JSON.stringify(errorResponse),
-        {
-          status: 400,
-          headers: { 'Content-Type': 'application/json', 'X-Request-ID': requestId }
-        }
-      );
-    }
-
-    // Redirect GET requests to use POST method
-    console.log(`[CHAT-API] ${requestId} - Redirecting GET request to use POST method`);
-    const errorResponse = createErrorResponse(
-      ERROR_TYPES.METHOD_DEPRECATED,
-      'GET method is deprecated. Please use POST method instead.',
-      {
-        recommendation: 'Use POST /api/chat with messages in the request body'
-      }
-    );
-    console.log(`[CHAT-API] ${requestId} - Sending deprecation response:`, JSON.stringify(errorResponse, null, 2));
-    return new Response(
-      JSON.stringify(errorResponse),
-      {
-        status: 405,
-        headers: {
-          'Content-Type': 'application/json',
-          'Allow': 'POST, OPTIONS',
-          'X-Request-ID': requestId
-        }
-      }
-    );
-
-  } catch (error) {
-    console.error(`[CHAT-API] ${requestId} - GET handler error:`, error);
-    const errorInfo = errorHandler(error);
-    
-    const errorResponse = createErrorResponse(
-      errorInfo.type as keyof typeof ERROR_TYPES,
-      errorInfo.message
-    );
-
-    console.log(`[CHAT-API] ${requestId} - Sending GET handler error response:`, JSON.stringify(errorResponse, null, 2));
-
-    return new Response(
-      JSON.stringify(errorResponse),
-      { 
-        status: errorInfo.status,
-        headers: { 
-          'Content-Type': 'application/json',
-          'X-Request-ID': requestId
-        }
-      }
-    );
-  }
+  return new Response(JSON.stringify(errorResponse), {
+    status: 405,
+    headers: {
+      "Content-Type": "application/json",
+      Allow: "POST, OPTIONS",
+      "X-Request-ID": requestId,
+    },
+  });
 }

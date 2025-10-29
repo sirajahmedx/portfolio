@@ -12,7 +12,7 @@ export default function Footer({ variant = "bottom", className = "" }: Footer) {
 
   const variantClasses = {
     bottom: "fixed bottom-4 left-1/2 transform -translate-x-1/2 z-10",
-    center: "flex justify-center items-center py-6",
+    center: "flex justify-center items-center py-2",
   };
 
   return (

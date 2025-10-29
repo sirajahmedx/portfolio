@@ -25,9 +25,9 @@ export type ChatMessageContentProps = {
   isLast?: boolean;
   isLoading?: boolean;
   reload?: () => Promise<string | null | undefined>;
-  addToolResult?: (args: { toolCallId: string; result: string }) => void;
   skipToolRendering?: boolean;
   showProjectsButton?: boolean;
+  isGreeting?: boolean; // New prop to indicate if this is a greeting response
 };
 
 const CodeBlock = ({ content }: { content: string }) => {
@@ -97,6 +97,30 @@ export default function ChatMessageContent({
   }, []);
 
   const renderContent = () => {
+    // Check if this is a casual greeting response
+    const isGreetingResponse =
+      message.role === "assistant" &&
+      (message.content.toLowerCase().includes("hey") ||
+        message.content.toLowerCase().includes("hi") ||
+        message.content.toLowerCase().includes("what's up") ||
+        message.content.toLowerCase().includes("what's on your mind"));
+
+    // Check if response should show projects button
+    const shouldShowProjectsButton =
+      message.role === "assistant" &&
+      (message.content.includes("[SHOW_PROJECTS_BUTTON]") ||
+        message.content.toLowerCase().includes("tuneit") ||
+        message.content.toLowerCase().includes("jobify") ||
+        message.content.toLowerCase().includes("servifi") ||
+        message.content.toLowerCase().includes("talent-tube") ||
+        message.content.toLowerCase().includes("sensify") ||
+        message.content.toLowerCase().includes("global parcel"));
+
+    // Remove the marker from display
+    const displayContent = message.content
+      .replace("[SHOW_PROJECTS_BUTTON]", "")
+      .trim();
+
     if (message.parts && message.parts.length > 0) {
       const content = message.parts.map((part, partIndex) => {
         if (part.type !== "text" || !part.text) return null;
@@ -115,7 +139,13 @@ export default function ChatMessageContent({
                     remarkPlugins={[remarkGfm]}
                     components={{
                       p: ({ children }) => (
-                        <p className="break-words whitespace-pre-wrap text-sm md:text-base leading-relaxed">
+                        <p
+                          className={`break-words whitespace-pre-wrap leading-relaxed ${
+                            isGreetingResponse
+                              ? "text-base md:text-lg"
+                              : "text-sm md:text-base"
+                          }`}
+                        >
                           {children}
                         </p>
                       ),
@@ -160,7 +190,7 @@ export default function ChatMessageContent({
       return (
         <div className="w-full space-y-4">
           {content}
-          {showProjectsButton && message.role === "assistant" && (
+          {shouldShowProjectsButton && message.role === "assistant" && (
             <div className="mt-4">
               <Button
                 onClick={() => (window.location.href = "/projects")}
@@ -176,7 +206,7 @@ export default function ChatMessageContent({
       );
     }
     if (message.content) {
-      const contentParts = message.content.split("```");
+      const contentParts = displayContent.split("```");
 
       const content = (
         <div className="w-full space-y-4">
@@ -189,7 +219,11 @@ export default function ChatMessageContent({
                       text={content}
                       maxLines={8}
                       mobileMaxLines={10}
-                      className="break-words whitespace-pre-wrap text-sm md:text-base leading-relaxed"
+                      className={`break-words whitespace-pre-wrap leading-relaxed ${
+                        isGreetingResponse
+                          ? "text-base md:text-lg"
+                          : "text-sm md:text-base"
+                      }`}
                     />
                   </div>
                 ) : (
@@ -197,7 +231,13 @@ export default function ChatMessageContent({
                     remarkPlugins={[remarkGfm]}
                     components={{
                       p: ({ children }) => (
-                        <p className="break-words whitespace-pre-wrap text-sm md:text-base leading-relaxed">
+                        <p
+                          className={`break-words whitespace-pre-wrap leading-relaxed ${
+                            isGreetingResponse
+                              ? "text-base md:text-lg"
+                              : "text-sm md:text-base"
+                          }`}
+                        >
                           {children}
                         </p>
                       ),
@@ -242,7 +282,7 @@ export default function ChatMessageContent({
       return (
         <div className="w-full space-y-4">
           {content}
-          {showProjectsButton && message.role === "assistant" && (
+          {shouldShowProjectsButton && message.role === "assistant" && (
             <div className="mt-4">
               <Button
                 onClick={() => (window.location.href = "/projects")}

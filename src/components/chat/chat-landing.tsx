@@ -60,9 +60,9 @@ const ChatLanding: React.FC<ChatLandingProps> = ({
       animate="visible"
       variants={containerVariants}
     >
-      <motion.div className="mb-4 md:mb-8 text-center" variants={itemVariants}>
-        <h2 className="mb-2 md:mb-3 text-xl md:text-2xl font-semibold leading-relaxed">
-          I'm Siraj's digital twin
+      <motion.div className="mb-3 md:mb-5 text-center" variants={itemVariants}>
+        <h2 className="mb-2 md:mb-3 text-2xl md:text-3xl font-semibold leading-relaxed">
+          Hey, I’m Siraj..
         </h2>
         {/* <p className="text-muted-foreground mx-auto max-w-md text-sm md:text-base leading-relaxed">
           A passionate 16-year-old developer from Pakistan.
