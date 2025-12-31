@@ -37,6 +37,11 @@ export interface StreamingChunk {
   chunk: number;
   timestamp: string;
   isComplete?: boolean;
+  semantic?: {
+    chunks?: import("./text-chunker").TextChunk[];
+    totalChunks?: number;
+    isAnalyzed?: boolean;
+  };
 }
 
 export interface StreamingError {
@@ -48,15 +53,15 @@ export interface StreamingError {
 
 // Standardized error types
 export const ERROR_TYPES = {
-  VALIDATION_ERROR: 'VALIDATION_ERROR',
-  AUTH_ERROR: 'AUTH_ERROR',
-  RATE_LIMIT_ERROR: 'RATE_LIMIT_ERROR',
-  API_ERROR: 'API_ERROR',
-  NETWORK_ERROR: 'NETWORK_ERROR',
-  QUOTA_EXCEEDED: 'QUOTA_EXCEEDED',
-  UNKNOWN_ERROR: 'UNKNOWN_ERROR',
-  PARSE_ERROR: 'PARSE_ERROR',
-  METHOD_DEPRECATED: 'METHOD_DEPRECATED'
+  VALIDATION_ERROR: "VALIDATION_ERROR",
+  AUTH_ERROR: "AUTH_ERROR",
+  RATE_LIMIT_ERROR: "RATE_LIMIT_ERROR",
+  API_ERROR: "API_ERROR",
+  NETWORK_ERROR: "NETWORK_ERROR",
+  QUOTA_EXCEEDED: "QUOTA_EXCEEDED",
+  UNKNOWN_ERROR: "UNKNOWN_ERROR",
+  PARSE_ERROR: "PARSE_ERROR",
+  METHOD_DEPRECATED: "METHOD_DEPRECATED",
 } as const;
 
 export type ErrorType = keyof typeof ERROR_TYPES;
@@ -71,7 +76,7 @@ export const ERROR_STATUS_MAP: Record<ErrorType, number> = {
   QUOTA_EXCEEDED: 429,
   UNKNOWN_ERROR: 500,
   PARSE_ERROR: 400,
-  METHOD_DEPRECATED: 405
+  METHOD_DEPRECATED: 405,
 };
 
 // Utility functions for creating standardized responses
@@ -83,7 +88,7 @@ export function createSuccessResponse<T>(
     success: true,
     data,
     timestamp: new Date().toISOString(),
-    requestId
+    requestId,
   };
 }
 
@@ -99,24 +104,50 @@ export function createErrorResponse(
       message,
       type,
       code: ERROR_STATUS_MAP[type],
-      details
+      details,
     },
     timestamp: new Date().toISOString(),
-    requestId
+    requestId,
   };
 }
 
 export function createStreamingChunk(
   text: string,
   chunkNumber: number,
-  isComplete = false
+  isComplete = false,
+  fullText?: string
 ): StreamingChunk {
-  return {
+  const chunk: StreamingChunk = {
     text,
     chunk: chunkNumber,
     timestamp: new Date().toISOString(),
-    isComplete
+    isComplete,
   };
+
+  // If this is the final chunk and we have full text, add semantic analysis
+  if (isComplete && fullText && fullText.trim()) {
+    const { chunkText } = require("./text-chunker");
+    try {
+      const semanticChunks = chunkText(fullText, {
+        fontSizeReduction: 20,
+        maxChunkLength: 150,
+        minChunkLength: 25,
+      });
+
+      chunk.semantic = {
+        chunks: semanticChunks,
+        totalChunks: semanticChunks.length,
+        isAnalyzed: true,
+      };
+    } catch (error) {
+      console.warn("Semantic chunking failed:", error);
+      chunk.semantic = {
+        isAnalyzed: false,
+      };
+    }
+  }
+
+  return chunk;
 }
 
 export function createStreamingError(
@@ -128,7 +159,7 @@ export function createStreamingError(
     error: message,
     type,
     timestamp: new Date().toISOString(),
-    chunk: chunkNumber
+    chunk: chunkNumber,
   };
 }
 
@@ -138,14 +169,14 @@ export function formatTimestamp(date: Date = new Date()): string {
 }
 
 export function formatDisplayDate(date: Date): string {
-  return date.toLocaleString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-    timeZoneName: 'short'
+  return date.toLocaleString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    timeZoneName: "short",
   });
 }
 
@@ -153,10 +184,11 @@ export function formatRelativeTime(date: Date): string {
   const now = new Date();
   const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
 
-  if (diffInSeconds < 60) return 'Just now';
+  if (diffInSeconds < 60) return "Just now";
   if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
   if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
-  if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)}d ago`;
+  if (diffInSeconds < 604800)
+    return `${Math.floor(diffInSeconds / 86400)}d ago`;
 
   return formatDisplayDate(date);
 }
@@ -167,9 +199,10 @@ export function capitalizeFirst(str: string): string {
 }
 
 export function titleCase(str: string): string {
-  return str.split(' ')
-    .map(word => capitalizeFirst(word))
-    .join(' ');
+  return str
+    .split(" ")
+    .map((word) => capitalizeFirst(word))
+    .join(" ");
 }
 
 export function formatErrorMessage(message: string): string {
@@ -179,7 +212,7 @@ export function formatErrorMessage(message: string): string {
     formatted = capitalizeFirst(formatted);
   }
   if (formatted && !formatted.match(/[.!?]$/)) {
-    formatted += '.';
+    formatted += ".";
   }
   return formatted;
 }
@@ -190,18 +223,27 @@ export function validateEmail(email: string): boolean {
   return emailRegex.test(email);
 }
 
-export function validateMessageContent(content: string): { isValid: boolean; error?: string } {
-  if (!content || typeof content !== 'string') {
-    return { isValid: false, error: 'Message content must be a non-empty string' };
+export function validateMessageContent(content: string): {
+  isValid: boolean;
+  error?: string;
+} {
+  if (!content || typeof content !== "string") {
+    return {
+      isValid: false,
+      error: "Message content must be a non-empty string",
+    };
   }
 
   const trimmed = content.trim();
   if (trimmed.length === 0) {
-    return { isValid: false, error: 'Message content cannot be empty' };
+    return { isValid: false, error: "Message content cannot be empty" };
   }
 
   if (trimmed.length > 10000) {
-    return { isValid: false, error: 'Message content cannot exceed 10,000 characters' };
+    return {
+      isValid: false,
+      error: "Message content cannot exceed 10,000 characters",
+    };
   }
 
   return { isValid: true };

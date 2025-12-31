@@ -11,6 +11,10 @@ import { ChevronDown, ChevronUp, ExternalLink } from "lucide-react";
 import { useEffect, useState } from "react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import {
+  SemanticChunkRenderer,
+  FallbackRenderer,
+} from "./semantic-chunk-renderer";
 
 interface Message {
   id: string;
@@ -121,6 +125,35 @@ export default function ChatMessageContent({
       .replace("[SHOW_PROJECTS_BUTTON]", "")
       .trim();
 
+    // If semantic chunks are attached to the message (from streaming analysis), render them
+    // message.metadata?.semantic?.chunks is expected shape
+    // @ts-ignore - runtime check below
+    const semantic = (message as any).metadata?.semantic;
+
+    if (
+      semantic &&
+      Array.isArray(semantic.chunks) &&
+      semantic.chunks.length > 0
+    ) {
+      return (
+        <div className="w-full">
+          <SemanticChunkRenderer chunks={semantic.chunks} />
+          {shouldShowProjectsButton && message.role === "assistant" && (
+            <div className="mt-4">
+              <Button
+                onClick={() => (window.location.href = "/projects")}
+                className="flex items-center gap-2"
+                variant="outline"
+              >
+                <ExternalLink className="h-4 w-4" />
+                View Projects
+              </Button>
+            </div>
+          )}
+        </div>
+      );
+    }
+
     if (message.parts && message.parts.length > 0) {
       const content = message.parts.map((part, partIndex) => {
         if (part.type !== "text" || !part.text) return null;
@@ -142,25 +175,25 @@ export default function ChatMessageContent({
                         <p
                           className={`break-words whitespace-pre-wrap leading-relaxed ${
                             isGreetingResponse
-                              ? "text-base md:text-lg"
-                              : "text-sm md:text-base"
+                              ? "text-sm md:text-base"
+                              : "text-xs md:text-sm"
                           }`}
                         >
                           {children}
                         </p>
                       ),
                       ul: ({ children }) => (
-                        <ul className="my-3 md:my-4 list-disc pl-4 md:pl-6 text-sm md:text-base leading-relaxed">
+                        <ul className="my-3 md:my-4 list-disc pl-4 md:pl-6 text-xs md:text-sm leading-relaxed">
                           {children}
                         </ul>
                       ),
                       ol: ({ children }) => (
-                        <ol className="my-3 md:my-4 list-decimal pl-4 md:pl-6 text-sm md:text-base leading-relaxed">
+                        <ol className="my-3 md:my-4 list-decimal pl-4 md:pl-6 text-xs md:text-sm leading-relaxed">
                           {children}
                         </ol>
                       ),
                       li: ({ children }) => (
-                        <li className="my-2 text-sm md:text-base leading-relaxed">
+                        <li className="my-2 text-xs md:text-sm leading-relaxed">
                           {children}
                         </li>
                       ),
@@ -221,8 +254,8 @@ export default function ChatMessageContent({
                       mobileMaxLines={10}
                       className={`break-words whitespace-pre-wrap leading-relaxed ${
                         isGreetingResponse
-                          ? "text-base md:text-lg"
-                          : "text-sm md:text-base"
+                          ? "text-sm md:text-base"
+                          : "text-xs md:text-sm"
                       }`}
                     />
                   </div>
@@ -234,25 +267,25 @@ export default function ChatMessageContent({
                         <p
                           className={`break-words whitespace-pre-wrap leading-relaxed ${
                             isGreetingResponse
-                              ? "text-base md:text-lg"
-                              : "text-sm md:text-base"
+                              ? "text-sm md:text-base"
+                              : "text-xs md:text-sm"
                           }`}
                         >
                           {children}
                         </p>
                       ),
                       ul: ({ children }) => (
-                        <ul className="my-3 md:my-4 list-disc pl-4 md:pl-6 text-sm md:text-base leading-relaxed">
+                        <ul className="my-3 md:my-4 list-disc pl-4 md:pl-6 text-xs md:text-sm leading-relaxed">
                           {children}
                         </ul>
                       ),
                       ol: ({ children }) => (
-                        <ol className="my-3 md:my-4 list-decimal pl-4 md:pl-6 text-sm md:text-base leading-relaxed">
+                        <ol className="my-3 md:my-4 list-decimal pl-4 md:pl-6 text-xs md:text-sm leading-relaxed">
                           {children}
                         </ol>
                       ),
                       li: ({ children }) => (
-                        <li className="my-2 text-sm md:text-base leading-relaxed">
+                        <li className="my-2 text-xs md:text-sm leading-relaxed">
                           {children}
                         </li>
                       ),

@@ -24,12 +24,12 @@ export default function Footer({ variant = "bottom", className = "" }: Footer) {
     >
       Inspired by{" "}
       <a
-        href="https://toukam.fr"
+        href="https://www.toukoum.fr/"
         target="_blank"
         rel="noopener noreferrer"
         className="ml-1 hover:text-primary transition-colors duration-200 underline decoration-dotted underline-offset-2"
       >
-        Toukam
+        Toukoum
       </a>
     </motion.div>
   );

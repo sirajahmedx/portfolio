@@ -466,7 +466,13 @@ function validateMessages(messages: any[]): Message[] {
     }
 
     if (msg.content.trim().length === 0) {
-      throw new Error(`Empty content at index ${index}`);
+      // Handle empty messages - convert to "what do you want to know?" query
+      return {
+        role: msg.role,
+        content: msg.role === "user" ? "what do you want to know?" : msg.content.trim(),
+        timestamp: msg.timestamp,
+        id: msg.id,
+      };
     }
 
     if (msg.content.length > 10000) {
@@ -556,20 +562,26 @@ async function createStreamingResponse(
           }
         }
 
-        // Send any remaining text
+        // Send any remaining text with semantic analysis
         if (currentSentence.trim()) {
           chunkIndex++;
           const chunkData = createStreamingChunk(
             currentSentence.trim(),
             chunkIndex,
-            true
+            true,
+            totalText // Pass full text for semantic analysis
           );
           controller.enqueue(
             new TextEncoder().encode(`data: ${JSON.stringify(chunkData)}\n\n`)
           );
         } else if (chunkIndex > 0) {
-          // Mark the last sent chunk as complete
-          const finalChunk = createStreamingChunk("", chunkIndex, true);
+          // Mark the last sent chunk as complete with semantic analysis
+          const finalChunk = createStreamingChunk(
+            "",
+            chunkIndex,
+            true,
+            totalText
+          );
           controller.enqueue(
             new TextEncoder().encode(`data: ${JSON.stringify(finalChunk)}\n\n`)
           );
@@ -685,6 +697,36 @@ export async function POST(req: Request) {
     // Detect query type and add structured response instructions if needed
     const lastUserMessage = validatedMessages[validatedMessages.length - 1];
     const userQuery = lastUserMessage ? lastUserMessage.content : "";
+
+    // Handle empty messages
+    if (!userQuery.trim()) {
+      return new Response(
+        new ReadableStream({
+          start(controller) {
+            const chunkData = {
+              text: "what do you want to know?",
+              isComplete: true,
+              chunk: 1,
+              totalChunks: 1,
+              showProjectsButton: false,
+            };
+            controller.enqueue(
+              new TextEncoder().encode(`data: ${JSON.stringify(chunkData)}\n\n`)
+            );
+            controller.close();
+          },
+        }),
+        {
+          headers: {
+            "Content-Type": "text/event-stream",
+            "Cache-Control": "no-cache",
+            Connection: "keep-alive",
+            "Access-Control-Allow-Origin": "*",
+          },
+        }
+      );
+    }
+
     const queryType = detectQueryType(userQuery);
 
     // Build conversation context
