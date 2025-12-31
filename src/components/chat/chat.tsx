@@ -717,7 +717,7 @@ const Chat = () => {
           try {
             const errorData = await response.json();
             // Handle both string and object error formats
-            if (typeof errorData.error === 'string') {
+            if (typeof errorData.error === "string") {
               errorMessage = errorData.error;
             } else if (errorData.error?.message) {
               errorMessage = errorData.error.message;
