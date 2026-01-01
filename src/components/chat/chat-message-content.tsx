@@ -125,6 +125,12 @@ export default function ChatMessageContent({
       .replace("[SHOW_PROJECTS_BUTTON]", "")
       .trim();
 
+    // Capitalize first letter for assistant responses
+    const processedContent =
+      message.role === "assistant" && displayContent.length > 0
+        ? displayContent.charAt(0).toUpperCase() + displayContent.slice(1)
+        : displayContent;
+
     // If semantic chunks are attached to the message (from streaming analysis), render them
     // message.metadata?.semantic?.chunks is expected shape
     // @ts-ignore - runtime check below
@@ -239,7 +245,7 @@ export default function ChatMessageContent({
       );
     }
     if (message.content) {
-      const contentParts = displayContent.split("```");
+      const contentParts = processedContent.split("```");
 
       const content = (
         <div className="w-full space-y-4">

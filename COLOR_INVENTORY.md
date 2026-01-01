@@ -1,11 +1,13 @@
 # Portfolio Application - Comprehensive Color Inventory
 
 ## Theme System Overview
+
 The application uses a CSS custom property-based design system with light and dark theme variants. Colors are defined using OKLCH color space for better perceptual uniformity and are converted to various opacity levels throughout the application.
 
 ## Core Theme Colors
 
 ### Light Theme (Default)
+
 - **Primary**: `oklch(0.55 0.2 264)` - Purple/Blue brand color
 - **Primary Foreground**: `oklch(0.95 0.005 264)` - Very light purple/white
 - **Secondary**: `oklch(0.88 0.01 264)` - Light grayish purple
@@ -26,6 +28,7 @@ The application uses a CSS custom property-based design system with light and da
 - **Ring**: `oklch(0.55 0.2 264)` - Same as primary for focus rings
 
 ### Dark Theme
+
 - **Primary**: `oklch(0.7 0.25 264)` - Brighter purple/blue
 - **Primary Foreground**: `oklch(0.08 0.01 264)` - Very dark background
 - **Secondary**: `oklch(0.18 0.03 264)` - Dark grayish purple
@@ -48,6 +51,7 @@ The application uses a CSS custom property-based design system with light and da
 ## Chart Colors (Both Themes)
 
 ### Light Theme Charts
+
 - **Chart 1**: `oklch(0.6 0.25 264)` - Purple
 - **Chart 2**: `oklch(0.65 0.2 320)` - Magenta
 - **Chart 3**: `oklch(0.7 0.18 200)` - Cyan
@@ -55,6 +59,7 @@ The application uses a CSS custom property-based design system with light and da
 - **Chart 5**: `oklch(0.6 0.2 40)` - Orange
 
 ### Dark Theme Charts
+
 - **Chart 1**: `oklch(0.65 0.25 264)` - Brighter purple
 - **Chart 2**: `oklch(0.7 0.22 320)` - Brighter magenta
 - **Chart 3**: `oklch(0.75 0.2 200)` - Brighter cyan
@@ -64,6 +69,7 @@ The application uses a CSS custom property-based design system with light and da
 ## Sidebar System Colors
 
 ### Light Theme Sidebar
+
 - **Sidebar**: `oklch(0.93 0.005 264)` - Same as background
 - **Sidebar Foreground**: `oklch(0.15 0.02 264)` - Same as foreground
 - **Sidebar Primary**: `oklch(0.55 0.2 264)` - Same as primary
@@ -74,6 +80,7 @@ The application uses a CSS custom property-based design system with light and da
 - **Sidebar Ring**: `oklch(0.55 0.2 264)` - Same as ring
 
 ### Dark Theme Sidebar
+
 - **Sidebar**: `oklch(0.1 0.015 264)` - Slightly lighter than background
 - **Sidebar Foreground**: `oklch(0.95 0.005 264)` - Same as foreground
 - **Sidebar Primary**: `oklch(0.7 0.25 264)` - Same as primary
@@ -86,16 +93,19 @@ The application uses a CSS custom property-based design system with light and da
 ## Hard-Coded Colors (Specific Use Cases)
 
 ### Button Colors (Helper Boost & Quick Actions)
+
 - **"Me" Button**: `#329696` (Teal)
 - **"Projects" Button**: `#3E9858` (Green)
 - **"Skills" Button**: `#856ED9` (Purple)
 - **"Contact" Button**: `#C19433` (Gold/Orange)
 
 ### Chat Components
+
 - **Chat Bubble (Sent)**: `#007AFF` (iOS Blue)
 - **Scrollbar Color**: `rgb(107 114 128 / 0.3)` (Gray with 30% opacity)
 
 ### UI Component Specific Colors
+
 - **Compare Component Particle**: `#FFFFFF` (White)
 - **Compare Component Shadow**: `#FFFFFF40` (White with 25% opacity)
 - **Sparkles Background Default**: `#0d47a1` (Dark Blue)
@@ -104,17 +114,20 @@ The application uses a CSS custom property-based design system with light and da
 - **Sparkles Light Values**: `#fff` (White)
 
 ### Project Card Backgrounds
+
 - **Light Project Cards**: `#F5F5F7` (Apple-style light gray)
 - **Dark Project Cards**: `#1D1D1F` (Apple-style dark gray)
 
 ### Gradient Specific Colors
-- **GitHub Badge Gradients**: 
+
+- **GitHub Badge Gradients**:
   - Light: `from-gray-500/70 to-gray-700/70`
   - Dark: `from-[#6E7681]/60 to-[#484F58]/60`
 
 ## Color Opacity Variations Used
 
 ### Primary Color Variations
+
 - `primary/5` - 5% opacity (subtle backgrounds)
 - `primary/8` - 8% opacity
 - `primary/10` - 10% opacity (light backgrounds)
@@ -124,10 +137,12 @@ The application uses a CSS custom property-based design system with light and da
 - `primary/90` - 90% opacity (hover states)
 
 ### Background Color Variations
+
 - `background/60` - 60% opacity
 - `background/80` - 80% opacity (overlays, modals)
 
 ### Card Color Variations
+
 - `card/2` - 2% opacity (very subtle)
 - `card/5` - 5% opacity
 - `card/10` - 10% opacity
@@ -141,6 +156,7 @@ The application uses a CSS custom property-based design system with light and da
 - `card/95` - 95% opacity (near opaque)
 
 ### Accent Color Variations
+
 - `accent/5` - 5% opacity (page backgrounds)
 - `accent/10` - 10% opacity (hover states)
 - `accent/20` - 20% opacity (active states, dark theme)
@@ -148,12 +164,14 @@ The application uses a CSS custom property-based design system with light and da
 - `accent/80` - 80% opacity
 
 ### Muted Color Variations
+
 - `muted/5` - 5% opacity
 - `muted/20` - 20% opacity (borders, subtle backgrounds)
 - `muted/30` - 30% opacity (message dialogs, cards)
 - `muted/50` - 50% opacity
 
 ### Border Color Variations
+
 - `border/10` - 10% opacity (very subtle borders)
 - `border/20` - 20% opacity
 - `border/30` - 30% opacity (standard borders)
@@ -163,11 +181,13 @@ The application uses a CSS custom property-based design system with light and da
 - `border/90` - 90% opacity (hover states)
 
 ### Destructive Color Variations
+
 - `destructive/10` - 10% opacity (error backgrounds)
 - `destructive/60` - 60% opacity (dark theme)
 - `destructive/70` - 70% opacity
 
 ### Black/White Variations
+
 - `black/0` - 0% opacity (transparent)
 - `black/50` - 50% opacity (modal overlays)
 - `black/60` - 60% opacity (modal overlays)
@@ -178,6 +198,7 @@ The application uses a CSS custom property-based design system with light and da
 ## State-Based Colors
 
 ### Hover States
+
 - `hover:bg-accent/10` - Light accent hover
 - `hover:bg-accent/20` - Standard accent hover
 - `hover:bg-accent/50` - Medium accent hover
@@ -190,58 +211,69 @@ The application uses a CSS custom property-based design system with light and da
 - `hover:border-border/90` - Very strong border hover
 
 ### Focus States
+
 - `focus-within:!border-primary/50` - Focus border
 - `focus-within:!shadow-primary/10` - Focus shadow
 - `outline-ring/50` - Focus outline
 
 ### Active/Pressed States
+
 - Various scale transformations with color changes
 - Shadow intensity variations
 
 ## Gradient Combinations
 
 ### Background Gradients
+
 - `bg-gradient-to-br from-primary/5 via-background to-accent/5` (Main page background)
 - `bg-gradient-to-r from-primary to-accent` (Text gradient)
 - `bg-gradient-to-br from-primary/20 to-accent/20` (Avatar background)
 - `bg-gradient-to-r from-transparent via-border to-transparent` (Dividers)
 
 ### Text Gradients
+
 - `bg-gradient-to-r from-foreground via-foreground/90 to-foreground/80` (Project titles)
 - `bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent` (Name highlight)
 
 ### Blur Effects
+
 - `bg-gradient-to-r from-primary/5 to-accent/5 blur-3xl` (Background blur effects)
 
 ## Component-Specific Color Usage
 
 ### Chat Interface
+
 - User messages: `bg-primary/10 border-primary/20`
 - System messages: Default foreground
 - Input area: `bg-background/80 border-border/30`
 - Hover buttons: `hover:bg-accent/20`
 
 ### Navigation/Header
+
 - Background: `bg-gradient-to-br from-primary/5 via-background/95 to-accent/5`
 - Borders: `border-border/30`
 
 ### Cards & Dialogs
+
 - Standard card: `bg-card border-border/50`
 - Dialog overlay: `bg-black/60`
 - Card content: Various muted and foreground combinations
 
 ### Form Elements
+
 - Input borders: `border-border/80`
 - Focus borders: `focus-within:!border-primary/50`
 - Disabled states: Reduced opacity variations
 
 ### Loading & Animation States
+
 - Loading dots: `bg-primary/60` with animation
 - Skeleton loading: Various muted color combinations
 
 ## Accessibility & Contrast Notes
 
 The color system maintains proper contrast ratios:
+
 - Light theme: Dark text on light backgrounds
 - Dark theme: Light text on dark backgrounds
 - Interactive elements have sufficient contrast
@@ -260,7 +292,7 @@ The color system maintains proper contrast ratios:
 
 - **Total Core Theme Colors**: 13 base colors per theme (26 total)
 - **Chart Colors**: 5 per theme (10 total)
-- **Sidebar Colors**: 6 per theme (12 total)  
+- **Sidebar Colors**: 6 per theme (12 total)
 - **Hard-coded Colors**: 15 specific hex values
 - **Opacity Variations**: 50+ different opacity combinations
 - **Gradient Combinations**: 15+ unique gradient patterns

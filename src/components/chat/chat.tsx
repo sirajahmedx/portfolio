@@ -938,20 +938,20 @@ const Chat = () => {
                       >
                         <div
                           className={`group relative ${
-                            message.role === "assistant" 
-                              ? "w-full" 
-                              : "w-full max-w-[75%]"
+                            message.role === "assistant"
+                              ? "w-full"
+                              : "flex justify-end w-full"
                           }`}
                         >
                           <div
                             className={`flex items-start gap-4 ${message.role === "user" ? "flex-row-reverse justify-start" : "flex-row"}`}
                           >
                             <div
-                              className={`relative w-full ${message.role === "user" ? "" : ""}`}
+                              className={`relative ${message.role === "user" ? "" : "w-full"}`}
                             >
                               {message.role === "user" ? (
-                                <div className="bg-primary/10 text-primary-foreground border-primary/20 rounded-2xl rounded-br-md px-4 py-3 shadow-md border backdrop-blur-sm w-full">
-                                  <div className="prose prose-base max-w-none text-foreground">
+                                <div className="bg-primary/10 text-primary-foreground border-primary/20 rounded-2xl rounded-br-md px-4 py-3 shadow-md border backdrop-blur-sm max-w-[75%] min-w-fit w-auto">
+                                  <div className="prose prose-base max-w-none text-foreground whitespace-pre-wrap break-words">
                                     <ChatMessageContent
                                       message={message}
                                       isLast={index === messages.length - 1}
@@ -996,7 +996,9 @@ const Chat = () => {
                             </div>
                           </div>
 
-                          <div className={`absolute top-0 ${message.role === "user" ? "-left-8" : "-right-8"} flex flex-col gap-1 opacity-0 transition-all duration-300 group-hover:opacity-100`}>
+                          <div
+                            className={`absolute top-0 ${message.role === "user" ? "-left-8" : "-right-8"} flex flex-col gap-1 opacity-0 transition-all duration-300 group-hover:opacity-100`}
+                          >
                             <button
                               onClick={() => copyToClipboard(message.content)}
                               className="text-muted-foreground hover:text-foreground hover:bg-accent/20 rounded-xl p-1.5 transition-all duration-200 hover:scale-110 active:scale-95"
@@ -1063,7 +1065,7 @@ const Chat = () => {
           <div className="mx-auto max-w-3xl">
             <form onSubmit={onSubmit} className="relative">
               <div
-                className="flex items-end rounded-full border-2  
+                className="flex items-end rounded-3xl border-2  
                border-border/80 p-2 sm:p-2.5 shadow-lg backdrop-blur-xl transition-all duration-300 hover:border-border/90 focus-within:!border-primary/50 focus-within:!shadow-lg focus-within:!shadow-primary/10"
               >
                 <textarea
