@@ -87,6 +87,58 @@ const CodeBlock = ({ content }: { content: string }) => {
   );
 };
 
+// Function to split text into readable paragraphs
+const splitIntoParagraphs = (text: string): string[] => {
+  if (!text) return [];
+
+  // First, split by existing double line breaks (paragraphs)
+  const paragraphs = text.split(/\n\s*\n/).filter((p) => p.trim().length > 0);
+
+  // Process each paragraph to break up long ones
+  const processedParagraphs: string[] = [];
+
+  paragraphs.forEach((paragraph) => {
+    const trimmed = paragraph.trim();
+
+    // If paragraph is short, keep as is
+    if (trimmed.length < 200) {
+      processedParagraphs.push(trimmed);
+      return;
+    }
+
+    // Split long paragraphs at sentence boundaries
+    const sentences = trimmed.split(/(?<=[.!?])\s+/);
+
+    let currentParagraph = "";
+    let sentenceCount = 0;
+
+    sentences.forEach((sentence, index) => {
+      currentParagraph += (currentParagraph ? " " : "") + sentence;
+      sentenceCount++;
+
+      // Break after 2-3 sentences or when reaching ~150 characters
+      const shouldBreak =
+        sentenceCount >= 2 &&
+        (currentParagraph.length > 120 ||
+          (sentenceCount >= 3 && currentParagraph.length > 80) ||
+          index === sentences.length - 1);
+
+      if (shouldBreak) {
+        processedParagraphs.push(currentParagraph.trim());
+        currentParagraph = "";
+        sentenceCount = 0;
+      }
+    });
+
+    // Add any remaining content
+    if (currentParagraph.trim()) {
+      processedParagraphs.push(currentParagraph.trim());
+    }
+  });
+
+  return processedParagraphs.filter((p) => p.length > 0);
+};
+
 export default function ChatMessageContent({
   message,
   showProjectsButton = false,
@@ -179,11 +231,7 @@ export default function ChatMessageContent({
                     components={{
                       p: ({ children }) => (
                         <p
-                          className={`break-words whitespace-pre-wrap leading-relaxed ${
-                            isGreetingResponse
-                              ? "text-base md:text-lg"
-                              : "text-sm md:text-base"
-                          }`}
+                          className={`break-words whitespace-pre-wrap leading-relaxed text-sm md:text-base`}
                         >
                           {children}
                         </p>
@@ -253,62 +301,62 @@ export default function ChatMessageContent({
             i % 2 === 0 ? (
               <div key={`text-${i}`} className="prose dark:prose-invert w-full">
                 {isMobile ? (
-                  <div className="prose dark:prose-invert w-full">
-                    <ExpandableText
-                      text={content}
-                      maxLines={8}
-                      mobileMaxLines={10}
-                      className={`break-words whitespace-pre-wrap leading-relaxed ${
-                        isGreetingResponse
-                          ? "text-base md:text-lg"
-                          : "text-sm md:text-base"
-                      }`}
-                    />
+                  <div className="space-y-3">
+                    {splitIntoParagraphs(content).map((paragraph, pIndex) => (
+                      <ExpandableText
+                        key={`mobile-para-${pIndex}`}
+                        text={paragraph}
+                        maxLines={8}
+                        mobileMaxLines={10}
+                        className={`break-words whitespace-pre-wrap leading-relaxed text-sm md:text-base`}
+                      />
+                    ))}
                   </div>
                 ) : (
-                  <Markdown
-                    remarkPlugins={[remarkGfm]}
-                    components={{
-                      p: ({ children }) => (
-                        <p
-                          className={`break-words whitespace-pre-wrap leading-relaxed ${
-                            isGreetingResponse
-                              ? "text-base md:text-lg"
-                              : "text-sm md:text-base"
-                          }`}
-                        >
-                          {children}
-                        </p>
-                      ),
-                      ul: ({ children }) => (
-                        <ul className="my-3 md:my-4 list-disc pl-4 md:pl-6 text-sm md:text-base leading-relaxed">
-                          {children}
-                        </ul>
-                      ),
-                      ol: ({ children }) => (
-                        <ol className="my-3 md:my-4 list-decimal pl-4 md:pl-6 text-sm md:text-base leading-relaxed">
-                          {children}
-                        </ol>
-                      ),
-                      li: ({ children }) => (
-                        <li className="my-2 text-sm md:text-base leading-relaxed">
-                          {children}
-                        </li>
-                      ),
-                      a: ({ href, children }) => (
-                        <a
-                          href={href}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-500 hover:underline"
-                        >
-                          {children}
-                        </a>
-                      ),
-                    }}
-                  >
-                    {content}
-                  </Markdown>
+                  <div className="space-y-3">
+                    {splitIntoParagraphs(content).map((paragraph, pIndex) => (
+                      <Markdown
+                        key={`para-${pIndex}`}
+                        remarkPlugins={[remarkGfm]}
+                        components={{
+                          p: ({ children }) => (
+                            <p
+                              className={`break-words whitespace-pre-wrap leading-relaxed text-sm md:text-base`}
+                            >
+                              {children}
+                            </p>
+                          ),
+                          ul: ({ children }) => (
+                            <ul className="my-3 md:my-4 list-disc pl-4 md:pl-6 text-sm md:text-base leading-relaxed">
+                              {children}
+                            </ul>
+                          ),
+                          ol: ({ children }) => (
+                            <ol className="my-3 md:my-4 list-decimal pl-4 md:pl-6 text-sm md:text-base leading-relaxed">
+                              {children}
+                            </ol>
+                          ),
+                          li: ({ children }) => (
+                            <li className="my-2 text-sm md:text-base leading-relaxed">
+                              {children}
+                            </li>
+                          ),
+                          a: ({ href, children }) => (
+                            <a
+                              href={href}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-500 hover:underline"
+                            >
+                              {children}
+                            </a>
+                          ),
+                        }}
+                      >
+                        {paragraph}
+                      </Markdown>
+                    ))}
+                  </div>
                 )}
               </div>
             ) : (
