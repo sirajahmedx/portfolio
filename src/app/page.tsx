@@ -239,18 +239,11 @@ export default function Home() {
 
             {/* Page.tsx */}
             <form onSubmit={handleSubmit} className="relative">
-              <div
-                className="flex items-end rounded-full border-2  
-               border-border/80 p-2 sm:p-2.5 shadow-lg backdrop-blur-xl transition-all duration-300 hover:border-border/90 focus-within:!border-primary/50 focus-within:!shadow-lg focus-within:!shadow-primary/10"
-              >
+              <div className="flex items-end rounded-lg border-2 border-border/80 p-2 sm:p-2.5 shadow-lg backdrop-blur-xl transition-all duration-300 hover:border-border/90 focus-within:!border-primary/50 focus-within:!shadow-lg focus-within:!shadow-primary/10">
                 <textarea
                   ref={inputRef}
                   value={input}
                   onChange={handleInputChange}
-                  onFocus={() => {
-                    // Navigate to chat when user focuses on input to ensure proper scroll behavior
-                    router.push("/chat");
-                  }}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && !e.shiftKey) {
                       e.preventDefault();
