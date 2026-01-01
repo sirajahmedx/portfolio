@@ -374,19 +374,18 @@ const Chat = () => {
       isUserScrolling: isUserScrolling.current,
     });
 
-    // Simple scroll to bottom
+    // Always scroll when forced (focus, new messages, etc.)
     if (force) {
       console.log("[SCROLL] Force scrolling to bottom");
-      container.scrollTo({
-        top: container.scrollHeight,
-        behavior: "smooth",
-      });
+      // Use immediate scroll for force mode to prevent partial scroll states
+      container.scrollTop = container.scrollHeight;
       return;
     }
 
     // Prevent excessive scrolling
     const now = Date.now();
-    if (now - lastScrollTime.current < 100) {
+    if (now - lastScrollTime.current < 50) {
+      // Reduced throttling for smoother updates
       console.log("[SCROLL] Throttled - too recent");
       return;
     }
@@ -395,7 +394,7 @@ const Chat = () => {
     // Check if user is near bottom
     const { scrollTop, scrollHeight, clientHeight } = container;
     const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
-    const isNearBottom = distanceFromBottom < 150;
+    const isNearBottom = distanceFromBottom < 100; // Reduced threshold for more responsive scrolling
 
     console.log("[SCROLL] Scroll state:", {
       scrollTop,
@@ -430,7 +429,7 @@ const Chat = () => {
     // Check if user is near bottom
     const { scrollTop, scrollHeight, clientHeight } = container;
     const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
-    const nearBottom = distanceFromBottom < 150;
+    const nearBottom = distanceFromBottom < 100; // Reduced threshold to match scrollToBottom
     isNearBottom.current = nearBottom;
     setShowScrollButton(!nearBottom && scrollTop > 200);
 
@@ -440,7 +439,7 @@ const Chat = () => {
 
     scrollTimeoutRef.current = setTimeout(() => {
       isUserScrolling.current = false;
-    }, 1500); // Longer timeout to prevent aggressive auto-scrolling
+    }, 1000); // Reduced timeout for more responsive auto-scrolling
   }, []);
 
   useEffect(() => {
@@ -469,7 +468,7 @@ const Chat = () => {
       {
         root: scrollContainerRef.current,
         threshold: 0.1,
-        rootMargin: "0px 0px 100px 0px", // Trigger when element is 100px from bottom
+        rootMargin: "0px 0px 50px 0px", // Reduced margin for more precise detection
       }
     );
 
@@ -482,8 +481,8 @@ const Chat = () => {
 
   // Smooth scroll to bottom when messages change
   useEffect(() => {
-    // Immediate scroll for new messages, debounced for updates
-    const timer = setTimeout(() => scrollToBottom(), 50);
+    // More responsive scroll for new messages
+    const timer = setTimeout(() => scrollToBottom(), 25); // Reduced delay for faster response
     return () => clearTimeout(timer);
   }, [messages, loadingSubmit, scrollToBottom]);
 
@@ -620,10 +619,10 @@ const Chat = () => {
             if (chunkCount === 0) {
             }
 
-            // Gentle scroll during streaming
-            if (chunkCount % 3 === 0) {
-              // Only scroll every 3rd chunk
-              setTimeout(() => scrollToBottom(), 100);
+            // More frequent scroll during streaming for better UX
+            if (chunkCount % 2 === 0) {
+              // Scroll every 2nd chunk instead of 3rd
+              setTimeout(() => scrollToBottom(), 50); // Reduced delay
             }
           } catch (parseError) {
             console.warn(
@@ -817,13 +816,13 @@ const Chat = () => {
     const handleViewportChange = () => {
       setTimeout(() => {
         scrollToBottom(true); // Force scroll on viewport change
-      }, 300);
+      }, 200); // Reduced delay for more responsive behavior
     };
 
     const handleFocus = () => {
       setTimeout(() => {
         scrollToBottom(true); // Force scroll on focus
-      }, 100);
+      }, 50); // Reduced delay for immediate response
     };
 
     window.addEventListener("resize", handleViewportChange);
@@ -909,7 +908,7 @@ const Chat = () => {
               overscrollBehavior: "contain",
             }}
           >
-            <div className="mx-auto max-w-4xl">
+            <div className="mx-auto max-w-3xl">
               <AnimatePresence mode="wait">
                 {isEmptyState ? (
                   <motion.div
@@ -935,20 +934,24 @@ const Chat = () => {
                           delay: Math.min(index * 0.05, 0.3),
                           ease: "easeOut",
                         }}
-                        className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
+                        className={`flex ${message.role === "user" ? "justify-end" : "justify-start"} w-full`}
                       >
                         <div
-                          className={`group relative ${message.role === "assistant" ? "max-w-full md:max-w-[85%] ml-4 md:ml-0" : "max-w-[85%]"}`}
+                          className={`group relative ${
+                            message.role === "assistant" 
+                              ? "w-full" 
+                              : "w-full max-w-[75%]"
+                          }`}
                         >
                           <div
-                            className={`flex items-start gap-4 ${message.role === "user" ? "flex-row-reverse" : "flex-row"}`}
+                            className={`flex items-start gap-4 ${message.role === "user" ? "flex-row-reverse justify-start" : "flex-row"}`}
                           >
                             <div
-                              className={`relative ${message.role === "user" ? "ml-8" : "mr-8"}`}
+                              className={`relative w-full ${message.role === "user" ? "" : ""}`}
                             >
                               {message.role === "user" ? (
-                                <div className="bg-primary/10 text-primary-foreground border-primary/20 rounded-3xl rounded-br-lg px-5 py-4 shadow-lg border backdrop-blur-sm">
-                                  <div className="prose prose-sm max-w-none text-foreground">
+                                <div className="bg-primary/10 text-primary-foreground border-primary/20 rounded-2xl rounded-br-md px-4 py-3 shadow-md border backdrop-blur-sm w-full">
+                                  <div className="prose prose-base max-w-none text-foreground">
                                     <ChatMessageContent
                                       message={message}
                                       isLast={index === messages.length - 1}
@@ -961,8 +964,8 @@ const Chat = () => {
                                   </div>
                                 </div>
                               ) : (
-                                <div className="text-foreground max-w-3xl">
-                                  <div className="prose prose-xs max-w-none">
+                                <div className="text-foreground w-full">
+                                  <div className="prose prose-sm max-w-none">
                                     <ChatMessageContent
                                       message={message}
                                       isLast={index === messages.length - 1}
@@ -993,7 +996,7 @@ const Chat = () => {
                             </div>
                           </div>
 
-                          <div className="absolute top-0 -right-8 flex flex-col gap-1 opacity-0 transition-all duration-300 group-hover:opacity-100">
+                          <div className={`absolute top-0 ${message.role === "user" ? "-left-8" : "-right-8"} flex flex-col gap-1 opacity-0 transition-all duration-300 group-hover:opacity-100`}>
                             <button
                               onClick={() => copyToClipboard(message.content)}
                               className="text-muted-foreground hover:text-foreground hover:bg-accent/20 rounded-xl p-1.5 transition-all duration-200 hover:scale-110 active:scale-95"
@@ -1057,7 +1060,7 @@ const Chat = () => {
         </div>
 
         <div className="absolute bottom-0 left-0 right-0 z-[100] bg-background/80 border-t border-border/30 min-h-[120px] md:min-h-[100px] flex-shrink-0 shadow-2xl backdrop-blur-md py-3 sm:px-4 md:px-6 lg:px-8">
-          <div className="mx-auto max-w-3xl lg:max-w-2xl">
+          <div className="mx-auto max-w-3xl">
             <form onSubmit={onSubmit} className="relative">
               <div
                 className="flex items-end rounded-full border-2  
@@ -1067,6 +1070,10 @@ const Chat = () => {
                   ref={setTextareaRef}
                   value={input}
                   onChange={handleInputChange}
+                  onFocus={() => {
+                    // Scroll to bottom when user focuses on input
+                    setTimeout(() => scrollToBottom(true), 100);
+                  }}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && !e.shiftKey) {
                       e.preventDefault();
@@ -1080,7 +1087,7 @@ const Chat = () => {
                   style={{
                     height: "auto",
                     minHeight: "48px",
-                    maxHeight: "140px",
+                    maxHeight: "200px",
                   }}
                   rows={1}
                   disabled={isToolInProgress || loadingSubmit}

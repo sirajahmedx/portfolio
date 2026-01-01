@@ -175,25 +175,25 @@ export default function ChatMessageContent({
                         <p
                           className={`break-words whitespace-pre-wrap leading-relaxed ${
                             isGreetingResponse
-                              ? "text-sm md:text-base"
-                              : "text-xs md:text-sm"
+                              ? "text-base md:text-lg"
+                              : "text-sm md:text-base"
                           }`}
                         >
                           {children}
                         </p>
                       ),
                       ul: ({ children }) => (
-                        <ul className="my-3 md:my-4 list-disc pl-4 md:pl-6 text-xs md:text-sm leading-relaxed">
+                        <ul className="my-3 md:my-4 list-disc pl-4 md:pl-6 text-sm md:text-base leading-relaxed">
                           {children}
                         </ul>
                       ),
                       ol: ({ children }) => (
-                        <ol className="my-3 md:my-4 list-decimal pl-4 md:pl-6 text-xs md:text-sm leading-relaxed">
+                        <ol className="my-3 md:my-4 list-decimal pl-4 md:pl-6 text-sm md:text-base leading-relaxed">
                           {children}
                         </ol>
                       ),
                       li: ({ children }) => (
-                        <li className="my-2 text-xs md:text-sm leading-relaxed">
+                        <li className="my-2 text-sm md:text-base leading-relaxed">
                           {children}
                         </li>
                       ),
@@ -254,8 +254,8 @@ export default function ChatMessageContent({
                       mobileMaxLines={10}
                       className={`break-words whitespace-pre-wrap leading-relaxed ${
                         isGreetingResponse
-                          ? "text-sm md:text-base"
-                          : "text-xs md:text-sm"
+                          ? "text-base md:text-lg"
+                          : "text-sm md:text-base"
                       }`}
                     />
                   </div>
@@ -267,25 +267,25 @@ export default function ChatMessageContent({
                         <p
                           className={`break-words whitespace-pre-wrap leading-relaxed ${
                             isGreetingResponse
-                              ? "text-sm md:text-base"
-                              : "text-xs md:text-sm"
+                              ? "text-base md:text-lg"
+                              : "text-sm md:text-base"
                           }`}
                         >
                           {children}
                         </p>
                       ),
                       ul: ({ children }) => (
-                        <ul className="my-3 md:my-4 list-disc pl-4 md:pl-6 text-xs md:text-sm leading-relaxed">
+                        <ul className="my-3 md:my-4 list-disc pl-4 md:pl-6 text-sm md:text-base leading-relaxed">
                           {children}
                         </ul>
                       ),
                       ol: ({ children }) => (
-                        <ol className="my-3 md:my-4 list-decimal pl-4 md:pl-6 text-xs md:text-sm leading-relaxed">
+                        <ol className="my-3 md:my-4 list-decimal pl-4 md:pl-6 text-sm md:text-base leading-relaxed">
                           {children}
                         </ol>
                       ),
                       li: ({ children }) => (
-                        <li className="my-2 text-xs md:text-sm leading-relaxed">
+                        <li className="my-2 text-sm md:text-base leading-relaxed">
                           {children}
                         </li>
                       ),

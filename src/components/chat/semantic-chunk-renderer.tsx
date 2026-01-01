@@ -16,7 +16,7 @@ export function SemanticChunkRenderer({
   chunks,
   className,
   animateIn = true,
-  baseSize = 13.5,
+  baseSize = 14.5,
 }: SemanticChunkRendererProps) {
   if (!chunks || chunks.length === 0) {
     return null;
@@ -213,7 +213,7 @@ function getTypeSpecificClasses(type: ChunkType): string {
 export function FallbackRenderer({
   content,
   className,
-  baseSize = 13.5,
+  baseSize = 14.5,
 }: {
   content: string;
   className?: string;

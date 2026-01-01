@@ -247,6 +247,10 @@ export default function Home() {
                   ref={inputRef}
                   value={input}
                   onChange={handleInputChange}
+                  onFocus={() => {
+                    // Navigate to chat when user focuses on input to ensure proper scroll behavior
+                    router.push("/chat");
+                  }}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && !e.shiftKey) {
                       e.preventDefault();
