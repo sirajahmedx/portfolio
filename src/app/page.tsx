@@ -43,7 +43,7 @@ export default function Home() {
 
   const goToChat = (query: string) =>
     router.push(
-      `/chat?query=${encodeURIComponent(query)}&style=${selectedStyle}`
+      `/chat?query=${encodeURIComponent(query)}&style=${selectedStyle}`,
     );
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -58,7 +58,7 @@ export default function Home() {
   };
 
   const handleStyleChange = (
-    style: "polite" | "concise" | "versatile" | "creative"
+    style: "polite" | "concise" | "versatile" | "creative",
   ) => {
     setSelectedStyle(style);
   };
@@ -182,23 +182,45 @@ export default function Home() {
               </motion.div>
             </div>
 
-            {/* <motion.div
+            <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.6 }}
               className="relative mt-4 sm:mt-6 lg:mt-0 flex-shrink-0 hidden lg:block xl:block"
             >
-              <div className="relative h-48 w-48 xl:h-56 xl:w-56 2xl:h-60 2xl:w-60 overflow-hidden rounded-full bg-gradient-to-br from-primary/20 to-accent/20 p-1 shadow-xl">
-                <Image
-                  src="/avatar-landing.png"
-                  alt="Siraj Ahmed - Full Stack Developer"
-                  width={256}
-                  height={256}
-                  priority
-                  className="h-full w-full rounded-full object-cover"
-                />
+              <div className="relative h-48 w-48 xl:h-56 xl:w-56 2xl:h-60 2xl:w-60 overflow-hidden rounded-full bg-gradient-to-br from-primary/20 to-accent/20 p-1 shadow-xl group cursor-pointer">
+                {/* Container for flip effect */}
+                <div className="relative h-full w-full rounded-full [perspective:1000px]">
+                  <div className="relative h-full w-full rounded-full transition-transform duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
+                    {/* Front face - Default image */}
+                    <div className="absolute inset-0 h-full w-full rounded-full [backface-visibility:hidden]">
+                      <Image
+                        src="/avatar-landing.png"
+                        alt="Siraj Ahmed - Full Stack Developer"
+                        width={256}
+                        height={256}
+                        priority
+                        className="h-full w-full rounded-full object-cover"
+                      />
+                    </div>
+                    {/* Back face - Hover image */}
+                    <div className="absolute inset-0 h-full w-full rounded-full [backface-visibility:hidden] [transform:rotateY(180deg)]">
+                      <Image
+                        src="/avatar-2.jpeg"
+                        alt="Siraj Ahmed - Full Stack Developer (Hover)"
+                        width={256}
+                        height={256}
+                        className="h-full w-full rounded-full object-cover brightness-110 contrast-110 hue-rotate-15"
+                        style={{
+                          filter:
+                            "brightness(1.1) contrast(1.1) hue-rotate(15deg) saturate(1.2)",
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
-            </motion.div> */}
+            </motion.div>
           </motion.div>
         </section>
 
