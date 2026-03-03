@@ -3,8 +3,7 @@ import {
   createStreamingChunk,
   createStreamingError,
   ERROR_TYPES,
-  formatErrorMessage,
-  formatTimestamp,
+  formatErrorMessage
 } from "@/lib/api-response-utils";
 import Groq from "groq-sdk";
 import { SYSTEM_PROMPT } from "./prompt";
@@ -490,6 +489,14 @@ function validateMessages(messages: any[]): Message[] {
   });
 }
 
+// Post-process AI responses to strip all types of dashes/hyphens
+function sanitizeResponse(text: string): string {
+  // Replace all types of dashes and hyphens with a space
+  // Regular hyphen (-), en-dash (–), em-dash (—), non-breaking hyphen (‑), figure dash (‒), horizontal bar (―)
+  return text.replace(/[\u002D\u2013\u2014\u2011\u2012\u2015]/g, ' ')
+    .replace(/  +/g, ' '); // Clean up any double spaces created
+}
+
 async function createStreamingResponse(
   result: any,
   userQuery: string,
@@ -541,7 +548,7 @@ async function createStreamingResponse(
 
               if (sentence.trim()) {
                 chunkIndex++;
-                const fullSentence = sentence + punctuation;
+                const fullSentence = sanitizeResponse(sentence + punctuation);
 
                 const chunkData = createStreamingChunk(
                   fullSentence,
@@ -566,7 +573,7 @@ async function createStreamingResponse(
         if (currentSentence.trim()) {
           chunkIndex++;
           const chunkData = createStreamingChunk(
-            currentSentence.trim(),
+            sanitizeResponse(currentSentence.trim()),
             chunkIndex,
             true,
             totalText // Pass full text for semantic analysis
